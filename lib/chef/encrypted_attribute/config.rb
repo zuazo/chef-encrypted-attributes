@@ -69,21 +69,20 @@ class Chef
         )
       end
 
-      # TODO change this to array of keys?
       def keys(arg=nil)
         set_or_return(
           :keys,
           arg,
-          :kind_of => Hash,
+          :kind_of => Array,
           :default => {},
           # TODO check if this is supported in old Chef versions
-          :callbacks => config_valid_keys_hash_callbacks
+          :callbacks => config_valid_keys_array_callbacks
         )
       end
 
-      def key_add(name, key)
-        if name.kind_of?(String) and key.kind_of?(String)
-          @keys[name] = key
+      def key_add(key)
+        if key.kind_of?(String) and not @keys.include?(key)
+          @keys.push(key)
         end
       end
 
@@ -105,19 +104,19 @@ class Chef
         }
       end
 
-      def config_valid_keys_hash?(k_hs)
-        k_hs.each do |k, v|
-          unless k.kind_of?(String) and v.kind_of?(String)
+      def config_valid_keys_array?(k_ary)
+        k_ary.each do |k|
+          unless k.kind_of?(String)
             return false
           end
         end
         true
       end
 
-      def config_valid_keys_hash_callbacks
+      def config_valid_keys_array_callbacks
         {
           'should be a valid hash of keys' => lambda do |keys|
-            config_valid_keys_hash?(keys)
+            config_valid_keys_array?(keys)
           end
         }
       end
