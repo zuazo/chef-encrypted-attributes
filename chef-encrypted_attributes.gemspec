@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rake", "~> 10.1.0")
 
   s.add_development_dependency 'chef', chef_version
+  s.add_development_dependency 'chef-zero'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec-core'
   s.add_development_dependency 'rspec-expectations'
