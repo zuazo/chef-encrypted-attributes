@@ -40,12 +40,11 @@ class Chef
         # TODO HMAC_ALGORITHM = 'sha256'
 
         def encrypt(value, public_keys)
-          value = value.to_json
           @enc_attr['_encrypted_rsa_data'] = Mash.new(Hash[
             public_keys.map do |public_key|
               [
                 node_key(public_key),
-                encrypt_value(public_key, value),
+                encrypt_value(public_key, json_encode(value)),
               ]
             end
           ])
@@ -55,10 +54,20 @@ class Chef
         def decrypt(key)
           # TODO check input and enc_attr
           enc_value = @enc_attr['_encrypted_rsa_data'][node_key(key.public_key)]
-          decrypt_value(key, enc_value)
+          json_decode(decrypt_value(key, enc_value))
         end
 
         protected
+
+        def json_encode(o)
+          # Array to avoid using quirks mode, create standard JSON
+          [ o ].to_json
+        end
+
+        def json_decode(o)
+          # TODO invalid JSON exception
+          JSON.parse(o)[0]
+        end
 
         def node_key(public_key)
           if public_key.kind_of?(String)
