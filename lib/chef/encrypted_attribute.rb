@@ -1,4 +1,3 @@
-# require 'chef'
 require 'chef/encrypted_attribute/config'
 require 'chef/encrypted_attribute/local_node'
 require 'chef/encrypted_attribute/remote_node'
@@ -33,7 +32,25 @@ class Chef
       keys = remote_clients + config.keys.values
       local_node = LocalNode.new
       keys.push(local_node.public_key)
+
       body.encrypt(o, keys)
+    end
+
+    def self.update(o)
+      old_body = AttributeBody.load(o)
+      new_body = AttributeBody.create(config.version)
+      remote_clients = RemoteClients.load(config.client_search)
+      keys = remote_clients + config.keys.values
+      local_node = LocalNode.new
+      keys.push(local_node.public_key)
+
+      if old_body.needs_update?(keys)
+        o_clear = old_body.decrypt(local_node.key)
+        o.replace(new_body.encrypt(o_clear, keys))
+        true
+      else
+        false
+      end
     end
 
   end

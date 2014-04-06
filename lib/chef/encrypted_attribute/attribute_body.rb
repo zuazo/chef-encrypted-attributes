@@ -26,6 +26,14 @@ class Chef
           raise "#{self.class.to_s}##{__method__} method not implemented."
         end
 
+        def can_be_decrypted_by?
+          raise "#{self.class.to_s}##{__method__} method not implemented."
+        end
+
+        def needs_update?(keys)
+          raise "#{self.class.to_s}##{__method__} method not implemented."
+        end
+
         def enc_attr
           @enc_attr
         end
@@ -40,6 +48,7 @@ class Chef
         # TODO HMAC_ALGORITHM = 'sha256'
 
         def encrypt(value, public_keys)
+          public_keys = remove_dup_keys(public_keys)
           @enc_attr['_encrypted_rsa_data'] = Mash.new(Hash[
             public_keys.map do |public_key|
               [
@@ -57,7 +66,26 @@ class Chef
           json_decode(decrypt_value(key, enc_value))
         end
 
+        def can_be_decrypted_by?(keys)
+          remove_dup_keys(keys).reduce(true) do |r, k|
+            r and @enc_attr['_encrypted_rsa_data'].kind_of?(Hash) and
+              @enc_attr['_encrypted_rsa_data'].has_key?(node_key(k))
+          end
+        end
+
+        def needs_update?(keys)
+          keys = remove_dup_keys(keys)
+          not can_be_decrypted_by?(keys) && @enc_attr['_encrypted_rsa_data'].keys.count == keys.count
+        end
+
         protected
+
+        def remove_dup_keys(keys)
+          keys = [ keys ].flatten
+          keys.map do |k|
+            k.kind_of?(String) ? k = OpenSSL::PKey::RSA.new(k) : k
+          end.uniq { |k| k.public_key.to_s.chomp }
+        end
 
         def json_encode(o)
           # Array to avoid using quirks mode, create standard JSON

@@ -1,4 +1,5 @@
 require 'integration_helper'
+require 'chef/api_client'
 
 describe Chef::EncryptedAttribute do
   extend ChefZero::RSpec
@@ -46,10 +47,13 @@ describe Chef::EncryptedAttribute do
 
       context 'using #load_from_node' do
         before do
-          node = Chef::Node.new
-          node.name(Chef::Config[:node_name])
-          node.set['encrypted']['attribute'] = @enc_attr
-          node.save
+          @node = Chef::Node.new
+          @node.name(Chef::Config[:node_name])
+          @node.set['encrypted']['attribute'] = @enc_attr
+          @node.save
+        end
+        after do
+          @node.destroy
         end
 
         it 'should be able to decrypt the attribute' do
@@ -93,10 +97,71 @@ describe Chef::EncryptedAttribute do
           node.set['enc_o'] = enc_o
           node.save
           Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'enc_o' ] ).should eql(o)
+          node.destroy
         end
 
       end # objects_to_test.each
     end # context #create & #load testing some basic types
 
-  end
+    context '#update' do
+      before do
+        @client1 = Chef::ApiClient.new
+        @client1.name('client1')
+        @client1.admin(true)
+        @client1.save
+
+        @enc_attr = Chef::EncryptedAttribute.create('Testing updates')
+      end
+      after do
+        @client1.destroy
+      end
+
+      it 'should not update an already updated attribute' do
+        enc_orig = @enc_attr.clone
+        Chef::EncryptedAttribute.update(@enc_attr).should eql(false)
+        @enc_attr.should eql(enc_orig)
+      end
+
+      it 'should update when there are new clients' do
+        # creating a new admin client will require a update
+        client2 = Chef::ApiClient.new
+        client2.name('client2')
+        client2.admin(true)
+        client2.save
+
+        enc_orig = @enc_attr.clone
+        Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
+        @enc_attr.should_not eql(enc_orig)
+
+        client2.destroy
+      end
+
+      it 'should update when some clients are removed' do
+        @client1.destroy
+
+        enc_orig = @enc_attr.clone
+        Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
+        @enc_attr.should_not eql(enc_orig)
+
+        @client1.save # avoid error 404 on after { client1.destroy }
+      end
+
+      it 'should update when some clients are added and others removed' do
+        @client1.destroy
+        client2 = Chef::ApiClient.new
+        client2.name('client2')
+        client2.admin(true)
+        client2.save
+
+        enc_orig = @enc_attr.clone
+        Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
+        @enc_attr.should_not eql(enc_orig)
+
+        client2.destroy
+        @client1.save # avoid error 404 on after { client1.destroy }
+      end
+
+    end # context #update
+
+  end # when_the_chef_server is ready to rock!
 end
