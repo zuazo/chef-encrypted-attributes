@@ -18,20 +18,10 @@ class Chef
             end
         end
 
-        def encrypt
-          raise "#{self.class.to_s}##{__method__} method not implemented."
-        end
-
-        def decrypt
-          raise "#{self.class.to_s}##{__method__} method not implemented."
-        end
-
-        def can_be_decrypted_by?
-          raise "#{self.class.to_s}##{__method__} method not implemented."
-        end
-
-        def needs_update?(keys)
-          raise "#{self.class.to_s}##{__method__} method not implemented."
+        %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
+          define_method(meth) do
+            raise "#{self.class.to_s}##{__method__} method not implemented."
+          end
         end
 
         def enc_attr
