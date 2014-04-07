@@ -30,7 +30,7 @@ class Chef
     def self.create(o)
       body = AttributeBody.create(config.version)
       remote_clients = RemoteClients.load(config.client_search)
-      keys = remote_clients + config.keys.values
+      keys = remote_clients + config.keys
       local_node = LocalNode.new
       keys.push(local_node.public_key)
 
@@ -41,7 +41,7 @@ class Chef
       old_body = AttributeBody.load(o)
       new_body = AttributeBody.create(config.version)
       remote_clients = RemoteClients.load(config.client_search)
-      keys = remote_clients + config.keys.values
+      keys = remote_clients + config.keys
       local_node = LocalNode.new
       keys.push(local_node.public_key)
 
