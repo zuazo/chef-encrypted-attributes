@@ -163,5 +163,49 @@ describe Chef::EncryptedAttribute do
 
     end # context #update
 
+    context '#exists?' do
+
+      clear_attributes = [
+        nil,
+        2,
+        'Spoon-bender',
+        Hash.new,
+        Mash.new,
+        Mash.new({
+          'version' => '1',
+        }),
+        begin
+          node = Chef::Node.new
+          node.name(Chef::Config[:node_name])
+          node.set['clear']['attribute'] = 'clear_node_attribute'
+          node['clear']['attribute']
+        end,
+      ]
+
+      clear_attributes.each do |a|
+
+        it "should return false for #{a.inspect}" do
+          Chef::EncryptedAttribute.exists?(a).should eql(false)
+        end
+
+      end
+
+      it 'should return true for an encrypted attribute' do
+        enc_attr = Chef::EncryptedAttribute.create(0)
+
+        Chef::EncryptedAttribute.exists?(enc_attr).should eql(true)
+      end
+
+      it 'should return true for a node encrypted attribute' do
+        enc_attr = Chef::EncryptedAttribute.create(0)
+        node = Chef::Node.new
+        node.name(Chef::Config[:node_name])
+        node.set['encrypted']['attribute'] = enc_attr
+
+        Chef::EncryptedAttribute.exists?(node['encrypted']['attribute']).should eql(true)
+      end
+
+    end # context #exists?
+
   end # when_the_chef_server is ready to rock!
 end

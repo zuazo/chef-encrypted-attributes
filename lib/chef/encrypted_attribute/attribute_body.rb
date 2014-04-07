@@ -32,6 +32,12 @@ class Chef
           self.class.to_s.sub(/^#{Regexp.escape(self.class.superclass.name)}/, '')
         end
 
+        def self.exists?(enc_attr)
+          enc_attr.kind_of?(Hash) and
+          enc_attr.has_key?('_version') and enc_attr['_version'].kind_of?(String) and
+          enc_attr.has_key?('_encryted_attribute') and enc_attr['_encryted_attribute'] == true
+        end
+
       end # Version
 
       class Version0 < Version
@@ -112,9 +118,16 @@ class Chef
       end
 
       def self.load(enc_attr)
-        # TODO check input
+        unless self.exists?(enc_attr)
+          # TODO exception class
+          raise 'Invalid attribute to decrypt. Perhaps is not encrypted?'
+        end
         version = enc_attr['_version']
         create_class(version, enc_attr)
+      end
+
+      def self.exists?(enc_attr)
+        Chef::EncryptedAttribute::AttributeBody::Version.exists?(enc_attr)
       end
 
       protected

@@ -8,6 +8,7 @@ class Chef
   class EncryptedAttribute
 
     def self.config(arg=nil)
+      # TODO allow config object instance
       if arg
         @@config = Config.new(arg)
       else
@@ -51,6 +52,10 @@ class Chef
       else
         false
       end
+    end
+
+    def self.exists?(hs)
+      AttributeBody.exists?(hs)
     end
 
   end
