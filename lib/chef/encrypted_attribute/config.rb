@@ -74,14 +74,14 @@ class Chef
           :keys,
           arg,
           :kind_of => Array,
-          :default => {},
+          :default => [],
           # TODO check if this is supported in old Chef versions
           :callbacks => config_valid_keys_array_callbacks
         )
       end
 
       def key_add(key)
-        if key.kind_of?(String) and not @keys.include?(key)
+        if key.kind_of?(String) and not keys.include?(key)
           @keys.push(key)
         end
       end
