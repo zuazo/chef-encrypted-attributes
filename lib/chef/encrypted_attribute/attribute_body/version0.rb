@@ -4,25 +4,31 @@ class Chef
   class EncryptedAttribute
     class AttributeBody
       class Version0 < Chef::EncryptedAttribute::AttributeBody::Version
-        # TODO HMAC_ALGORITHM = 'sha256'
+        HASH_ALGORITHM = 'sha256'
 
         def encrypt(value, public_keys)
+          value_json = json_encode(value)
           public_keys = remove_dup_keys(public_keys)
           self['_encrypted_rsa_data'] = Mash.new(Hash[
             public_keys.map do |public_key|
               [
                 node_key(public_key),
-                encrypt_value(public_key, json_encode(value)),
+                encrypt_value(public_key, value_json),
               ]
             end
           ])
+          self["_digest_#{HASH_ALGORITHM}"] = digest(value_json)
           self
         end
 
         def decrypt(key)
           # TODO check input and enc_attr
           enc_value = self['_encrypted_rsa_data'][node_key(key.public_key)]
-          json_decode(decrypt_value(key, enc_value))
+          value_json = decrypt_value(key, enc_value)
+          if digest(value_json) != self["_digest_#{HASH_ALGORITHM}"]
+            raise 'Error decrypting attribute value: invalid digest. Most likely the encrypted attribute is corrupted.'
+          end
+          json_decode(value_json)
           # we avoid saving the decrypted value, only return it
         end
 
@@ -73,6 +79,11 @@ class Chef
 
         def decrypt_value(key, value)
           key.private_decrypt(Base64.decode64(value))
+        end
+
+        def digest(value)
+          digest = OpenSSL::Digest::Digest.new(HASH_ALGORITHM).digest(value)
+          Base64.encode64(digest)
         end
 
       end
