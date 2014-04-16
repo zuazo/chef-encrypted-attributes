@@ -23,7 +23,8 @@ class Chef
     class Config
       include ::Chef::Mixin::ParamsValidate
 
-      def initialize(config={})
+      def initialize(config=nil)
+        # TODO allow config object instance as arg
         config.each do |key, value|
           if Chef::EncryptedAttribute::Config.method_defined?(key) and
              not /^config_/ =~ key.to_s
@@ -31,7 +32,7 @@ class Chef
           else
             Chef::Log.warn("#{self.class.to_s}: configuration method not found: #{key}.")
           end
-        end
+        end if config.kind_of?(Hash)
       end
 
       def version(arg=nil)

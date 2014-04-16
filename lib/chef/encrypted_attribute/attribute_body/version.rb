@@ -10,12 +10,12 @@ class Chef
         CHEF_TYPE =       'x_chef_type'.freeze # TODO "x_" not needed here?
         CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
 
-        def initialize(enc_attr=nil)
+        def initialize(enc_hs=nil)
           super
           self[JSON_CLASS] = self.class.name
           self[CHEF_TYPE] = CHEF_TYPE_VALUE
           # TODO better to use is_a? ?
-          update_from!(enc_attr) if enc_attr.kind_of?(Hash)
+          update_from!(enc_hs) if enc_hs.kind_of?(Hash)
         end
 
         %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
@@ -24,16 +24,16 @@ class Chef
           end
         end
 
-        def self.exists?(enc_attr)
-          enc_attr.kind_of?(Hash) and
-          enc_attr.has_key?(JSON_CLASS) and
-          enc_attr[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ and
-          enc_attr.has_key?(CHEF_TYPE) and enc_attr[CHEF_TYPE] == CHEF_TYPE_VALUE
+        def self.exists?(enc_hs)
+          enc_hs.kind_of?(Hash) and
+          enc_hs.has_key?(JSON_CLASS) and
+          enc_hs[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ and
+          enc_hs.has_key?(CHEF_TYPE) and enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
         end
 
-        def self.create(version, o=nil)
+        def self.create(version)
           klass = version_klass(version)
-          klass.send(:new, o)
+          klass.send(:new)
         end
 
         # Serialize this object as a hash
@@ -48,23 +48,23 @@ class Chef
         end
 
         # Update the AttributeBody from Hash
-        def update_from!(o)
-          unless self.class.exists?(o)
+        def update_from!(enc_hs)
+          unless self.class.exists?(enc_hs)
             raise 'Trying to construct invalid encrypted attribute. Perhaps is not encrypted?'
           end
-          o = o.dup
-          o.delete(JSON_CLASS)
-          o.delete(CHEF_TYPE)
-          update(o)
+          enc_hs = enc_hs.dup
+          enc_hs.delete(JSON_CLASS)
+          enc_hs.delete(CHEF_TYPE)
+          update(enc_hs)
         end
 
         # Create a AttributeBody::Version from JSON
-        def self.json_create(o)
-          klass = string_to_klass(o[JSON_CLASS])
+        def self.json_create(enc_hs)
+          klass = string_to_klass(enc_hs[JSON_CLASS])
           if klass.nil?
             raise "Unknown chef-encrypted-attribute class '#{o[JSON_CLASS]}'"
           end
-          klass.send(:new, o)
+          klass.send(:new, enc_hs)
         end
 
         protected
