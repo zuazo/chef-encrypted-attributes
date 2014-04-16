@@ -28,12 +28,11 @@ describe Chef::EncryptedAttribute::Config do
     lambda { @Config.new }.should_not raise_error
   end
 
-  it 'should create read the configuration from the constructor' do
+  it 'should update the configuration from the constructor' do
     Chef::Log.should_not_receive(:warn)
-    config = @Config.new({
-      :partial_search => true
-    })
-    config.partial_search.should equal(true)
+    config_hs = { :partial_search => true }
+    @Config.any_instance.should_receive(:update!).with(config_hs).once
+    config = @Config.new(config_hs)
   end
 
   it 'should warn about unknown configuration values' do
@@ -128,6 +127,126 @@ describe Chef::EncryptedAttribute::Config do
       end
 
     end # describe #key_add
+
+    describe '#update!' do
+      before do
+        @config.version(2)
+        @config.partial_search(true)
+        @config.client_search([ 'admin:true' ])
+        @config.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
+      end
+
+      it 'should update version value from a @Config class' do
+        config2 = @Config.new
+        config2.version(5)
+        @config.update!(config2)
+        @config.version.should eql(config2.version)
+      end
+
+      it 'should update partial_search values from a @Config class' do
+        config2 = @Config.new
+        config2.partial_search(false)
+        @config.update!(config2)
+        @config.partial_search.should eql(config2.partial_search)
+      end
+
+      it 'should update client_search values from a @Config class' do
+        config2 = @Config.new
+        config2.client_search([ '*:*' ])
+        @config.update!(config2)
+        @config.client_search.should eql(config2.client_search)
+      end
+
+      it 'should update keys values from a @Config class' do
+        config2 = @Config.new
+        config2.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
+        @config.update!(config2)
+        @config.keys.should eql(config2.keys)
+      end
+
+      it 'should update version value from a Hash with symbol keys' do
+        config2 = { :version => 5 }
+        @config.update!(config2)
+        @config.version.should eql(config2[:version])
+      end
+
+      it 'should update partial_search value from a Hash with symbol keys' do
+        config2 = { :partial_search => false }
+        @config.update!(config2)
+        @config.partial_search.should eql(config2[:partial_search])
+      end
+
+      it 'should update client_search value from a Hash with symbol keys' do
+        config2 = { :client_search => [ '*:*' ] }
+        @config.update!(config2)
+        @config.client_search.should eql(config2[:client_search])
+      end
+
+      it 'should update keys value from a Hash with symbol keys' do
+        config2 = { :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ] }
+        @config.update!(config2)
+        @config.keys.should eql(config2[:keys])
+      end
+
+      it 'should update multiple values from a Hash with different kind of keys' do
+        config2 = {
+          'partial_search' => false,
+          :client_search => [],
+          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
+        }
+        @config.update!(config2)
+
+        @config.partial_search.should eql(config2['partial_search'])
+        @config.client_search.should eql(config2[:client_search])
+        @config.keys.should eql(config2[:keys])
+      end
+
+    end # describe #update!
+
+    describe '#merge' do
+      before do
+        @config_prev_hs = {
+          :version => 3,
+          :partial_search => false,
+          :client_search => [ 'admin:*' ],
+          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
+        }
+        @config_prev = @Config.new(@config_prev_hs)
+      end
+
+      it 'should preserve previous values for default configurations' do
+        config2 = @config_prev.merge(@Config.new)
+        config2.version.should eql(@config_prev_hs[:version])
+        config2.partial_search.should eql(@config_prev_hs[:partial_search])
+        config2.client_search.should eql(@config_prev_hs[:client_search])
+        config2.keys.should eql(@config_prev_hs[:keys])
+      end
+
+      it 'should merge version values' do
+        config_new = @Config.new({ :version => 4 })
+        config_res = @config_prev.merge(config_new)
+        config_res.version.should eql(config_new.version)
+      end
+
+      it 'should merge partial_search values' do
+        config_new = @Config.new({ :partial_search => true })
+        config_res = @config_prev.merge(config_new)
+        config_res.partial_search.should eql(config_new.partial_search)
+      end
+
+      it 'should merge client_search values' do
+        config_new = @Config.new({ :client_search => [ 'admin:true' ] })
+        config_res = @config_prev.merge(config_new)
+        config_res.client_search.should eql(config_new.client_search)
+      end
+
+      it 'should merge keys values' do
+        config_new = @Config.new({ :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ] })
+        config_res = @config_prev.merge(config_new)
+        config_res.keys.should eql(config_new.keys)
+      end
+
+    end # describe #merge
 
   end # describe Chef::EncryptedAttribute::Config instance
 

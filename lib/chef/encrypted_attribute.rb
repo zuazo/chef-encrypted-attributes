@@ -23,30 +23,28 @@ class Chef
   class EncryptedAttribute
 
     def self.config(arg=nil)
-      unless arg.nil?
-        @@config = Config.new(arg)
-      else
-        @@config ||= Config.new
-      end
+      @@config ||= Config.new
+      @@config.update!(arg) unless arg.nil?
+      @@config
     end
 
-    def self.load(hs)
-      body = AttributeBody.new(config)
+    def self.load(hs, c={})
+      body = AttributeBody.new(config.merge(c))
       body.load(hs)
     end
 
-    def self.load_from_node(name, attr_ary)
-      body = AttributeBody.new(config)
+    def self.load_from_node(name, attr_ary, c={})
+      body = AttributeBody.new(config.merge(c))
       body.load_from_node(name, attr_ary)
     end
 
-    def self.create(hs)
-      body = AttributeBody.new(config)
+    def self.create(hs, c={})
+      body = AttributeBody.new(config.merge(c))
       body.create(hs)
     end
 
-    def self.update(hs)
-      body = AttributeBody.new(config)
+    def self.update(hs, c={})
+      body = AttributeBody.new(config.merge(c))
       body.update(hs)
     end
 

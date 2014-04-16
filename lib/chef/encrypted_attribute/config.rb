@@ -23,16 +23,15 @@ class Chef
     class Config
       include ::Chef::Mixin::ParamsValidate
 
+      OPTIONS = [
+        :version,
+        :partial_search,
+        :client_search,
+        :keys,
+      ].freeze
+
       def initialize(config=nil)
-        # TODO allow config object instance as arg
-        config.each do |key, value|
-          if Chef::EncryptedAttribute::Config.method_defined?(key) and
-             not /^config_/ =~ key.to_s
-            self.send(key, value)
-          else
-            Chef::Log.warn("#{self.class.to_s}: configuration method not found: #{key}.")
-          end
-        end if config.kind_of?(Hash)
+        update!(config) unless config.nil?
       end
 
       def version(arg=nil)
@@ -85,6 +84,35 @@ class Chef
         if key.kind_of?(String) and not keys.include?(key)
           @keys.push(key)
         end
+      end
+
+      def update!(config)
+        if config.kind_of?(self.class)
+          OPTIONS.each do |attr|
+            self.instance_variable_set("@#{attr.to_s}", config.send(attr))
+          end
+        elsif config.kind_of?(Hash)
+          config.each do |attr, value|
+            attr = attr.to_sym if attr.kind_of?(String)
+            if OPTIONS.include?(attr)
+              self.send(attr, value)
+            else
+              Chef::Log.warn("#{self.class.to_s}: configuration method not found: \"#{attr.to_s}\".")
+            end
+          end
+        end
+      end
+
+      def merge(config)
+        config = Config.new(config) if config.kind_of?(Hash)
+        result = Config.new(self)
+        if config.kind_of?(Config)
+          OPTIONS.each do |attr|
+            config_val = config.instance_variable_get("@#{attr.to_s}")
+            result.send(attr, config_val) unless config_val.nil?
+          end
+        end
+        result
       end
 
       protected
