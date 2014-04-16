@@ -82,8 +82,8 @@ class Chef
 
       def target_keys
         @target_keys ||= begin
-          remote_clients = RemoteClients.load(config.client_search)
-          keys = remote_clients + config.keys
+          remote_keys = RemoteClients.get_public_keys(config.client_search)
+          keys = remote_keys + config.keys
           keys.push(local_node.public_key)
           keys
         end # TODO improve this cache, can be problematic
