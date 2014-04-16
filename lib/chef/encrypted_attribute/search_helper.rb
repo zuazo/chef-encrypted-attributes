@@ -21,6 +21,7 @@ require 'chef/search/query'
 class Chef
   class EncryptedAttribute
     module SearchHelper
+      extend self
 
       def query
         Chef::Search::Query.new

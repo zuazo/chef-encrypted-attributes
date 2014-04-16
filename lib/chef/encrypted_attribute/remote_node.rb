@@ -21,7 +21,7 @@ require 'chef/encrypted_attribute/search_helper'
 class Chef
   class EncryptedAttribute
     class RemoteNode
-      extend ::Chef::EncryptedAttribute::SearchHelper
+      include ::Chef::EncryptedAttribute::SearchHelper
 
       def initialize(name)
         @name = name
@@ -33,7 +33,7 @@ class Chef
 
       def load_attribute(attr_ary)
         keys = { 'value' => attr_ary }
-        self.class.search(:node, "name:#{@name}", keys, 1)[0]['value']
+        search(:node, "name:#{@name}", keys, 1)[0]['value']
       end
 
     end
