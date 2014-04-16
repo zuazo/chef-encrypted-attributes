@@ -9,7 +9,7 @@ class Chef
         def encrypt(value, public_keys)
           value_json = json_encode(value)
           public_keys = remove_dup_keys(public_keys)
-          self['_encrypted_rsa_data'] = Mash.new(Hash[
+          self['encrypted_rsa_data'] = Mash.new(Hash[
             public_keys.map do |public_key|
               [
                 node_key(public_key),
@@ -17,15 +17,15 @@ class Chef
               ]
             end
           ])
-          self["_digest_#{HASH_ALGORITHM}"] = digest(value_json)
+          self["digest_#{HASH_ALGORITHM}"] = digest(value_json)
           self
         end
 
         def decrypt(key)
           # TODO check input and enc_attr
-          enc_value = self['_encrypted_rsa_data'][node_key(key.public_key)]
+          enc_value = self['encrypted_rsa_data'][node_key(key.public_key)]
           value_json = decrypt_value(key, enc_value)
-          if digest(value_json) != self["_digest_#{HASH_ALGORITHM}"]
+          if digest(value_json) != self["digest_#{HASH_ALGORITHM}"]
             raise 'Error decrypting attribute value: invalid digest. Most likely the encrypted attribute is corrupted.'
           end
           json_decode(value_json)
@@ -34,14 +34,14 @@ class Chef
 
         def can_be_decrypted_by?(keys)
           remove_dup_keys(keys).reduce(true) do |r, k|
-            r and self['_encrypted_rsa_data'].kind_of?(Hash) and
-              self['_encrypted_rsa_data'].has_key?(node_key(k))
+            r and self['encrypted_rsa_data'].kind_of?(Hash) and
+              self['encrypted_rsa_data'].has_key?(node_key(k))
           end
         end
 
         def needs_update?(keys)
           keys = remove_dup_keys(keys)
-          not can_be_decrypted_by?(keys) && self['_encrypted_rsa_data'].keys.count == keys.count
+          not can_be_decrypted_by?(keys) && self['encrypted_rsa_data'].keys.count == keys.count
         end
 
         protected
