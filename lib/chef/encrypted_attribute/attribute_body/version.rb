@@ -1,3 +1,5 @@
+require 'chef/encrypted_attribute/exceptions'
+
 class Chef
   class EncryptedAttribute
     class AttributeBody
@@ -20,7 +22,7 @@ class Chef
 
         %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
           define_method(meth) do
-            raise "#{self.class.to_s}##{__method__} method not implemented."
+            raise NotImplementedError, "#{self.class.to_s}##{__method__} method not implemented."
           end
         end
 
@@ -50,7 +52,7 @@ class Chef
         # Update the AttributeBody from Hash
         def update_from!(enc_hs)
           unless self.class.exists?(enc_hs)
-            raise 'Trying to construct invalid encrypted attribute. Perhaps is not encrypted?'
+            raise UnacceptableEncryptedAttributeFormat, 'Trying to construct invalid encrypted attribute. Maybe it is not encrypted?'
           end
           enc_hs = enc_hs.dup
           enc_hs.delete(JSON_CLASS)
@@ -62,7 +64,7 @@ class Chef
         def self.json_create(enc_hs)
           klass = string_to_klass(enc_hs[JSON_CLASS])
           if klass.nil?
-            raise "Unknown chef-encrypted-attribute class '#{o[JSON_CLASS]}'"
+            raise UnsupportedEncryptedAttributeFormat, "Unknown chef-encrypted-attribute class \"#{enc_hs[JSON_CLASS]}\""
           end
           klass.send(:new, enc_hs)
         end
@@ -85,13 +87,11 @@ class Chef
         def self.version_klass(version)
           version = version.to_s unless version.kind_of?(String)
           if version.empty?
-            # TODO create an exception class
-            raise "Bad chef-encrypted-attribute version '#{version.inspect}'"
+            raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute version \"#{version.inspect}\""
           end
           klass = string_to_klass("#{name.to_s}#{version}")
           if klass.nil?
-            # TODO create an exception class
-            raise "This version of chef-encrypted-attribute does not support encrypted attribute item format version '#{version}'"
+            raise UnsupportedEncryptedAttributeFormat, "This version of chef-encrypted-attribute does not support encrypted attribute item format version: \"#{version}\""
           end
           klass
         end

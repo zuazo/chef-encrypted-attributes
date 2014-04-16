@@ -1,4 +1,5 @@
 require 'chef/encrypted_attribute/attribute_body/version'
+require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
@@ -26,7 +27,7 @@ class Chef
           enc_value = self['encrypted_rsa_data'][node_key(key.public_key)]
           value_json = decrypt_value(key, enc_value)
           if digest(value_json) != self["digest_#{HASH_ALGORITHM}"]
-            raise 'Error decrypting attribute value: invalid digest. Most likely the encrypted attribute is corrupted.'
+            raise DecryptionFailure, 'Error decrypting attribute value: invalid digest. Most likely the encrypted attribute is corrupted.'
           end
           json_decode(value_json)
           # we avoid saving the decrypted value, only return it
