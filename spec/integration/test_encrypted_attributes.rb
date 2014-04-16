@@ -8,19 +8,26 @@ describe Chef::EncryptedAttribute do
 
     context '#create' do
       before do
+        @json_class = Chef::EncryptedAttribute::AttributeBody::Version::JSON_CLASS
+        @chef_type = Chef::EncryptedAttribute::AttributeBody::Version::CHEF_TYPE
+        @chef_type_value = Chef::EncryptedAttribute::AttributeBody::Version::CHEF_TYPE_VALUE
         @enc_attr = Chef::EncryptedAttribute.create('A coconut yogourts lover')
       end
 
       it 'should create and encrypted attribute' do
-        @enc_attr['_encryted_attribute'].should eql(true)
+        include Chef::EncryptedAttribute::AttributeBody::Version
+        @enc_attr[@chef_type].should eql(@chef_type_value)
       end
 
       it 'should set the encrypted attribute version' do
-        @enc_attr['_version'].should be_kind_of(String)
+        include Chef::EncryptedAttribute::AttributeBody::Version
+        @enc_attr[@json_class].should be_kind_of(String)
       end
 
       it 'should be a correct version' do
-        @enc_attr['_version'].should_not be_empty
+        include Chef::EncryptedAttribute::AttributeBody::Version
+        @enc_attr[@json_class].should be_kind_of(String)
+        @enc_attr[@json_class].should match(/^Chef::EncryptedAttribute::AttributeBody::Version/)
       end
 
     end # context #create
