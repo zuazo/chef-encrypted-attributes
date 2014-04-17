@@ -20,6 +20,7 @@ class Chef
   class EncryptedAttribute
     class LocalNode
 
+      # currently not used
       def name
         Chef::Config[:node_name]
       end

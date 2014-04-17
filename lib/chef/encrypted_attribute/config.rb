@@ -27,6 +27,7 @@ class Chef
         :version,
         :partial_search,
         :client_search,
+        :users,
         :keys,
       ].freeze
 
@@ -66,6 +67,17 @@ class Chef
           :default => [ 'admin:true' ],
           # TODO check if this is supported in old Chef versions
           :callbacks => config_search_array_callbacks
+        )
+      end
+
+      def users(arg=nil)
+        set_or_return(
+          :users,
+          arg,
+          :kind_of => [ String, Array ],
+          :default => [],
+          # TODO check if this is supported in old Chef versions
+          :callbacks => config_users_arg_callbacks
         )
       end
 
@@ -129,6 +141,23 @@ class Chef
         {
           'should be a valid array of search patterns' => lambda do |cs|
             config_valid_search_array?(cs)
+          end
+        }
+      end
+
+      def config_valid_user_arg?(users)
+        return users == '*' if users.kind_of?(String)
+        users.each do |u|
+          # TODO a less generic check?
+          return false unless u.kind_of?(String)
+        end
+        true
+      end
+
+      def config_users_arg_callbacks
+        {
+          'should be a valid array of search patterns' => lambda do |us|
+            config_valid_user_arg?(us)
           end
         }
       end

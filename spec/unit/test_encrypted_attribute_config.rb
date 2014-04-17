@@ -63,6 +63,11 @@ describe Chef::EncryptedAttribute::Config do
         :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ] ], # string case is treated below separately
         :error => [ 1, 0.2, Hash.new, Object.new ], # TODO empty array
       },
+      :users => {
+        :default => [],
+        :ok => [ '*', [], [ 'admin1' ], [ 'admin1', 'admin2' ] ],
+        :error => [ 1, 0.2, 'any-string', Hash.new, Object.new, [ 2 ], [ 'admin1', Hash.new ] ],
+      },
       :keys => {
         :default => [],
         :ok => [
@@ -133,6 +138,7 @@ describe Chef::EncryptedAttribute::Config do
         @config.version(2)
         @config.partial_search(true)
         @config.client_search([ 'admin:true' ])
+        @config.users('*')
         @config.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
       end
 
@@ -155,6 +161,13 @@ describe Chef::EncryptedAttribute::Config do
         config2.client_search([ '*:*' ])
         @config.update!(config2)
         @config.client_search.should eql(config2.client_search)
+      end
+
+      it 'should update users values from a @Config class' do
+        config2 = @Config.new
+        config2.users([ 'admin' ])
+        @config.update!(config2)
+        @config.users.should eql(config2.users)
       end
 
       it 'should update keys values from a @Config class' do
@@ -180,6 +193,12 @@ describe Chef::EncryptedAttribute::Config do
         config2 = { :client_search => [ '*:*' ] }
         @config.update!(config2)
         @config.client_search.should eql(config2[:client_search])
+      end
+
+      it 'should update users value from a Hash with symbol keys' do
+        config2 = { :users => [ 'admin' ] }
+        @config.update!(config2)
+        @config.users.should eql(config2[:users])
       end
 
       it 'should update keys value from a Hash with symbol keys' do
@@ -209,6 +228,7 @@ describe Chef::EncryptedAttribute::Config do
           :version => 3,
           :partial_search => false,
           :client_search => [ 'admin:*' ],
+          :users => [ 'admin' ],
           :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
         }
         @config_prev = @Config.new(@config_prev_hs)
@@ -219,6 +239,7 @@ describe Chef::EncryptedAttribute::Config do
         config2.version.should eql(@config_prev_hs[:version])
         config2.partial_search.should eql(@config_prev_hs[:partial_search])
         config2.client_search.should eql(@config_prev_hs[:client_search])
+        config2.users.should eql(@config_prev_hs[:users])
         config2.keys.should eql(@config_prev_hs[:keys])
       end
 
@@ -238,6 +259,12 @@ describe Chef::EncryptedAttribute::Config do
         config_new = @Config.new({ :client_search => [ 'admin:true' ] })
         config_res = @config_prev.merge(config_new)
         config_res.client_search.should eql(config_new.client_search)
+      end
+
+      it 'should merge users values' do
+        config_new = @Config.new({ :users => [ 'dev1' ] })
+        config_res = @config_prev.merge(config_new)
+        config_res.users.should eql(config_new.users)
       end
 
       it 'should merge keys values' do

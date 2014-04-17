@@ -32,7 +32,7 @@ describe Chef::EncryptedAttribute do
         @enc_attr = Chef::EncryptedAttribute.create('A coconut yogourts lover')
       end
 
-      it 'should create and encrypted attribute' do
+      it 'should create an encrypted attribute' do
         include Chef::EncryptedAttribute::AttributeBody::Version
         @enc_attr[@chef_type].should eql(@chef_type_value)
       end

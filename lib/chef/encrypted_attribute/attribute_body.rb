@@ -19,6 +19,7 @@
 require 'chef/encrypted_attribute/local_node'
 require 'chef/encrypted_attribute/remote_node'
 require 'chef/encrypted_attribute/remote_clients'
+require 'chef/encrypted_attribute/remote_users'
 require 'chef/encrypted_attribute/attribute_body/version'
 require 'chef/encrypted_attribute/attribute_body/version0'
 
