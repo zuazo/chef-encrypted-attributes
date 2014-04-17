@@ -87,18 +87,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     end # each do |code, exception|
 
-    it 'should throw an UserNotFound exception if the server returns a 404' do
-      Chef::User.stub(:load) do
-        raise Net::HTTPServerException.new('Net::HTTPServerException',
-          Net::HTTPResponse.new('1.1', '404', 'Net::HTTPResponse')
-        )
-      end
-      lambda do
-        @RemoteUsers.get_public_keys([ 'unknown1' ] )
-      end.should raise_error(Chef::EncryptedAttribute::UserNotFound)
-    end
-
-
   end # describe #get_public_keys
 
 end
