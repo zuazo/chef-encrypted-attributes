@@ -17,7 +17,6 @@
 #
 
 require 'spec_helper'
-require 'chef/exceptions'
 
 describe Chef::EncryptedAttribute::Config do
   before do

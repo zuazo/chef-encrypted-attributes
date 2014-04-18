@@ -17,7 +17,6 @@
 #
 
 require 'spec_helper'
-require 'chef/exceptions'
 
 describe Chef::EncryptedAttribute::RemoteUsers do
   before do

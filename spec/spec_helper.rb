@@ -26,11 +26,12 @@ SimpleCov.start do
 end
 
 require 'chef/encrypted_attribute'
+require 'chef/exceptions'
 
 require 'rspec/autorun'
 
 RSpec.configure do |config|
-  # config.order = 'random'
+  config.order = 'random'
 
   config.color_enabled = true
   config.tty = true

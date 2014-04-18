@@ -17,7 +17,6 @@
 #
 
 require 'spec_helper'
-require 'chef/exceptions'
 
 describe Chef::EncryptedAttribute::LocalNode do
   before do
@@ -27,11 +26,11 @@ describe Chef::EncryptedAttribute::LocalNode do
     Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
   end
 
-  it 'should create a remote node without errors' do
+  it 'should create a local node without errors' do
     lambda { @LocalNode.new }.should_not raise_error
   end
 
-  it '#name should return the local server name' do
+  it '#name should return the local node name' do
     @local_node.name.should eql(Chef::Config[:node_name])
   end
 
@@ -39,7 +38,7 @@ describe Chef::EncryptedAttribute::LocalNode do
     @local_node.key.should be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
-  it '#key should return the local server key' do
+  it '#key should return the local node key' do
     key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read())
     @local_node.key.to_s.should eql(key.to_s)
   end
@@ -48,7 +47,7 @@ describe Chef::EncryptedAttribute::LocalNode do
     @local_node.public_key.should be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
-  it '#public_key should return the local server public_key' do
+  it '#public_key should return the local node public_key' do
     public_key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read()).public_key
     @local_node.public_key.to_s.should eql(public_key.to_s)
   end
