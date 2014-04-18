@@ -16,24 +16,39 @@
 # limitations under the License.
 #
 
+require 'chef/mixin/params_validate'
 require 'chef/encrypted_attribute/search_helper'
 
 class Chef
   class EncryptedAttribute
     class RemoteNode
+      include ::Chef::Mixin::ParamsValidate
       include ::Chef::EncryptedAttribute::SearchHelper
 
       def initialize(name)
-        @name = name
+        name(name)
       end
 
-      def name
-        @name
+      def name(arg=nil)
+        set_or_return(
+          :name,
+          arg,
+          :kind_of => String
+        )
       end
 
       def load_attribute(attr_ary)
+        unless attr_ary.kind_of?(Array)
+          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+        end
         keys = { 'value' => attr_ary }
-        search(:node, "name:#{@name}", keys, 1)[0]['value']
+        res = search(:node, "name:#{@name}", keys, 1)
+        if res.kind_of?(Array) and res[0].kind_of?(Hash) and
+           res[0].has_key?('value')
+          res[0]['value']
+        else
+          nil
+        end
       end
 
     end
