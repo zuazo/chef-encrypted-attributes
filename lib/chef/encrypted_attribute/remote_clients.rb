@@ -23,7 +23,7 @@ class Chef
     class RemoteClients
       extend ::Chef::EncryptedAttribute::SearchHelper
 
-      def self.get_public_keys(search=nil)
+      def self.get_public_keys(search='*:*')
         search(:client, search, {
           'public_key' => [ 'public_key' ]
         }).map do |client|
