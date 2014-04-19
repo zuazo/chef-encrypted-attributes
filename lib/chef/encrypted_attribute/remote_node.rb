@@ -37,12 +37,12 @@ class Chef
         )
       end
 
-      def load_attribute(attr_ary)
+      def load_attribute(attr_ary, partial_search=true)
         unless attr_ary.kind_of?(Array)
           raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
         end
         keys = { 'value' => attr_ary }
-        res = search(:node, "name:#{@name}", keys, 1)
+        res = search(:node, "name:#{@name}", keys, 1, partial_search)
         if res.kind_of?(Array) and res[0].kind_of?(Hash) and
            res[0].has_key?('value')
           res[0]['value']

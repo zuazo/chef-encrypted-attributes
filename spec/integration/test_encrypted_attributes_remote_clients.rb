@@ -46,8 +46,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
       @client1.save
       @client1 = Chef::ApiClient.load(@client1.name) # reload the public_key
       @clients << @client1
-
-      # Chef::EncryptedAttribute.config.partial_search(false)
     end
     after do
       @admin1.destroy

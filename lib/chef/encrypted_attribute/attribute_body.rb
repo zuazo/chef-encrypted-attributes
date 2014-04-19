@@ -49,10 +49,10 @@ class Chef
       # Decrypts a encrypted attribute from a remote node
       def load_from_node(name, attr_ary)
         remote_node = RemoteNode.new(name)
-        self.load(remote_node.load_attribute(attr_ary))
+        self.load(remote_node.load_attribute(attr_ary, config.partial_search))
       end
 
-      # Creates an ecnrypted attribute from a Hash
+      # Creates an encrypted attribute from a Hash
       def create(hs)
         body = AttributeBody::Version.create(config.version)
         body.encrypt(hs, target_keys)
@@ -83,7 +83,7 @@ class Chef
 
       def target_keys
         @target_keys ||= begin
-          remote_keys = RemoteClients.get_public_keys(config.client_search)
+          remote_keys = RemoteClients.get_public_keys(config.client_search, config.partial_search)
           keys = remote_keys + config.keys
           keys.push(local_node.public_key)
           keys

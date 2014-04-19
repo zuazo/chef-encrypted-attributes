@@ -54,6 +54,8 @@ describe Chef::EncryptedAttribute::RemoteClients do
         :client,
         query,
         { 'public_key' => [ 'public_key' ] },
+        1000,
+        true
       ).and_return(@clients)
       @RemoteClients.get_public_keys(query)
     end
@@ -63,6 +65,8 @@ describe Chef::EncryptedAttribute::RemoteClients do
         :client,
         '*:*',
         { 'public_key' => [ 'public_key' ] },
+        1000,
+        true
       ).and_return(@clients)
       @RemoteClients.get_public_keys
     end

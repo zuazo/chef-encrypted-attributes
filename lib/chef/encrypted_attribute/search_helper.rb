@@ -56,8 +56,8 @@ class Chef
         end
       end
 
-      def search(type, query, keys, rows=1000)
-        if Chef::EncryptedAttribute.config.partial_search
+      def search(type, query, keys, rows=1000, partial_search=true)
+        if partial_search
           partial_search(type, query, keys, rows)
         else
           normal_search(type, query, keys, rows)

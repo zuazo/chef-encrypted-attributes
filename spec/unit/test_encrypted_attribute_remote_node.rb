@@ -59,7 +59,8 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
-        1
+        1,
+        true
       ).and_return(
         [ { 'value' => nil } ]
       )

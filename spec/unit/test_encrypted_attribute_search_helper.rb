@@ -108,15 +108,13 @@ describe Chef::EncryptedAttribute::SearchHelper do
   context '#search' do
 
     it 'should call #partial_search when partial_search=true' do
-      Chef::EncryptedAttribute.config.partial_search(true)
       @SearchHelper.should_receive(:partial_search).with(1, 2, 3, 4)
-      @SearchHelper.search(1, 2, 3, 4)
+      @SearchHelper.search(1, 2, 3, 4, true)
     end
 
     it 'should call #normal_search when partial_search=false' do
-      Chef::EncryptedAttribute.config.partial_search(false)
       @SearchHelper.should_receive(:normal_search).with(1, 2, 3, 4)
-      @SearchHelper.search(1, 2, 3, 4)
+      @SearchHelper.search(1, 2, 3, 4, false)
     end
 
   end
