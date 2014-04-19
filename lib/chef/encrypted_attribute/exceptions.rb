@@ -23,8 +23,13 @@ class Chef
     class UnacceptableEncryptedAttributeFormat < StandardError; end
     class DecryptionFailure < StandardError; end
     class EncryptionFailure < StandardError; end
-    class NoAdminPrivileges < StandardError; end
+
+    class InsufficientPrivileges < StandardError; end
     class UserNotFound < StandardError; end
+
+    class SearchFailure < StandardError; end
+    class SearchFatalError < StandardError; end
+    class InvalidSearchKeys < StandardError; end
 
   end
 end

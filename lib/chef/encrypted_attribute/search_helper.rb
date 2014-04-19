@@ -17,6 +17,7 @@
 #
 
 require 'chef/search/query'
+require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
@@ -42,6 +43,19 @@ class Chef
         escape(query_s)
       end
 
+      def valid_search_keys?(keys)
+        return false unless keys.kind_of?(Hash)
+        keys.reduce(true) do |r, (k, v)|
+          r && unless k.kind_of?(String) || k.kind_of?(Symbol) and v.kind_of?(Array)
+            false
+          else
+            v.reduce(true) do |r, x|
+              r and x.kind_of?(String)
+            end
+          end
+        end
+      end
+
       def search(type, query, keys, rows=1000)
         if Chef::EncryptedAttribute.config.partial_search
           partial_search(type, query, keys, rows)
@@ -51,16 +65,36 @@ class Chef
       end
 
       def normal_search(type, query, keys, rows=1000)
-        resp = self.query.search(type, escape_query(query), nil, 0, rows)[0]
+        escaped_query = escape_query(query)
+        Chef::Log.info("Normal Search query: #{escaped_query}, keys: #{keys.inspect}")
+        unless valid_search_keys?(keys)
+          raise InvalidSearchKeys, "Invalid search keys: #{keys.inspect}"
+        end
+
+        begin
+          resp = self.query.search(type, escaped_query, nil, 0, rows)[0]
+        rescue Net::HTTPServerException => e
+          if e.response.kind_of?(Net::HTTPResponse) and e.response.code == '404' # Not Found
+            return []
+          else
+            raise SearchFailure, "Partial Search exception #{e.class.name}: #{e.to_s}"
+          end
+        rescue Net::HTTPFatalError => e
+          raise SearchFailure, "Normal Search exception #{e.class.name}: #{e.to_s}"
+        end
+        unless resp.kind_of?(Array)
+          raise SearchFatalError, "Wrong response received from Normal Search: #{resp.inspect}"
+        end
         # TODO too complex, refactorize
         resp.map do |row|
           Hash[keys.map do |key_name, attr_ary|
             value = attr_ary.reduce(row) do |r, attr|
               if r.respond_to?(attr.to_sym)
                 r.send(attr.to_sym)
-              elsif r.respond_to?(:has_key?) and
-                r.has_key?(attr)
-                r[attr]
+              elsif r.respond_to?(:has_key?)
+                if r.has_key?(attr.to_s)
+                  r[attr.to_s]
+                end
               end
             end
             [ key_name, value ]
@@ -70,20 +104,33 @@ class Chef
 
       def partial_search(type, query, keys, rows=1000)
         escaped_query = "search/#{escape(type)}?q=#{escape_query(query)}&start=0&rows=#{rows}"
-        Chef::Log.info("Partial search query: #{escaped_query}")
-        Chef::Log.info("Partial search keys: #{keys.inspect}")
-        rest = Chef::REST.new(Chef::Config[:chef_server_url])
-        resp = rest.post_rest(escaped_query, keys)
-        if resp['rows'].kind_of?(Array)
-          resp['rows'].map do |row|
-            if row.kind_of?(Hash) and row['data'].kind_of?(Hash)
-              row['data']
-            end
-          end.compact
-        else
-          Chef::Log.warn('Wrong result from partial search.')
-          []
+        Chef::Log.info("Partial Search query: #{escaped_query}, keys: #{keys.inspect}")
+        unless valid_search_keys?(keys)
+          raise InvalidSearchKeys, "Invalid search keys: #{keys.inspect}"
         end
+
+        rest = Chef::REST.new(Chef::Config[:chef_server_url])
+        begin
+          resp = rest.post_rest(escaped_query, keys)
+        rescue Net::HTTPServerException => e
+          if e.response.kind_of?(Net::HTTPResponse) and e.response.code == '404' # Not Found
+            return []
+          else
+            raise SearchFailure, "Partial Search exception #{e.class.name}: #{e.to_s}"
+          end
+        rescue Net::HTTPFatalError => e
+          raise SearchFailure, "Partial Search exception #{e.class.name}: #{e.to_s}"
+        end
+        unless resp.kind_of?(Hash) and resp.has_key?('rows') and resp['rows'].kind_of?(Array)
+          raise SearchFatalError, "Wrong response received from Partial Search: #{resp.inspect}"
+        end
+        resp['rows'].map do |row|
+          if row.kind_of?(Hash) and row['data'].kind_of?(Hash)
+            row['data']
+          else
+            raise SearchFatalError, "Wrong row format received from Partial Search: #{row.inspect}"
+          end
+        end.compact
       end
 
     end

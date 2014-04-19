@@ -42,8 +42,8 @@ class Chef
         rescue Net::HTTPServerException => e
           case e.response.code
           when '403'
-            raise NoAdminPrivileges, 'Your node needs admin privileges to be able to work with Chef Users.'
-          when '404'
+            raise InsufficientPrivileges, 'Your node needs admin privileges to be able to work with Chef Users.'
+          when '404' # Not Found
             raise UserNotFound, "Chef User not found: \"#{name}\"."
           else
             raise e

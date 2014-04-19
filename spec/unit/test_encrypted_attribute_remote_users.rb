@@ -68,7 +68,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     {
-      '403' => Chef::EncryptedAttribute::NoAdminPrivileges,
+      '403' => Chef::EncryptedAttribute::InsufficientPrivileges,
       '404' => Chef::EncryptedAttribute::UserNotFound,
       'anything_else' => Net::HTTPServerException,
     }.each do |code, exception|

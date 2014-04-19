@@ -24,7 +24,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
   when_the_chef_server 'is ready to rock!' do
     before do
       @RemoteUsers = Chef::EncryptedAttribute::RemoteUsers
-      @users = (0..2).step.map do |n|
+      @users = (1..3).step.map do |n|
         user = Chef::User.new
         user.name("user#{n}")
         user.save
@@ -43,11 +43,11 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       end
 
       it 'should return only public keys specified' do
-        @RemoteUsers.get_public_keys([ 'user0', 'user1' ] ).count.should eql(2)
+        @RemoteUsers.get_public_keys([ 'user1', 'user2' ] ).count.should eql(2)
       end
 
       it 'should return valid public keys' do
-        pkey_pem = @RemoteUsers.get_public_keys([ 'user0' ])[0]
+        pkey_pem = @RemoteUsers.get_public_keys([ 'user1' ])[0]
         pkey_pem.should be_a(String)
         pkey = OpenSSL::PKey::RSA.new(pkey_pem)
         pkey.public?.should be_true
