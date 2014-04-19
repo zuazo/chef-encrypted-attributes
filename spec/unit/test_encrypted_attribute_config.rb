@@ -274,6 +274,36 @@ describe Chef::EncryptedAttribute::Config do
 
     end # describe #merge
 
+    context '#[]' do
+
+        it 'should read a configuration variable' do
+          config = @Config.new({ :partial_search => true })
+          config[:partial_search].should eql(true)
+        end
+
+        it 'should ignore non existing configuration options' do
+          config = @Config.new
+          lambda { config[:random_config_options] }.should_not raise_error
+        end
+
+    end
+
+    context '#[]=' do
+
+        it 'should write a configuration variable' do
+          config = @Config.new({ :partial_search => false })
+          config[:partial_search].should eql(false)
+          config[:partial_search] = true
+          config[:partial_search].should eql(true)
+        end
+
+        it 'should ignore non existing configuration options' do
+          config = @Config.new
+          lambda { config[:random_config_options] = 5 }.should_not raise_error
+        end
+
+    end
+
   end # describe Chef::EncryptedAttribute::Config instance
 
 end # describe Chef::EncryptedAttribute::Config

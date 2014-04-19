@@ -127,6 +127,20 @@ class Chef
         result
       end
 
+      def [](key)
+        key = key.to_sym if key.kind_of?(String)
+        if OPTIONS.include?(key)
+          self.send(key)
+        end
+      end
+
+      def []=(key, value)
+        key = key.to_sym if key.kind_of?(String)
+        if OPTIONS.include?(key)
+          self.send(key, value)
+        end
+      end
+
       protected
 
       def config_valid_search_array?(s_ary)
