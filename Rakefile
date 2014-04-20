@@ -30,8 +30,8 @@ require 'rake/testtask'
   :integration => 'integration',
 }.each do |test, dir|
   Rake::TestTask.new(test) do |test|
-    test.libs << 'lib' << 'spec'
-    test.pattern = "spec/#{dir}/test_*.rb"
+    test.libs << 'lib' << 'test'
+    test.pattern = "test/#{dir}/test_*.rb"
     test.verbose = true
   end
 end
