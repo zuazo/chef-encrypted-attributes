@@ -274,6 +274,34 @@ describe Chef::EncryptedAttribute::Config do
 
     end # describe #merge
 
+    context '#reset' do
+      before do
+        @config = @Config.new({
+          :version => 3,
+          :partial_search => false,
+          :client_search => [ 'admin:*' ],
+          :users => [ 'admin' ],
+          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
+        })
+      end
+
+      it 'should reset config variables to default' do
+        @config.version.should eql(3)
+        @config.partial_search.should eql(false)
+        @config.client_search.should eql([ 'admin:*' ])
+        @config.users.should eql([ 'admin' ])
+        @config.keys.should_not eql([])
+        @config.reset
+
+        @config.version.should eql(0)
+        @config.partial_search.should eql(true)
+        @config.client_search.should eql([ 'admin:true' ])
+        @config.users.should eql([])
+        @config.keys.should eql([])
+      end
+
+    end # context #clear
+
     context '#[]' do
 
         it 'should read a configuration variable' do

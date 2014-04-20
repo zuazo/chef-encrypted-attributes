@@ -127,6 +127,12 @@ class Chef
         result
       end
 
+      def reset
+        OPTIONS.each do |attr|
+          remove_instance_variable("@#{attr.to_s}")
+        end
+      end
+
       def [](key)
         key = key.to_sym if key.kind_of?(String)
         if OPTIONS.include?(key)
