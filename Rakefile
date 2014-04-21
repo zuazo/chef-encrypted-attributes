@@ -31,7 +31,7 @@ require 'rake/testtask'
 }.each do |test, dir|
   Rake::TestTask.new(test) do |test|
     test.libs << 'lib' << 'spec'
-    test.pattern = "spec/#{dir}/test_*.rb"
+    test.pattern = "spec/#{dir}/**/*.rb"
     test.verbose = true
   end
 end

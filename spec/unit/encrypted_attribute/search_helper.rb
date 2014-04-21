@@ -21,7 +21,7 @@ require 'spec_helper'
 describe Chef::EncryptedAttribute::SearchHelper do
   before do
     @SearchHelper = Chef::EncryptedAttribute::SearchHelper
-    Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
+    Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../../data/client.pem"
   end
 
   context '#query' do
