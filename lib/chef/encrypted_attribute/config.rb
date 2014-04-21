@@ -65,7 +65,6 @@ class Chef
           arg,
           :kind_of => Array,
           :default => [ 'admin:true' ],
-          # TODO check if this is supported in old Chef versions
           :callbacks => config_search_array_callbacks
         )
       end
@@ -76,7 +75,6 @@ class Chef
           arg,
           :kind_of => [ String, Array ],
           :default => [],
-          # TODO check if this is supported in old Chef versions
           :callbacks => config_users_arg_callbacks
         )
       end
@@ -87,13 +85,15 @@ class Chef
           arg,
           :kind_of => Array,
           :default => [],
-          # TODO check if this is supported in old Chef versions
           :callbacks => config_valid_keys_array_callbacks
         )
       end
 
       def add_key(key)
-        if key.kind_of?(String) and not keys.include?(key)
+        unless config_valid_key?(key)
+          raise Chef::Exceptions::ValidationFailed, 'You passed and incorrect public key.'
+        end
+        if not keys.include?(key)
           @keys.push(key)
         end
       end
@@ -151,7 +151,6 @@ class Chef
 
       def config_valid_search_array?(s_ary)
         s_ary.each do |s|
-          # TODO a less generic check?
           return false unless s.kind_of?(String)
         end
         true
@@ -168,8 +167,7 @@ class Chef
       def config_valid_user_arg?(users)
         return users == '*' if users.kind_of?(String)
         users.each do |u|
-          # TODO a less generic check?
-          return false unless u.kind_of?(String)
+          return false unless u.kind_of?(String) and u.match(/^[a-z0-9\-_]+$/)
         end
         true
       end
@@ -182,9 +180,19 @@ class Chef
         }
       end
 
+      def config_valid_key?(k)
+        return false unless k.kind_of?(String)
+        begin
+          rsa_k = OpenSSL::PKey::RSA.new(k)
+        rescue OpenSSL::PKey::RSAError, TypeError
+          return false
+        end
+        rsa_k.public?
+      end
+
       def config_valid_keys_array?(k_ary)
         k_ary.each do |k|
-          unless k.kind_of?(String)
+          unless config_valid_key?(k)
             return false
           end
         end

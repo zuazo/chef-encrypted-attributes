@@ -61,7 +61,6 @@ class Chef
         end
 
         # Returns a Hash for JSON
-        # TODO not needed method?
         def for_json
           to_hash
         end

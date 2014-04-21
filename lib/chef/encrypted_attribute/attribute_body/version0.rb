@@ -108,12 +108,9 @@ class Chef
         end
 
         def encrypt_value(public_key, value)
-          # if public_key.kind_of?(String)
-          #   public_key = OpenSSL::PKey::RSA.new(public_key)
-          # end
           begin
             Base64.encode64(public_key.public_encrypt(value))
-          rescue OpenSSL::PKey::RSAError => e # not needed?
+          rescue OpenSSL::PKey::RSAError => e
             raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
         end

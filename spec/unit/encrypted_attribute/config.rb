@@ -59,13 +59,13 @@ describe Chef::EncryptedAttribute::Config do
       },
       :client_search => {
         :default => [ 'admin:true' ],
-        :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ] ], # string case is treated below separately
-        :error => [ 1, 0.2, Hash.new, Object.new ], # TODO empty array
+        :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ], [] ], # string case is treated below separately
+        :error => [ 1, 0.2, Hash.new, Object.new ],
       },
       :users => {
         :default => [],
         :ok => [ '*', [], [ 'admin1' ], [ 'admin1', 'admin2' ] ],
-        :error => [ 1, 0.2, 'any-string', Hash.new, Object.new, [ 2 ], [ 'admin1', Hash.new ] ],
+        :error => [ 1, 0.2, 'any-string', Hash.new, Object.new, [ 2 ], [ 'admin1', Hash.new ], 'invalid.u$er' ],
       },
       :keys => {
         :default => [],
@@ -78,6 +78,7 @@ describe Chef::EncryptedAttribute::Config do
           OpenSSL::PKey::RSA.new(128),
           [ OpenSSL::PKey::RSA.new(128) ],
           [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, 4 ],
+          [ 'bad-key' ],
           # TODO non-public key string arrays
         ],
       },
@@ -118,7 +119,15 @@ describe Chef::EncryptedAttribute::Config do
         @key2 = OpenSSL::PKey::RSA.new(128).public_key.to_pem
       end
 
-      # TODO disallow non-public key strings
+      it 'should not allow bad keys' do
+        lambda { @config.add_key('bad-key') }.should raise_error(Chef::Exceptions::ValidationFailed)
+      end
+
+      it 'should not allow non-public keys' do
+        key = OpenSSL::PKey::RSA.new(128)
+        key.stub(:public?).and_return(false)
+        lambda { @config.add_key(key) }.should raise_error(Chef::Exceptions::ValidationFailed)
+      end
 
       it 'should accept String type' do
         lambda { @config.add_key(@key1) }.should_not raise_error
