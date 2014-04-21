@@ -31,6 +31,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         user
       end
     end
+    after do
+      @users.each { |u| u.destroy }
+    end
 
     context '#get_public_keys' do
 

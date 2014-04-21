@@ -33,6 +33,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       @node.set['sub-attr']['attr2'] = @attr2
       @node.save
     end
+    after do
+      @node.destroy
+    end
 
     context '#name' do
 

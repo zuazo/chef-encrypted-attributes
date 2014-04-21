@@ -232,5 +232,72 @@ describe Chef::EncryptedAttribute do
 
     end # context #exists?
 
+    context 'working with multiple clients' do
+      before do
+        @attr_clear = 'A coconut yogourts lover'
+        Chef::EncryptedAttribute.config.reset
+
+        @node = Chef::Node.new
+        @node.name('client1')
+        @node.set['encrypted']['attribute'] = Chef::EncryptedAttribute.create(@attr_clear)
+        @node.save
+
+        @client = Chef::ApiClient.new
+        @client.name('client1')
+        client_hs = @client.save
+        @client.public_key(client_hs['public_key'])
+        @client.private_key(client_hs['private_key'])
+        @client
+      end
+      after do
+        @node.destroy
+        @client.destroy
+      end
+
+      it 'original client should be able to read the attribute' do
+        Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+      end
+
+      it 'other clients should not be able to read it by default' do
+        Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+        lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+      end
+
+      it 'other clients should be able to read it if added as #udpate arg' do
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [ @client.public_key ] })
+
+        Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+        Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+      end
+
+      it 'other clients should be able to read it if added in global config' do
+        Chef::EncryptedAttribute.config.key_add(@client.public_key)
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])
+
+        Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+        Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+      end
+
+      it 'other clients should not be able to read if they are removed from global config' do
+        Chef::EncryptedAttribute.config.key_add(@client.public_key) # first add the key
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
+        Chef::EncryptedAttribute.config.keys([]) # removed the key
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
+
+        Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+        lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+      end
+
+      it 'other clients should not be able to read if they are removed using #udpate arg' do
+        Chef::EncryptedAttribute.config.key_add(@client.public_key) # first add the key
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
+        Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
+
+        Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+        lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+      end
+
+    end # context working with multiple clients
+
   end # when_the_chef_server is ready to rock!
 end

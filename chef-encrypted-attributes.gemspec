@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob('{test,spec,features}/*')
 
   # Rake 10.2 drops Ruby 1.8 support
-  s.add_development_dependency("rake", "~> 10.1.0")
+  s.add_development_dependency('rake', '~> 10.1.0')
 
   s.add_development_dependency 'chef', chef_version
   s.add_development_dependency 'chef-zero'

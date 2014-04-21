@@ -71,9 +71,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
       @RemoteClients.get_public_keys
     end
 
-    xit 'should throw an error on bad searches' do
-    end
-
   end # describe #get_public_keys
 
 end

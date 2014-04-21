@@ -44,8 +44,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
           client = Chef::ApiClient.new
           client.name("client#{c}")
           client.admin(false)
-          client.save
-          client = Chef::ApiClient.load(client.name) # reload the public_key
+          client.public_key(client.save['public_key'])
           client
         end
       end

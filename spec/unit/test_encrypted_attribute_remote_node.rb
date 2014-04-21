@@ -67,16 +67,17 @@ describe Chef::EncryptedAttribute::RemoteNode do
       remote_node.load_attribute(attr_ary)
     end
 
-    xit 'should return nil if the attribute is not found' do
+    it 'should return nil if the attribute is not found' do
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
       remote_node.should_receive(:search).with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
-        1
+        1,
+        true
       ).and_return(
-        [ { 'value' => [] } ]
+        [ { 'value' => nil } ]
       )
       remote_node.load_attribute(attr_ary).should eql(nil)
     end

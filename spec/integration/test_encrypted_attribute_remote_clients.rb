@@ -35,16 +35,14 @@ describe Chef::EncryptedAttribute::RemoteClients do
       @admin1 = Chef::ApiClient.new
       @admin1.name('admin1')
       @admin1.admin(true)
-      @admin1.save
-      @admin1 = Chef::ApiClient.load(@admin1.name) # reload the public_key
+      @admin1.public_key(@admin1.save['public_key'])
       @clients << @admin1
 
       # create one normal client like a node
       @client1 = Chef::ApiClient.new
       @client1.name('client1')
       @client1.admin(false)
-      @client1.save
-      @client1 = Chef::ApiClient.load(@client1.name) # reload the public_key
+      @client1.public_key(@client1.save['public_key'])
       @clients << @client1
     end
     after do

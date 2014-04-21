@@ -28,15 +28,17 @@ describe Chef::Knife::EncryptedAttributeShow do
       Chef::Knife::EncryptedAttributeShow.load_deps
       @knife = Chef::Knife::EncryptedAttributeShow.new
 
-      node = Chef::Node.new
-      node.name('node1')
-      node.set['encrypted']['attribute'] = Chef::EncryptedAttribute.create('unicorns drill accurately')
-      node.set['encrypted']['attri.bu\\te'] = Chef::EncryptedAttribute.create('escaped unicorns')
-      Chef::Log.info('asdad')
-      node.save
+      @node = Chef::Node.new
+      @node.name('node1')
+      @node.set['encrypted']['attribute'] = Chef::EncryptedAttribute.create('unicorns drill accurately')
+      @node.set['encrypted']['attri.bu\\te'] = Chef::EncryptedAttribute.create('escaped unicorns')
+      @node.save
 
       @stdout = StringIO.new
       @knife.ui.stub(:stdout).and_return(@stdout)
+    end
+    after do
+      @node.destroy
     end
 
     it 'should show the encrypted attribute' do

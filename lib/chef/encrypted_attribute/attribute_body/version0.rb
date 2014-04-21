@@ -74,7 +74,7 @@ class Chef
         def pem_to_key(k)
           begin
             k.kind_of?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
-          rescue OpenSSL::PKey::RSAError => e
+          rescue OpenSSL::PKey::RSAError, TypeError => e
             raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
           end
         end
