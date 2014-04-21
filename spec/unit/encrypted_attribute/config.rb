@@ -112,7 +112,7 @@ describe Chef::EncryptedAttribute::Config do
       @config.client_search.should eql([ 'admin:false' ])
     end
 
-    describe '#key_add' do
+    describe '#add_key' do
       before do
         @key1 = OpenSSL::PKey::RSA.new(128).public_key.to_pem
         @key2 = OpenSSL::PKey::RSA.new(128).public_key.to_pem
@@ -121,16 +121,16 @@ describe Chef::EncryptedAttribute::Config do
       # TODO disallow non-public key strings
 
       it 'should accept String type' do
-        lambda { @config.key_add(@key1) }.should_not raise_error
+        lambda { @config.add_key(@key1) }.should_not raise_error
       end
 
       it 'should add the strings to the keys attribute' do
-        @config.key_add(@key1)
-        @config.key_add(@key2)
+        @config.add_key(@key1)
+        @config.add_key(@key2)
         @config.keys.should eql([ @key1, @key2 ])
       end
 
-    end # describe #key_add
+    end # describe #add_key
 
     describe '#update!' do
       before do

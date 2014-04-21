@@ -92,7 +92,7 @@ class Chef
         )
       end
 
-      def key_add(key)
+      def add_key(key)
         if key.kind_of?(String) and not keys.include?(key)
           @keys.push(key)
         end

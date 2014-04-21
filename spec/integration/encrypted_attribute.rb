@@ -271,7 +271,7 @@ describe Chef::EncryptedAttribute do
       end
 
       it 'other clients should be able to read it if added in global config' do
-        Chef::EncryptedAttribute.config.key_add(@client.public_key)
+        Chef::EncryptedAttribute.config.add_key(@client.public_key)
         Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])
 
         Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
@@ -279,7 +279,7 @@ describe Chef::EncryptedAttribute do
       end
 
       it 'other clients should not be able to read if they are removed from global config' do
-        Chef::EncryptedAttribute.config.key_add(@client.public_key) # first add the key
+        Chef::EncryptedAttribute.config.add_key(@client.public_key) # first add the key
         Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
         Chef::EncryptedAttribute.config.keys([]) # removed the key
         Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
@@ -289,7 +289,7 @@ describe Chef::EncryptedAttribute do
       end
 
       it 'other clients should not be able to read if they are removed using #udpate arg' do
-        Chef::EncryptedAttribute.config.key_add(@client.public_key) # first add the key
+        Chef::EncryptedAttribute.config.add_key(@client.public_key) # first add the key
         Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
         Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
 
