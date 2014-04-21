@@ -95,7 +95,7 @@ class Chef
               class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const, scope === Kernel) }
             end
           rescue NameError => e
-            Chef::Log.info(e)
+            Chef::Log.error(e)
             nil
           end
         end
