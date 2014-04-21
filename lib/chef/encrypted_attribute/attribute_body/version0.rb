@@ -26,7 +26,7 @@ class Chef
 
         def encrypt(value, public_keys)
           value_json = json_encode(value)
-          public_keys = remove_dup_keys(public_keys)
+          public_keys = public_keys_uniq(public_keys)
           self['encrypted_rsa_data'] = Mash.new(Hash[
             public_keys.map do |public_key|
               [
@@ -39,7 +39,14 @@ class Chef
         end
 
         def decrypt(key)
-          # TODO check input and enc_attr
+          key = pem_to_key(key)
+          unless key.public? and key.private?
+            raise InvalidPrivateKey, 'The provided key for decryption is invalid, a valid public and private key is required.'
+          end
+          unless can_be_decrypted_by?(key) # TODO optimize, node key digest is calculated multiple times
+            raise DecryptionFailure, 'Attribute data cannot be decrypted by the provided key.'
+          end
+
           enc_value = self['encrypted_rsa_data'][node_key(key.public_key)]
           value_json = decrypt_value(key, enc_value)
           json_decode(value_json)
@@ -47,23 +54,39 @@ class Chef
         end
 
         def can_be_decrypted_by?(keys)
-          remove_dup_keys(keys).reduce(true) do |r, k|
-            r and self['encrypted_rsa_data'].kind_of?(Hash) and
-              self['encrypted_rsa_data'].has_key?(node_key(k))
+          return false unless encrypted?
+          public_keys_uniq(keys).reduce(true) do |r, k|
+            r and self['encrypted_rsa_data'].has_key?(node_key(k.public_key))
           end
         end
 
         def needs_update?(keys)
-          keys = remove_dup_keys(keys)
+          keys = public_keys_uniq(keys)
           not can_be_decrypted_by?(keys) && self['encrypted_rsa_data'].keys.count == keys.count
         end
 
         protected
 
-        def remove_dup_keys(keys)
+        def encrypted?
+          has_key?('encrypted_rsa_data') and self['encrypted_rsa_data'].kind_of?(Hash)
+        end
+
+        def pem_to_key(k)
+          begin
+            k.kind_of?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
+          rescue OpenSSL::PKey::RSAError => e
+            raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
+          end
+        end
+
+        def public_keys_uniq(keys)
           keys = [ keys ].flatten
           keys.map do |k|
-            k.kind_of?(String) ? k = OpenSSL::PKey::RSA.new(k) : k
+            k = pem_to_key(k)
+            unless k.public?
+              raise InvalidPublicKey, 'Some provided public keys are invalid.'
+            end
+            k
           end.uniq { |k| k.public_key.to_s.chomp }
         end
 
@@ -73,26 +96,34 @@ class Chef
         end
 
         def json_decode(o)
-          # TODO invalid JSON exception
-          JSON.parse(o)[0]
+          begin
+            JSON.parse(o.to_s)[0]
+          rescue JSON::ParserError => e
+            raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          end
         end
 
         def node_key(public_key)
-          if public_key.kind_of?(String)
-            public_key = OpenSSL::PKey::RSA.new(public_key)
-          end
           Digest::SHA1.hexdigest(public_key.to_der)
         end
 
         def encrypt_value(public_key, value)
-          if public_key.kind_of?(String)
-            public_key = OpenSSL::PKey::RSA.new(public_key)
+          # if public_key.kind_of?(String)
+          #   public_key = OpenSSL::PKey::RSA.new(public_key)
+          # end
+          begin
+            Base64.encode64(public_key.public_encrypt(value))
+          rescue OpenSSL::PKey::RSAError => e # not needed?
+            raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
-          Base64.encode64(public_key.public_encrypt(value))
         end
 
         def decrypt_value(key, value)
-          key.private_decrypt(Base64.decode64(value))
+          begin
+            key.private_decrypt(Base64.decode64(value.to_s))
+          rescue OpenSSL::PKey::RSAError => e
+            raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          end
         end
 
       end
