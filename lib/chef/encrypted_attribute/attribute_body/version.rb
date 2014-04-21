@@ -27,7 +27,7 @@ class Chef
         # chef in the future using JSONCompat
 
         JSON_CLASS =      'x_json_class'.freeze
-        CHEF_TYPE =       'x_chef_type'.freeze # TODO "x_" not needed here?
+        CHEF_TYPE =       'chef_type'.freeze
         CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
 
         def initialize(enc_hs=nil)
