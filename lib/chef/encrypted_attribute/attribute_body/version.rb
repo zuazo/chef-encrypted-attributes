@@ -34,7 +34,6 @@ class Chef
           super
           self[JSON_CLASS] = self.class.name
           self[CHEF_TYPE] = CHEF_TYPE_VALUE
-          # TODO better to use is_a? ?
           update_from!(enc_hs) if enc_hs.kind_of?(Hash)
         end
 
@@ -56,7 +55,7 @@ class Chef
           klass.send(:new)
         end
 
-        # Serialize this object as a hash
+        # Serialize this object as a Hash
         def to_json(*a)
           for_json.to_json(*a)
         end
@@ -78,7 +77,7 @@ class Chef
           update(enc_hs)
         end
 
-        # Create a AttributeBody::Version from JSON
+        # Create an AttributeBody::Version from JSON Hash
         def self.json_create(enc_hs)
           klass = string_to_klass(enc_hs[JSON_CLASS])
           if klass.nil?
@@ -97,7 +96,7 @@ class Chef
               class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const, scope === Kernel) }
             end
           rescue NameError => e
-            Chef::Log.debug(e)
+            Chef::Log.info(e)
             nil
           end
         end
