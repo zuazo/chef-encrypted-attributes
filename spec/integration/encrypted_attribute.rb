@@ -216,13 +216,13 @@ describe Chef::EncryptedAttribute do
       end
 
       it 'should return true for an encrypted attribute' do
-        enc_attr = Chef::EncryptedAttribute.create(0)
+        enc_attr = Chef::EncryptedAttribute.create('any-data')
 
         Chef::EncryptedAttribute.exists?(enc_attr).should eql(true)
       end
 
       it 'should return true for a node encrypted attribute' do
-        enc_attr = Chef::EncryptedAttribute.create(0)
+        enc_attr = Chef::EncryptedAttribute.create('any-data')
         node = Chef::Node.new
         node.name(Chef::Config[:node_name])
         node.set['encrypted']['attribute'] = enc_attr

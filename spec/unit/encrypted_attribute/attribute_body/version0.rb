@@ -135,7 +135,7 @@ describe Chef::EncryptedAttribute::AttributeBody::Version0 do
       key = OpenSSL::PKey::RSA.new(256)
       body = @AttributeBodyVersion0.new
       body.encrypt('value1', key.public_key)
-      body['encrypted_rsa_data'] = Hash[body['encrypted_rsa_data'].map do |k, v|
+      body['encrypted_data'] = Hash[body['encrypted_data'].map do |k, v|
         [ k, 'Corrupted data' ]
       end]
       lambda { body.decrypt(key) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /OpenSSL::PKey::RSAError/)
@@ -145,7 +145,7 @@ describe Chef::EncryptedAttribute::AttributeBody::Version0 do
       key = OpenSSL::PKey::RSA.new(256)
       body = @AttributeBodyVersion0.new
       body.encrypt('value1', key.public_key)
-      body['encrypted_rsa_data'] = Hash[body['encrypted_rsa_data'].map do |k, v|
+      body['encrypted_data'] = Hash[body['encrypted_data'].map do |k, v|
         [ k, Base64.encode64(key.public_encrypt('bad-json')) ]
       end]
       lambda { body.decrypt(key) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /JSON::ParserError/)

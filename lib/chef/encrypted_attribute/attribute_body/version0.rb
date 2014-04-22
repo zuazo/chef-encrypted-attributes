@@ -26,49 +26,34 @@ class Chef
 
         def encrypt(value, public_keys)
           value_json = json_encode(value)
-          public_keys = public_keys_uniq(public_keys)
-          self['encrypted_rsa_data'] = Mash.new(Hash[
-            public_keys.map do |public_key|
-              [
-                node_key(public_key),
-                encrypt_value(public_key, value_json),
-              ]
-            end
-          ])
+          public_keys = parse_public_keys(public_keys)
+          self['encrypted_data'] = rsa_encrypt_multi_key(value_json, public_keys)
           self
         end
 
         def decrypt(key)
-          key = pem_to_key(key)
-          unless key.public? and key.private?
-            raise InvalidPrivateKey, 'The provided key for decryption is invalid, a valid public and private key is required.'
-          end
-          unless can_be_decrypted_by?(key) # TODO optimize, node key digest is calculated multiple times
-            raise DecryptionFailure, 'Attribute data cannot be decrypted by the provided key.'
-          end
-
-          enc_value = self['encrypted_rsa_data'][node_key(key.public_key)]
-          value_json = decrypt_value(key, enc_value)
+          key = parse_decryption_key(key)
+          value_json = rsa_decrypt_multi_key(self['encrypted_data'], key)
           json_decode(value_json)
           # we avoid saving the decrypted value, only return it
         end
 
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
-          public_keys_uniq(keys).reduce(true) do |r, k|
-            r and self['encrypted_rsa_data'].has_key?(node_key(k.public_key))
+          parse_public_keys(keys).reduce(true) do |r, k|
+            r and data_can_be_decrypted_by_key?(self['encrypted_data'], k)
           end
         end
 
         def needs_update?(keys)
-          keys = public_keys_uniq(keys)
-          not can_be_decrypted_by?(keys) && self['encrypted_rsa_data'].keys.count == keys.count
+          keys = parse_public_keys(keys)
+          not can_be_decrypted_by?(keys) && self['encrypted_data'].keys.count == keys.count
         end
 
         protected
 
         def encrypted?
-          has_key?('encrypted_rsa_data') and self['encrypted_rsa_data'].kind_of?(Hash)
+          has_key?('encrypted_data') and self['encrypted_data'].kind_of?(Hash)
         end
 
         def pem_to_key(k)
@@ -79,14 +64,29 @@ class Chef
           end
         end
 
-        def public_keys_uniq(keys)
+        def parse_public_key(key)
+          key = pem_to_key(key)
+          unless key.public?
+            raise InvalidPublicKey, 'Invalid public key provided.'
+          end
+          key
+        end
+
+        def parse_decryption_key(key)
+          key = pem_to_key(key)
+          unless key.public? and key.private?
+            raise InvalidPrivateKey, 'The provided key for decryption is invalid, a valid public and private key is required.'
+          end
+          unless can_be_decrypted_by?(key) # TODO optimize, node key digest is calculated multiple times
+            raise DecryptionFailure, 'Attribute data cannot be decrypted by the provided key.'
+          end
+          key
+        end
+
+        def parse_public_keys(keys)
           keys = [ keys ].flatten
           keys.map do |k|
-            k = pem_to_key(k)
-            unless k.public?
-              raise InvalidPublicKey, 'Some provided public keys are invalid.'
-            end
-            k
+            parse_public_key(k)
           end.uniq { |k| k.public_key.to_s.chomp }
         end
 
@@ -107,7 +107,7 @@ class Chef
           Digest::SHA1.hexdigest(public_key.to_der)
         end
 
-        def encrypt_value(public_key, value)
+        def rsa_encrypt_value(value, public_key)
           begin
             Base64.encode64(public_key.public_encrypt(value))
           rescue OpenSSL::PKey::RSAError => e
@@ -115,12 +115,32 @@ class Chef
           end
         end
 
-        def decrypt_value(key, value)
+        def rsa_decrypt_value(value, key)
           begin
             key.private_decrypt(Base64.decode64(value.to_s))
           rescue OpenSSL::PKey::RSAError => e
             raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
+        end
+
+        def rsa_encrypt_multi_key(value, public_keys)
+          Mash.new(Hash[
+            public_keys.map do |public_key|
+              [
+                node_key(public_key),
+                rsa_encrypt_value(value, public_key),
+              ]
+            end
+          ])
+        end
+
+        def rsa_decrypt_multi_key(enc_value, key)
+          enc_value = enc_value[node_key(key.public_key)]
+          rsa_decrypt_value(enc_value, key)
+        end
+
+        def data_can_be_decrypted_by_key?(enc_value, key)
+          enc_value.has_key?(node_key(key.public_key))
         end
 
       end
