@@ -129,7 +129,10 @@ class Chef
 
       def reset
         OPTIONS.each do |attr|
-          remove_instance_variable("@#{attr.to_s}")
+          name = "@#{attr.to_s}"
+          if instance_variable_defined?(name)
+            remove_instance_variable(name)
+          end
         end
       end
 
