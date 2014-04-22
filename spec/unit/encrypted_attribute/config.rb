@@ -302,11 +302,16 @@ describe Chef::EncryptedAttribute::Config do
         @config.keys.should_not eql([])
         @config.reset
 
-        @config.version.should eql(0)
-        @config.partial_search.should eql(true)
-        @config.client_search.should eql([ 'admin:true' ])
-        @config.users.should eql([])
-        @config.keys.should eql([])
+        default = @Config.new
+        @Config::OPTIONS.each do |opt|
+          @config.send(opt).should eql(default.send(opt))
+        end
+      end
+
+      it 'should support multiple resets' do
+        (1..3).step.each do
+          lambda { @config.reset }.should_not raise_error
+        end
       end
 
     end # context #clear
