@@ -85,6 +85,7 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
     end
 
     it 'should throw an Unsupported exception for unknown versions' do
+      Chef::Log.stub(:error) # silence Chef::Log.error by Version#string_to_klass
       lambda { @AttributeBodyVersion.create(1000) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
@@ -163,6 +164,7 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
     end
 
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
+      Chef::Log.stub(:error) # silence Chef::Log.error by Version#string_to_klass
       lambda { @AttributeBodyVersion.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
