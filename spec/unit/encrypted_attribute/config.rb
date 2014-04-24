@@ -48,7 +48,7 @@ describe Chef::EncryptedAttribute::Config do
 
     {
       :version => {
-        :default => 0,
+        :default => 1,
         :ok => [ 1, 'any-string' ],
         :error => [ true, false, 0.2, Hash.new, Array.new, Object.new ],
       },

@@ -43,7 +43,7 @@ class Chef
           :version,
           arg,
           :kind_of => [ Fixnum, String ],
-          :default => 0
+          :default => 1
         )
       end
 

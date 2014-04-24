@@ -22,6 +22,7 @@ require 'chef/encrypted_attribute/remote_clients'
 require 'chef/encrypted_attribute/remote_users'
 require 'chef/encrypted_attribute/attribute_body/version'
 require 'chef/encrypted_attribute/attribute_body/version0'
+require 'chef/encrypted_attribute/attribute_body/version1'
 
 class Chef
   class EncryptedAttribute

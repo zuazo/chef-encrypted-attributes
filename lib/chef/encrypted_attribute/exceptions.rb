@@ -23,6 +23,7 @@ class Chef
     class UnacceptableEncryptedAttributeFormat < StandardError; end
     class DecryptionFailure < StandardError; end
     class EncryptionFailure < StandardError; end
+    class MessageAuthenticationFailure < StandardError; end
     class InvalidPublicKey < StandardError; end
     class InvalidPrivateKey < StandardError; end
 
