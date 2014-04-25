@@ -24,6 +24,7 @@ require 'chef/encrypted_attribute/encrypted_mash/base'
 require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/encrypted_mash/version1'
 
+# EncryptedMash Factory class for EncryptedMash::Version* classes
 class Chef
   class EncryptedAttribute
     class EncryptedMash

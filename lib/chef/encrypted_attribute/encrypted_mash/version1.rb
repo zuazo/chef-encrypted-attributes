@@ -19,6 +19,7 @@
 require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/exceptions'
 
+# Version1 format: using RSA with a shared secret and message authentication (HMAC)
 class Chef
   class EncryptedAttribute
     class EncryptedMash

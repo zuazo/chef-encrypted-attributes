@@ -19,6 +19,7 @@
 require 'chef/encrypted_attribute/encrypted_mash/base'
 require 'chef/encrypted_attribute/exceptions'
 
+# Version0 format: using RSA without shared secret
 class Chef
   class EncryptedAttribute
     class EncryptedMash
