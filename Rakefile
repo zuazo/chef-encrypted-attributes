@@ -25,9 +25,10 @@ Bundler::GemHelper.install_tasks
 require 'rake/testtask'
 
 {
-  :test => '**',
+  :test => '{unit,integration}',
   :unit => 'unit',
   :integration => 'integration',
+  :benchmark => 'benchmark',
 }.each do |test, dir|
   Rake::TestTask.new(test) do |test|
     test.libs << 'lib' << 'spec'
