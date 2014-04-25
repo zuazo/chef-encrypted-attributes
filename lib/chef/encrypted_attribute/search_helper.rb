@@ -56,7 +56,13 @@ class Chef
         end
       end
 
+      def empty_search?(query)
+        query.kind_of?(String) && query.empty? or
+        query.kind_of?(Array) && query.count == 0
+      end
+
       def search(type, query, keys, rows=1000, partial_search=true)
+        return [] if empty_search?(query) # avoid empty searches
         if partial_search
           partial_search(type, query, keys, rows)
         else

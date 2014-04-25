@@ -107,6 +107,12 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
   context '#search' do
 
+    it 'should not search for empty searches' do
+      @SearchHelper.should_not_receive(:partial_search)
+      @SearchHelper.should_not_receive(:normal_search)
+      @SearchHelper.search(1, [], 3, 4, true)
+    end
+
     it 'should call #partial_search when partial_search=true' do
       @SearchHelper.should_receive(:partial_search).with(1, 2, 3, 4)
       @SearchHelper.search(1, 2, 3, 4, true)
