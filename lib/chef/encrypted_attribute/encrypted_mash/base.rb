@@ -20,8 +20,8 @@ require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
-    class AttributeBody
-      class Version < Mash
+    class EncryptedMash
+      class Base < Mash
 
         # This class is oriented to be easily integrable with
         # chef in the future using JSONCompat
@@ -29,6 +29,8 @@ class Chef
         JSON_CLASS =      'x_json_class'.freeze
         CHEF_TYPE =       'chef_type'.freeze
         CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
+
+        VERSION_PREFIX = "#{Module.nesting[1]}::Version"
 
         def initialize(enc_hs=nil)
           super
@@ -65,7 +67,7 @@ class Chef
           to_hash
         end
 
-        # Update the AttributeBody from Hash
+        # Update the EncryptedMash from Hash
         def update_from!(enc_hs)
           unless self.class.exists?(enc_hs)
             raise UnacceptableEncryptedAttributeFormat, 'Trying to construct invalid encrypted attribute. Maybe it is not encrypted?'
@@ -76,7 +78,7 @@ class Chef
           update(enc_hs)
         end
 
-        # Create an AttributeBody::Version from JSON Hash
+        # Create an EncryptedMash::Version from JSON Hash
         def self.json_create(enc_hs)
           klass = string_to_klass(enc_hs[JSON_CLASS])
           if klass.nil?
@@ -105,7 +107,7 @@ class Chef
           if version.empty?
             raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute version \"#{version.inspect}\""
           end
-          klass = string_to_klass("#{name.to_s}#{version}")
+          klass = string_to_klass("#{VERSION_PREFIX}#{version}")
           if klass.nil?
             raise UnsupportedEncryptedAttributeFormat, "This version of chef-encrypted-attribute does not support encrypted attribute item format version: \"#{version}\""
           end

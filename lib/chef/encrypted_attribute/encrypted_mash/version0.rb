@@ -16,13 +16,13 @@
 # limitations under the License.
 #
 
-require 'chef/encrypted_attribute/attribute_body/version'
+require 'chef/encrypted_attribute/encrypted_mash/base'
 require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
-    class AttributeBody
-      class Version0 < Chef::EncryptedAttribute::AttributeBody::Version
+    class EncryptedMash
+      class Version0 < Chef::EncryptedAttribute::EncryptedMash::Base
 
         def encrypt(value, public_keys)
           value_json = json_encode(value)

@@ -20,13 +20,13 @@ require 'chef/encrypted_attribute/local_node'
 require 'chef/encrypted_attribute/remote_node'
 require 'chef/encrypted_attribute/remote_clients'
 require 'chef/encrypted_attribute/remote_users'
-require 'chef/encrypted_attribute/attribute_body/version'
-require 'chef/encrypted_attribute/attribute_body/version0'
-require 'chef/encrypted_attribute/attribute_body/version1'
+require 'chef/encrypted_attribute/encrypted_mash/base'
+require 'chef/encrypted_attribute/encrypted_mash/version0'
+require 'chef/encrypted_attribute/encrypted_mash/version1'
 
 class Chef
   class EncryptedAttribute
-    class AttributeBody
+    class EncryptedMash
 
       def initialize(c=nil)
         config(Config.new(c))
@@ -42,7 +42,7 @@ class Chef
 
       # Decrypts an encrypted attribute from a (encrypted) Hash
       def load(enc_hs)
-        body = AttributeBody::Version.json_create(enc_hs)
+        body = EncryptedMash::Base.json_create(enc_hs)
         local_node = LocalNode.new
         body.decrypt(local_node.key)
       end
@@ -55,13 +55,13 @@ class Chef
 
       # Creates an encrypted attribute from a Hash
       def create(hs)
-        body = AttributeBody::Version.create(config.version)
+        body = EncryptedMash::Base.create(config.version)
         body.encrypt(hs, target_keys)
       end
 
       # Updates the keys for which the attribute is encrypted
       def update(enc_hs)
-        old_body = AttributeBody::Version.json_create(enc_hs)
+        old_body = EncryptedMash::Base.json_create(enc_hs)
         if old_body.needs_update?(target_keys)
           hs = old_body.decrypt(local_node.key)
           new_body = create(hs)
@@ -73,7 +73,7 @@ class Chef
       end
 
       def self.exists?(enc_hs)
-        AttributeBody::Version.exists?(enc_hs)
+        EncryptedMash::Base.exists?(enc_hs)
       end
 
       protected

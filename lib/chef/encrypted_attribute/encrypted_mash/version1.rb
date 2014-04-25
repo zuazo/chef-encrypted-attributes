@@ -16,13 +16,13 @@
 # limitations under the License.
 #
 
-require 'chef/encrypted_attribute/attribute_body/version0'
+require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
-    class AttributeBody
-      class Version1 < Chef::EncryptedAttribute::AttributeBody::Version0
+    class EncryptedMash
+      class Version1 < Chef::EncryptedAttribute::EncryptedMash::Version0
         SYMM_ALGORITHM = 'aes-256-cbc'
         HMAC_ALGORITHM = 'sha256'
 

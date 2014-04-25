@@ -19,7 +19,7 @@
 require 'integration_helper'
 require 'chef/api_client'
 
-describe Chef::EncryptedAttribute::AttributeBody do
+describe Chef::EncryptedAttribute::EncryptedMash do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
@@ -28,7 +28,7 @@ describe Chef::EncryptedAttribute::AttributeBody do
       before do
         @EncryptedAttribute = Chef::EncryptedAttribute
         @RemoteClients = Chef::EncryptedAttribute::RemoteClients
-        @AttributeBody = Chef::EncryptedAttribute::AttributeBody
+        @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
       end
 
       it 'should call RemoteClients#get_public_keys only once' do

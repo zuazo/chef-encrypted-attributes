@@ -21,7 +21,7 @@ require 'spec_helper'
 describe Chef::EncryptedAttribute do
   before do
     @EncryptedAttribute = Chef::EncryptedAttribute
-    @AttributeBody = Chef::EncryptedAttribute::AttributeBody
+    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     @Config = Chef::EncryptedAttribute::Config
   end
 
@@ -45,26 +45,26 @@ describe Chef::EncryptedAttribute do
 
     context "##{meth}" do
       before do
-        @AttributeBody.any_instance.stub(meth.to_sym)
+        @EncryptedMash.any_instance.stub(meth.to_sym)
       end
 
-      it 'should create an AttributeBody object' do
-        body = @AttributeBody.new
-        @AttributeBody.should_receive(:new).and_return(body)
+      it 'should create an EncryptedMash object' do
+        body = @EncryptedMash.new
+        @EncryptedMash.should_receive(:new).and_return(body)
         @EncryptedAttribute.send(meth, [ 'a' ])
       end
 
-      it 'should create an AttributeBody object with a custom config' do
+      it 'should create an EncryptedMash object with a custom config' do
         config = @Config.new
         merged_config = @Config.new
-        body = @AttributeBody.new
+        body = @EncryptedMash.new
         @Config.any_instance.stub(:merge).and_return(merged_config)
-        @AttributeBody.should_receive(:new).with(merged_config).and_return(body)
+        @EncryptedMash.should_receive(:new).with(merged_config).and_return(body)
         @EncryptedAttribute.send(meth, [ 'a' ], config)
       end
 
-      it "should call AttributeBody##{meth} and return its result" do
-        @AttributeBody.any_instance.should_receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
+      it "should call EncryptedMash##{meth} and return its result" do
+        @EncryptedMash.any_instance.should_receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
         @EncryptedAttribute.send(meth, [ 'a' ]).should eql("#{meth}")
       end
 
@@ -74,26 +74,26 @@ describe Chef::EncryptedAttribute do
 
   context '#load_from_node' do
     before do
-      @AttributeBody.any_instance.stub(:load_from_node)
+      @EncryptedMash.any_instance.stub(:load_from_node)
     end
 
-    it 'should create an AttributeBody object' do
-      body = @AttributeBody.new
-      @AttributeBody.should_receive(:new).and_return(body)
+    it 'should create an EncryptedMash object' do
+      body = @EncryptedMash.new
+      @EncryptedMash.should_receive(:new).and_return(body)
       @EncryptedAttribute.load_from_node('node1', [ 'a' ])
     end
 
-    it 'should create an AttributeBody object with a custom config' do
+    it 'should create an EncryptedMash object with a custom config' do
       config = @Config.new
       merged_config = @Config.new
-      body = @AttributeBody.new
+      body = @EncryptedMash.new
       @Config.any_instance.stub(:merge).and_return(merged_config)
-      @AttributeBody.should_receive(:new).with(merged_config).and_return(body)
+      @EncryptedMash.should_receive(:new).with(merged_config).and_return(body)
       @EncryptedAttribute.load_from_node('node1', [ 'a' ], config)
     end
 
-    it 'should call AttributeBody#load_from_node and return its result' do
-      @AttributeBody.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
+    it 'should call EncryptedMash#load_from_node and return its result' do
+      @EncryptedMash.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
       @EncryptedAttribute.load_from_node('node1', [ 'a' ]).should eql('load_from_node')
     end
 
@@ -101,15 +101,15 @@ describe Chef::EncryptedAttribute do
 
   context '#exists?' do
     before do
-      @AttributeBody.any_instance.stub(:exists?)
+      @EncryptedMash.any_instance.stub(:exists?)
     end
 
-    it 'should not create an AttributeBody object' do
-      @AttributeBody.should_not_receive(:new)
+    it 'should not create an EncryptedMash object' do
+      @EncryptedMash.should_not_receive(:new)
     end
 
-    it 'should call AttributeBody#exists? and return its result' do
-      @AttributeBody.should_receive(:exists?).with([ 'a' ]).and_return('exists?')
+    it 'should call EncryptedMash#exists? and return its result' do
+      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return('exists?')
       @EncryptedAttribute.exists?([ 'a' ]).should eql('exists?')
     end
 

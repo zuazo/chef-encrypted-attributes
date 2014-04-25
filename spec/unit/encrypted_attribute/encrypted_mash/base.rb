@@ -1,9 +1,9 @@
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
 # Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
-# License:: Apache License, Version 2.0
+# License:: Apache License, Base 2.0
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Base 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -18,27 +18,27 @@
 
 require 'spec_helper'
 
-describe Chef::EncryptedAttribute::AttributeBody::Version do
+describe Chef::EncryptedAttribute::EncryptedMash::Base do
   before do
-    @AttributeBodyVersion = Chef::EncryptedAttribute::AttributeBody::Version
+    @EncryptedMashBase = Chef::EncryptedAttribute::EncryptedMash::Base
   end
 
   context '#new' do
 
-    it 'should create an AttributeBody::Version object without errors' do
-      lambda { @AttributeBodyVersion.new }.should_not raise_error
+    it 'should create an EncryptedMash::Base object without errors' do
+      lambda { @EncryptedMashBase.new }.should_not raise_error
     end
 
-    it 'should be able to create an AttributeBody::Version from another AttributeBody::Version instance passed as arg' do
-      body0 = @AttributeBodyVersion.new
-      @AttributeBodyVersion.any_instance.should_receive(:update_from!).with(body0)
-      lambda { @AttributeBodyVersion.new(body0) }.should_not raise_error
+    it 'should be able to create an EncryptedMash::Base from another EncryptedMash::Base instance passed as arg' do
+      body0 = @EncryptedMashBase.new
+      @EncryptedMashBase.any_instance.should_receive(:update_from!).with(body0)
+      lambda { @EncryptedMashBase.new(body0) }.should_not raise_error
     end
 
     %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
 
       it "##{meth} method should raise a NotImplementedError error" do
-        body = @AttributeBodyVersion.new
+        body = @EncryptedMashBase.new
         lambda { body.send(meth) }.should raise_error(NotImplementedError)
       end
 
@@ -48,29 +48,29 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
 
   context '#self.exists' do
 
-    @AttributeBodyVersion = Chef::EncryptedAttribute::AttributeBody::Version
+    @EncryptedMashBase = Chef::EncryptedAttribute::EncryptedMash::Base
     [
-      @AttributeBodyVersion.new,
+      @EncryptedMashBase.new,
       {
-        @AttributeBodyVersion::JSON_CLASS => @AttributeBodyVersion.to_s,
-        @AttributeBodyVersion::CHEF_TYPE => @AttributeBodyVersion::CHEF_TYPE_VALUE,
+        @EncryptedMashBase::JSON_CLASS => @EncryptedMashBase.to_s,
+        @EncryptedMashBase::CHEF_TYPE => @EncryptedMashBase::CHEF_TYPE_VALUE,
       },
     ].each do |o|
       it "should return true for #{o.inspect}" do
-        @AttributeBodyVersion.exists?(o).should be_true
+        @EncryptedMashBase.exists?(o).should be_true
       end
     end
 
     [
       5, true, {},
-      { @AttributeBodyVersion::JSON_CLASS => '@AttributeBodyVersion' },
+      { @EncryptedMashBase::JSON_CLASS => '@EncryptedMashBase' },
       {
-        @AttributeBodyVersion::JSON_CLASS => '@AttributeBodyVersion',
-        @AttributeBodyVersion::CHEF_TYPE => 'bad_type',
+        @EncryptedMashBase::JSON_CLASS => '@EncryptedMashBase',
+        @EncryptedMashBase::CHEF_TYPE => 'bad_type',
       },
     ].each do |o|
       it "should return false for #{o.inspect}" do
-        @AttributeBodyVersion.exists?(o).should be_false
+        @EncryptedMashBase.exists?(o).should be_false
       end
     end
 
@@ -78,33 +78,33 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
 
   context '#self.create' do
 
-    it 'should create a AttributeBody::Version subclass object' do
-      o = @AttributeBodyVersion.create(0)
-      o.should be_kind_of(@AttributeBodyVersion)
-      o.should_not be_an_instance_of(@AttributeBodyVersion)
+    it 'should create a EncryptedMash::Base subclass object' do
+      o = @EncryptedMashBase.create(0)
+      o.should be_kind_of(@EncryptedMashBase)
+      o.should_not be_an_instance_of(@EncryptedMashBase)
     end
 
     it 'should throw an Unsupported exception for unknown versions' do
-      Chef::Log.stub(:error) # silence Chef::Log.error by Version#string_to_klass
-      lambda { @AttributeBodyVersion.create(1000) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      Chef::Log.stub(:error) # silence Chef::Log.error by Base#string_to_klass
+      lambda { @EncryptedMashBase.create(1000) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
     [ nil, ''].each do |version|
       it "should throw an Unacceptable exception for #{version.inspect} versions" do
-        lambda { @AttributeBodyVersion.create(version) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+        lambda { @EncryptedMashBase.create(version) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
       end
     end
 
     it 'should use #const_get in a Ruby 1.8 compatible way' do
       stub_const('RUBY_VERSION', '1.8.7')
       Kernel.should_receive(:const_get).with('Chef').once.and_return(Chef)
-      @AttributeBodyVersion.create(0)
+      @EncryptedMashBase.create(0)
     end
 
     it 'should use #const_get in a Ruby 1.9 compatible way', :if => RUBY_VERSION >= '1.9' do
       stub_const('RUBY_VERSION', '1.9.0')
       Kernel.should_receive(:const_get).with('Chef', true).once.and_return(Chef)
-      @AttributeBodyVersion.create(0)
+      @EncryptedMashBase.create(0)
     end
 
   end # context #self.create
@@ -112,13 +112,13 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
   context '#to_json' do
 
     it 'should return a JSON object' do
-      o = @AttributeBodyVersion.create(0)
+      o = @EncryptedMashBase.create(0)
       o.to_json.should eql(o.to_hash.to_json)
     end
 
     it 'should pass arguments to Hash#to_json method' do
-      o = @AttributeBodyVersion.create(0)
-      @AttributeBodyVersion.any_instance.should_receive(:for_json).and_return(o.to_hash)
+      o = @EncryptedMashBase.create(0)
+      @EncryptedMashBase.any_instance.should_receive(:for_json).and_return(o.to_hash)
       Hash.any_instance.should_receive(:to_json).with(1, 2, 3, 4)
       o.to_json(1, 2, 3, 4)
     end
@@ -128,7 +128,7 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
   context '#for_json' do
 
     it 'should return a Hash object' do
-      o = @AttributeBodyVersion.new
+      o = @EncryptedMashBase.new
       o.for_json.should be_instance_of(Hash)
       o.for_json.should eql(o.to_hash)
     end
@@ -138,15 +138,15 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
   context '#update_from!' do
 
     it 'should update the encrypted attribute from another encrypted attribute' do
-      orig = @AttributeBodyVersion.new
+      orig = @EncryptedMashBase.new
       orig['key1'] = 'value1'
-      new = @AttributeBodyVersion.new
+      new = @EncryptedMashBase.new
       new.update_from!(orig)
       new['key1'].should eql('value1')
     end
 
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
-      o = @AttributeBodyVersion.new
+      o = @EncryptedMashBase.new
       lambda { o.update_from!({}) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
     end
 
@@ -155,19 +155,19 @@ describe Chef::EncryptedAttribute::AttributeBody::Version do
   context '#self.json_create' do
 
     it 'should create a new object from a JSON Hash' do
-      orig = @AttributeBodyVersion.new
+      orig = @EncryptedMashBase.new
       orig['key1'] = 'value1'
-      new = @AttributeBodyVersion.json_create(orig)
-      new.should be_kind_of(@AttributeBodyVersion)
+      new = @EncryptedMashBase.json_create(orig)
+      new.should be_kind_of(@EncryptedMashBase)
       new.should_not equal(orig)
       new['key1'].should eql('value1')
     end
 
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
-      Chef::Log.stub(:error) # silence Chef::Log.error by Version#string_to_klass
-      lambda { @AttributeBodyVersion.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      Chef::Log.stub(:error) # silence Chef::Log.error by Base#string_to_klass
+      lambda { @EncryptedMashBase.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
   end # context #self.json_create
 
-end # describe Chef::EncryptedAttribute::AttributeBody::Version
+end # describe Chef::EncryptedAttribute::EncryptedMash::Base

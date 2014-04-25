@@ -33,10 +33,10 @@ describe Chef::EncryptedAttribute do
 
         context '#create' do
           before do
-            @Version = Chef::EncryptedAttribute::AttributeBody::Version
-            @json_class = @Version::JSON_CLASS
-            @chef_type = @Version::CHEF_TYPE
-            @chef_type_value = @Version::CHEF_TYPE_VALUE
+            @Base = Chef::EncryptedAttribute::EncryptedMash::Base
+            @json_class = @Base::JSON_CLASS
+            @chef_type = @Base::CHEF_TYPE
+            @chef_type_value = @Base::CHEF_TYPE_VALUE
             @enc_attr = Chef::EncryptedAttribute.create('A coconut yogourts lover')
           end
 
@@ -49,19 +49,19 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'should set the encrypted attribute version correctly', :if => version == 'default' do
-            @enc_attr[@json_class].should match(/^Chef::EncryptedAttribute::AttributeBody::Version/)
+            @enc_attr[@json_class].should match(/^Chef::EncryptedAttribute::EncryptedMash::Version/)
           end
 
           it 'should set the encrypted attribute version correctly', :if => version != 'default' do
-            @enc_attr[@json_class].should eql("Chef::EncryptedAttribute::AttributeBody::Version#{version}")
+            @enc_attr[@json_class].should eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
           end
 
           it 'should create the correct version object' do
-            @enc_attr.should be_kind_of(@Version)
+            @enc_attr.should be_kind_of(@Base)
           end
 
           it 'should create the correct version object', :if => version != 'default' do
-            @enc_attr.class.name.should eql("Chef::EncryptedAttribute::AttributeBody::Version#{version}")
+            @enc_attr.class.name.should eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
           end
 
         end # context #create
