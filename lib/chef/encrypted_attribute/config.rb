@@ -89,15 +89,6 @@ class Chef
         )
       end
 
-      def add_key(key)
-        unless config_valid_key?(key)
-          raise Chef::Exceptions::ValidationFailed, 'You passed and incorrect public key.'
-        end
-        if not keys.include?(key)
-          @keys.push(key)
-        end
-      end
-
       def update!(config)
         if config.kind_of?(self.class)
           OPTIONS.each do |attr|
@@ -125,15 +116,6 @@ class Chef
           end
         end
         result
-      end
-
-      def reset
-        OPTIONS.each do |attr|
-          name = "@#{attr.to_s}"
-          if instance_variable_defined?(name)
-            remove_instance_variable(name)
-          end
-        end
       end
 
       def [](key)

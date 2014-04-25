@@ -27,8 +27,9 @@ describe Chef::EncryptedAttribute do
     %w{default 0 1}.each do |version|
       context "EncryptedAttribute version #{version}" do
         before do
-          Chef::EncryptedAttribute.config.reset
-          Chef::EncryptedAttribute.config.version(version) if version != 'default'
+          if version != 'default'
+            Chef::Config[:encrypted_attributes][:version] = version
+          end
         end
 
         context '#create' do
@@ -146,7 +147,7 @@ describe Chef::EncryptedAttribute do
 
         context '#update' do
           before do
-            Chef::EncryptedAttribute.config.client_search([ 'admin:true' ])
+            Chef::Config[:encrypted_attributes][:client_search] = [ 'admin:true' ]
 
             @client1 = Chef::ApiClient.new
             @client1.name('client1')
@@ -253,7 +254,6 @@ describe Chef::EncryptedAttribute do
         context 'working with multiple clients' do
           before do
             @attr_clear = 'A coconut yogourts lover'
-            Chef::EncryptedAttribute.config.reset
 
             @node = Chef::Node.new
             @node.name('client1')
@@ -289,7 +289,7 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should be able to read it if added in global config' do
-            Chef::EncryptedAttribute.config.add_key(@client.public_key)
+            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ]
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])
 
             Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
@@ -297,9 +297,9 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should not be able to read if they are removed from global config' do
-            Chef::EncryptedAttribute.config.add_key(@client.public_key) # first add the key
+            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ] # first add the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
-            Chef::EncryptedAttribute.config.keys([]) # removed the key
+            Chef::Config[:encrypted_attributes][:keys] = [] # remove the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
 
             Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
@@ -307,7 +307,7 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should not be able to read if they are removed using #udpate arg' do
-            Chef::EncryptedAttribute.config.add_key(@client.public_key) # first add the key
+            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ] # first add the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
 

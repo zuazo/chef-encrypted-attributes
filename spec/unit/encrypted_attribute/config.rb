@@ -113,34 +113,6 @@ describe Chef::EncryptedAttribute::Config do
       @config.client_search.should eql([ 'admin:false' ])
     end
 
-    describe '#add_key' do
-      before do
-        @key1 = OpenSSL::PKey::RSA.new(128).public_key.to_pem
-        @key2 = OpenSSL::PKey::RSA.new(128).public_key.to_pem
-      end
-
-      it 'should not allow bad keys' do
-        lambda { @config.add_key('bad-key') }.should raise_error(Chef::Exceptions::ValidationFailed)
-      end
-
-      it 'should not allow non-public keys' do
-        key = OpenSSL::PKey::RSA.new(128)
-        key.stub(:public?).and_return(false)
-        lambda { @config.add_key(key) }.should raise_error(Chef::Exceptions::ValidationFailed)
-      end
-
-      it 'should accept String type' do
-        lambda { @config.add_key(@key1) }.should_not raise_error
-      end
-
-      it 'should add the strings to the keys attribute' do
-        @config.add_key(@key1)
-        @config.add_key(@key2)
-        @config.keys.should eql([ @key1, @key2 ])
-      end
-
-    end # describe #add_key
-
     describe '#update!' do
       before do
         @config.version(2)
@@ -282,39 +254,6 @@ describe Chef::EncryptedAttribute::Config do
       end
 
     end # describe #merge
-
-    context '#reset' do
-      before do
-        @config = @Config.new({
-          :version => 3,
-          :partial_search => false,
-          :client_search => [ 'admin:*' ],
-          :users => [ 'admin' ],
-          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
-        })
-      end
-
-      it 'should reset config variables to default' do
-        @config.version.should eql(3)
-        @config.partial_search.should eql(false)
-        @config.client_search.should eql([ 'admin:*' ])
-        @config.users.should eql([ 'admin' ])
-        @config.keys.should_not eql([])
-        @config.reset
-
-        default = @Config.new
-        @Config::OPTIONS.each do |opt|
-          @config.send(opt).should eql(default.send(opt))
-        end
-      end
-
-      it 'should support multiple resets' do
-        (1..3).step.each do
-          lambda { @config.reset }.should_not raise_error
-        end
-      end
-
-    end # context #clear
 
     context '#[]' do
 

@@ -18,19 +18,27 @@
 
 require 'chef/encrypted_attribute/config'
 require 'chef/encrypted_attribute/encrypted_mash'
+require 'chef/config'
+require 'chef/mash'
+
+Chef::Config[:encrypted_attributes] = Mash.new unless Chef::Config[:encrypted_attributes].kind_of?(Hash)
 
 class Chef
   class EncryptedAttribute
 
+    protected
+
     def self.config(arg=nil)
-      @@config ||= Config.new
-      @@config.update!(arg) unless arg.nil?
-      @@config
+      config = EncryptedAttribute::Config.new(Chef::Config[:encrypted_attributes])
+      config.update!(arg) unless arg.nil?
+      config
     end
+
+    public
 
     def self.load(hs, c={})
       Chef::Log.debug("#{self.class.name}: Loading Local Encrypted Attribute from: #{hs.to_s}")
-      body = EncryptedMash.new(config.merge(c))
+      body = EncryptedMash.new(config(c))
       result = body.load(hs)
       Chef::Log.debug("#{self.class.name}: Local Encrypted Attribute loaded.")
       result
@@ -38,7 +46,7 @@ class Chef
 
     def self.load_from_node(name, attr_ary, c={})
       Chef::Log.debug("#{self.class.name}: Loading Remote Encrypted Attribute from #{name}: #{attr_ary.to_s}")
-      body = EncryptedMash.new(config.merge(c))
+      body = EncryptedMash.new(config(c))
       result = body.load_from_node(name, attr_ary)
       Chef::Log.debug("#{self.class.name}: Remote Encrypted Attribute loaded.")
       result
@@ -46,7 +54,7 @@ class Chef
 
     def self.create(hs, c={})
       Chef::Log.debug("#{self.class.name}: Creating Encrypted Attribute.")
-      body = EncryptedMash.new(config.merge(c))
+      body = EncryptedMash.new(config(c))
       result = body.create(hs)
       Chef::Log.debug("#{self.class.name}: Encrypted Attribute created.")
       result
@@ -54,7 +62,7 @@ class Chef
 
     def self.update(hs, c={})
       Chef::Log.debug("#{self.class.name}: Updating Encrypted Attribute: #{hs.to_s}")
-      body = EncryptedMash.new(config.merge(c))
+      body = EncryptedMash.new(config(c))
       result = body.update(hs)
       if result
         Chef::Log.debug("#{self.class.name}: Encrypted Attribute updated.")

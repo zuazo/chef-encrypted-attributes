@@ -25,22 +25,6 @@ describe Chef::EncryptedAttribute do
     @Config = Chef::EncryptedAttribute::Config
   end
 
-  context '#config' do
-
-    it 'should return a Config object' do
-      @EncryptedAttribute.config.should be_a(@Config)
-    end
-
-    it 'should set the config passed as arg' do
-      config = {
-        'version' => 5,
-      }
-      @EncryptedAttribute.config.should_receive(:update!).with(config)
-      @EncryptedAttribute.config(config)
-    end
-
-  end # context #config
-
   %w{load create update}.each do |meth|
 
     context "##{meth}" do
@@ -51,16 +35,16 @@ describe Chef::EncryptedAttribute do
       it 'should create an EncryptedMash object' do
         body = @EncryptedMash.new
         @EncryptedMash.should_receive(:new).and_return(body)
+        Chef::Config.should_receive(:[]).with(:encrypted_attributes).once.and_return(nil)
         @EncryptedAttribute.send(meth, [ 'a' ])
       end
 
       it 'should create an EncryptedMash object with a custom config' do
-        config = @Config.new
-        merged_config = @Config.new
+        orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
+        custom_config = @Config.new({ :partial_search => false })
         body = @EncryptedMash.new
-        @Config.any_instance.stub(:merge).and_return(merged_config)
-        @EncryptedMash.should_receive(:new).with(merged_config).and_return(body)
-        @EncryptedAttribute.send(meth, [ 'a' ], config)
+        @EncryptedMash.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+        @EncryptedAttribute.send(meth, [ 'a' ], custom_config)
       end
 
       it "should call EncryptedMash##{meth} and return its result" do
@@ -84,12 +68,11 @@ describe Chef::EncryptedAttribute do
     end
 
     it 'should create an EncryptedMash object with a custom config' do
-      config = @Config.new
-      merged_config = @Config.new
+      orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
+      custom_config = @Config.new({ :partial_search => false })
       body = @EncryptedMash.new
-      @Config.any_instance.stub(:merge).and_return(merged_config)
-      @EncryptedMash.should_receive(:new).with(merged_config).and_return(body)
-      @EncryptedAttribute.load_from_node('node1', [ 'a' ], config)
+      @EncryptedMash.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      @EncryptedAttribute.load_from_node('node1', [ 'a' ], custom_config)
     end
 
     it 'should call EncryptedMash#load_from_node and return its result' do
