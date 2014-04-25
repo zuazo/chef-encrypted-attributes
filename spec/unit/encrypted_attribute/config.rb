@@ -58,7 +58,7 @@ describe Chef::EncryptedAttribute::Config do
         :error => [ 1, 0.2, 'any-string', Hash.new, Array.new, Object.new ],
       },
       :client_search => {
-        :default => [ 'admin:true' ],
+        :default => [],
         :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ], [] ], # string case is treated below separately
         :error => [ 1, 0.2, Hash.new, Object.new ],
       },

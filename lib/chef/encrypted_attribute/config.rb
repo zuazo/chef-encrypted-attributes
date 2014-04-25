@@ -64,7 +64,7 @@ class Chef
           :client_search,
           arg,
           :kind_of => Array,
-          :default => [ 'admin:true' ],
+          :default => [],
           :callbacks => config_search_array_callbacks
         )
       end

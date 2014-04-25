@@ -146,6 +146,8 @@ describe Chef::EncryptedAttribute do
 
         context '#update' do
           before do
+            Chef::EncryptedAttribute.config.client_search([ 'admin:true' ])
+
             @client1 = Chef::ApiClient.new
             @client1.name('client1')
             @client1.admin(true)
