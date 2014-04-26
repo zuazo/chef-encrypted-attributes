@@ -91,7 +91,7 @@ class Chef
             enc_value['iv'] = Base64.encode64(cipher.iv = cipher.random_iv)
             enc_value['secret'] = Base64.encode64(cipher.key = cipher.random_key)
             enc_data = cipher.update(value) + cipher.final
-          rescue OpenSSL::CipherError => e
+          rescue OpenSSL::Cipher::CipherError => e
             raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
           enc_value['data'] = Base64.encode64(enc_data)
@@ -100,12 +100,12 @@ class Chef
 
         def symmetric_decrypt_value(enc_value, algo=SYMM_ALGORITHM)
           begin
-            cipher = OpenSSL::Cipher.new(algo)
+            cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
             cipher.decrypt
             cipher.iv = Base64.decode64(enc_value['iv'])
             cipher.key = Base64.decode64(enc_value['secret'])
             dec_data = cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
-          rescue OpenSSL::CipherError => e
+          rescue OpenSSL::Cipher::CipherError => e
             raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
           dec_data
@@ -118,7 +118,7 @@ class Chef
             secret = OpenSSL::Random.random_bytes(digest.block_length)
             hmac['secret'] = Base64.encode64(secret)
             hmac['data'] = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
-          rescue OpenSSL::DigestError, OpenSSL::HMACError, RuntimeError => e
+          rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
             # RuntimeError is raised for unsupported algorithms
             raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
           end
@@ -130,7 +130,7 @@ class Chef
             digest = OpenSSL::Digest.new(algo)
             secret = Base64.decode64(secret)
             new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
-          rescue OpenSSL::DigestError, OpenSSL::HMACError, RuntimeError => e
+          rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
             # RuntimeError is raised for unsupported algorithms
             raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
           end

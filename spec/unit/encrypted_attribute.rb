@@ -92,8 +92,10 @@ describe Chef::EncryptedAttribute do
     end
 
     it 'should call EncryptedMash#exists? and return its result' do
-      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return('exists?')
-      @EncryptedAttribute.exists?([ 'a' ]).should eql('exists?')
+      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return(true)
+      @EncryptedAttribute.exists?([ 'a' ]).should eql(true)
+      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return(false)
+      @EncryptedAttribute.exists?([ 'a' ]).should eql(false)
     end
 
   end # context #exists?
