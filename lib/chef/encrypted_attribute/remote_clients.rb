@@ -17,18 +17,28 @@
 #
 
 require 'chef/encrypted_attribute/search_helper'
+require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
     class RemoteClients
       extend ::Chef::EncryptedAttribute::SearchHelper
 
+      def self.cache
+        @@cache ||= Chef::EncryptedAttribute::CacheLru.new
+      end
+
       def self.get_public_keys(search='*:*', partial_search=true)
-        search(:client, search, {
-          'public_key' => [ 'public_key' ]
-        }, 1000, partial_search).map do |client|
-          client['public_key']
-        end.compact
+        escaped_query = escape_query(search)
+        if cache.has_key?(escaped_query)
+          cache[escaped_query]
+        else
+          cache[escaped_query] = search(:client, search, {
+            'public_key' => [ 'public_key' ]
+          }, 1000, partial_search).map do |client|
+            client['public_key']
+          end.compact
+        end
       end
 
     end

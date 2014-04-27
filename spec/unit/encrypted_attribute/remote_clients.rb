@@ -30,12 +30,17 @@ describe Chef::EncryptedAttribute::RemoteClients do
   end
 
   describe '#get_public_keys' do
+    before(:all) do
+      Chef::EncryptedAttribute::RemoteClients.cache.max_size(20)
+    end
     before do
       @public_keys = [
         OpenSSL::PKey::RSA.new(128).public_key.to_pem,
         OpenSSL::PKey::RSA.new(128).public_key.to_pem,
       ]
       @clients = @public_keys.map { |x| { 'public_key' => x } }
+
+      Chef::EncryptedAttribute::RemoteClients.cache.clear
     end
 
     it 'should get client public_keys using SearchHelper' do
@@ -50,7 +55,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
 
     it 'should do a search with the correct arguments' do
       query = 'admin:true'
-      @RemoteClients.should_receive(:search).with(
+      @RemoteClients.should_receive(:search).once.with(
         :client,
         query,
         { 'public_key' => [ 'public_key' ] },
@@ -69,6 +74,20 @@ describe Chef::EncryptedAttribute::RemoteClients do
         true
       ).and_return(@clients)
       @RemoteClients.get_public_keys
+    end
+
+    it 'should cache search results for multiple calls' do
+      query = 'admin:true'
+      @RemoteClients.should_receive(:search).once.with(
+        :client,
+        query,
+        { 'public_key' => [ 'public_key' ] },
+        1000,
+        true
+      ).and_return(@clients)
+
+      @RemoteClients.get_public_keys(query)
+      @RemoteClients.get_public_keys(query) # cached
     end
 
   end # describe #get_public_keys

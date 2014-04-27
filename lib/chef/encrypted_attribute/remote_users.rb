@@ -18,14 +18,23 @@
 
 require 'chef/user'
 require 'chef/encrypted_attribute/exceptions'
+require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
     class RemoteUsers
 
+      def self.cache
+        @@cache ||= Chef::EncryptedAttribute::CacheLru.new
+      end
+
       def self.get_public_keys(users=[])
-        if users == '*'
-          get_all_public_keys
+        if users == '*' # users are [a-z0-9\-_]+, cannot be *
+          if cache.has_key?('*')
+            cache['*']
+          else
+            cache['*'] = get_all_public_keys
+          end
         elsif users.kind_of?(Array)
           get_users_public_keys(users)
         elsif not users.nil?
@@ -36,9 +45,10 @@ class Chef
       protected
 
       def self.get_user_public_key(name)
+        return cache[name] if cache.has_key?(name)
         begin
           user = Chef::User.load(name)
-          user.public_key
+          cache[name] = user.public_key
         rescue Net::HTTPServerException => e
           case e.response.code
           when '403'

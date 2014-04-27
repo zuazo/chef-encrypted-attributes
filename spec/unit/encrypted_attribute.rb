@@ -19,6 +19,10 @@
 require 'spec_helper'
 
 describe Chef::EncryptedAttribute do
+  before(:all) do
+    Chef::EncryptedAttribute::RemoteClients.cache.clear
+    Chef::EncryptedAttribute::RemoteUsers.cache.clear
+  end
   before do
     @EncryptedAttribute = Chef::EncryptedAttribute
     @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash

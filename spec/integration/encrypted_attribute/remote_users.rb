@@ -20,6 +20,9 @@ require 'integration_helper'
 
 describe Chef::EncryptedAttribute::RemoteUsers do
   extend ChefZero::RSpec
+  before(:all) do
+    Chef::EncryptedAttribute::RemoteUsers.cache.clear
+  end
 
   when_the_chef_server 'is ready to rock!' do
     before do

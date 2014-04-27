@@ -21,6 +21,10 @@ require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::EncryptedMash do
   extend ChefZero::RSpec
+  before(:all) do
+    Chef::EncryptedAttribute::RemoteClients.cache.clear
+    Chef::EncryptedAttribute::RemoteUsers.cache.clear
+  end
 
   when_the_chef_server 'is ready to rock!' do
 

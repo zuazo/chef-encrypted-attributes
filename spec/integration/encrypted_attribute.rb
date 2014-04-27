@@ -21,6 +21,10 @@ require 'chef/api_client'
 
 describe Chef::EncryptedAttribute do
   extend ChefZero::RSpec
+  before(:all) do
+    Chef::EncryptedAttribute::RemoteClients.cache.clear
+    Chef::EncryptedAttribute::RemoteUsers.cache.clear
+  end
 
   when_the_chef_server 'is ready to rock!' do
 
@@ -148,6 +152,8 @@ describe Chef::EncryptedAttribute do
         context '#update' do
           before do
             Chef::Config[:encrypted_attributes][:client_search] = [ 'admin:true' ]
+            # disable remote clients cache
+            Chef::EncryptedAttribute::RemoteClients.cache.max_size(0)
 
             @client1 = Chef::ApiClient.new
             @client1.name('client1')

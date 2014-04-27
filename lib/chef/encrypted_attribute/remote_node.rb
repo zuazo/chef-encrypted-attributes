@@ -18,6 +18,7 @@
 
 require 'chef/mixin/params_validate'
 require 'chef/encrypted_attribute/search_helper'
+require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
@@ -27,6 +28,10 @@ class Chef
 
       def initialize(name)
         name(name)
+      end
+
+      def self.cache
+        @@cache ||= Chef::EncryptedAttribute::CacheLru.new(0) # disabled by default
       end
 
       def name(arg=nil)
@@ -41,14 +46,25 @@ class Chef
         unless attr_ary.kind_of?(Array)
           raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
         end
-        keys = { 'value' => attr_ary }
-        res = search(:node, "name:#{@name}", keys, 1, partial_search)
-        if res.kind_of?(Array) and res[0].kind_of?(Hash) and
-           res[0].has_key?('value')
-          res[0]['value']
+        cache_key = cache_key(name, attr_ary)
+        if self.class.cache.has_key?(cache_key)
+          self.class.cache[cache_key]
         else
-          nil
+          keys = { 'value' => attr_ary }
+          res = search(:node, "name:#{@name}", keys, 1, partial_search)
+          self.class.cache[cache_key] = if res.kind_of?(Array) and
+               res[0].kind_of?(Hash) and res[0].has_key?('value')
+              res[0]['value']
+            else
+              nil
+            end
         end
+      end
+
+      protected
+
+      def cache_key(name, attr_ary)
+        "#{name}:#{attr_ary.inspect}" # TODO ok, this can be improved
       end
 
     end

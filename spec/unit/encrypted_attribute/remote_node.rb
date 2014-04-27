@@ -50,7 +50,10 @@ describe Chef::EncryptedAttribute::RemoteNode do
 
   end
 
-  describe '#load' do
+  describe '#load_attribute' do
+    before do
+      Chef::EncryptedAttribute::RemoteNode.cache.clear
+    end
 
     it 'should read the node attribute using SearchHelper' do
       attr_ary = [ 'attr1', 'subattr1' ]
@@ -62,9 +65,43 @@ describe Chef::EncryptedAttribute::RemoteNode do
         1,
         true
       ).and_return(
-        [ { 'value' => nil } ]
+        [ { 'value' => 'value1' } ]
       )
-      remote_node.load_attribute(attr_ary)
+      remote_node.load_attribute(attr_ary).should eql('value1')
+    end
+
+    it 'should not cache the attribute if read multiple times and cache is disabled' do
+      Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
+      attr_ary = [ 'attr1', 'subattr1' ]
+      remote_node = @RemoteNode.new('bob')
+      remote_node.should_receive(:search).twice.with(
+        :node,
+        "name:#{remote_node.name}",
+        { 'value' => attr_ary },
+        1,
+        true
+      ).and_return(
+        [ { 'value' => 'value1' } ]
+      )
+      remote_node.load_attribute(attr_ary).should eql('value1')
+      remote_node.load_attribute(attr_ary).should eql('value1')
+    end
+
+    it 'should cache the attribute if read multiple times and cache is enabled' do
+      Chef::EncryptedAttribute::RemoteNode.cache.max_size(10)
+      attr_ary = [ 'attr1', 'subattr1' ]
+      remote_node = @RemoteNode.new('bob')
+      remote_node.should_receive(:search).once.with(
+        :node,
+        "name:#{remote_node.name}",
+        { 'value' => attr_ary },
+        1,
+        true
+      ).and_return(
+        [ { 'value' => 'value1' } ]
+      )
+      remote_node.load_attribute(attr_ary).should eql('value1')
+      remote_node.load_attribute(attr_ary).should eql('value1') # cached
     end
 
     it 'should return nil if the attribute is not found' do
@@ -81,6 +118,22 @@ describe Chef::EncryptedAttribute::RemoteNode do
       )
       remote_node.load_attribute(attr_ary).should eql(nil)
     end
+
+    it 'should return nil if the search result is wrong' do
+      attr_ary = [ 'attr1', 'subattr1' ]
+      remote_node = @RemoteNode.new('bob')
+      remote_node.should_receive(:search).with(
+        :node,
+        "name:#{remote_node.name}",
+        { 'value' => attr_ary },
+        1,
+        true
+      ).and_return(
+        [ { 'bad-value' => 'wrong' } ]
+      )
+      remote_node.load_attribute(attr_ary).should eql(nil)
+    end
+
 
     it 'should raise an error if the attribute list is incorrect' do
       remote_node = @RemoteNode.new('bob')
