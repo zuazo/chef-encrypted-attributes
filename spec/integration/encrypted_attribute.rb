@@ -272,6 +272,7 @@ describe Chef::EncryptedAttribute do
             @client.public_key(client_hs['public_key'])
             @client.private_key(client_hs['private_key'])
             @client
+            @private_key = OpenSSL::PKey::RSA.new(@client.private_key)
           end
           after do
             @node.destroy
@@ -283,14 +284,14 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should not be able to read it by default' do
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
             lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 
           it 'other clients should be able to read it if added as #udpate arg' do
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [ @client.public_key ] })
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
             Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
           end
 
@@ -298,7 +299,7 @@ describe Chef::EncryptedAttribute do
             Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ]
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
             Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
           end
 
@@ -308,7 +309,7 @@ describe Chef::EncryptedAttribute do
             Chef::Config[:encrypted_attributes][:keys] = [] # remove the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
             lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 
@@ -317,7 +318,7 @@ describe Chef::EncryptedAttribute do
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client.private_key)
+            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
             lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 

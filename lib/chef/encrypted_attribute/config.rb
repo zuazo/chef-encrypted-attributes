@@ -92,12 +92,14 @@ class Chef
       def update!(config)
         if config.kind_of?(self.class)
           OPTIONS.each do |attr|
-            self.instance_variable_set("@#{attr.to_s}", config.send(attr))
+            value = Marshal.load(Marshal.dump(config.send(attr))) # dup
+            self.instance_variable_set("@#{attr.to_s}", value)
           end
         elsif config.kind_of?(Hash)
           config.each do |attr, value|
             attr = attr.to_sym if attr.kind_of?(String)
             if OPTIONS.include?(attr)
+              value = Marshal.load(Marshal.dump(value)) # dup
               self.send(attr, value)
             else
               Chef::Log.warn("#{self.class.to_s}: configuration method not found: \"#{attr.to_s}\".")

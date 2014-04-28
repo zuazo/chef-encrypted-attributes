@@ -30,12 +30,13 @@ class Chef
     class EncryptedMash
 
       def initialize(c=nil)
-        config(Config.new(c))
+        config(c)
       end
 
       def config(arg=nil)
         unless arg.nil?
           @config = Config.new(arg)
+          @config.keys.push(local_node.public_key)
         else
           @config
         end
@@ -44,7 +45,6 @@ class Chef
       # Decrypts an encrypted attribute from a (encrypted) Hash
       def load(enc_hs)
         body = EncryptedMash::Base.json_create(enc_hs)
-        local_node = LocalNode.new
         body.decrypt(local_node.key)
       end
 
@@ -57,13 +57,13 @@ class Chef
       # Creates an encrypted attribute from a Hash
       def create(hs)
         body = EncryptedMash::Base.create(config.version)
-        body.encrypt(hs, target_keys)
+        body.encrypt(hs, config.keys + remote_client_keys)
       end
 
       # Updates the keys for which the attribute is encrypted
       def update(enc_hs)
         old_body = EncryptedMash::Base.json_create(enc_hs)
-        if old_body.needs_update?(target_keys)
+        if old_body.needs_update?(config.keys + remote_client_keys)
           hs = old_body.decrypt(local_node.key)
           new_body = create(hs)
           enc_hs.replace(new_body)
@@ -83,13 +83,8 @@ class Chef
         @local_node ||= LocalNode.new
       end
 
-      def target_keys
-        @target_keys ||= begin
-          remote_keys = RemoteClients.get_public_keys(config.client_search, config.partial_search)
-          keys = remote_keys + config.keys
-          keys.push(local_node.public_key)
-          keys
-        end # TODO improve this cache, can be problematic
+      def remote_client_keys
+        RemoteClients.get_public_keys(config.client_search, config.partial_search)
       end
 
     end

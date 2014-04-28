@@ -24,6 +24,7 @@ describe Chef::EncryptedAttribute do
     Chef::EncryptedAttribute::RemoteUsers.cache.clear
   end
   before do
+    Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
     @EncryptedAttribute = Chef::EncryptedAttribute
     @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     @Config = Chef::EncryptedAttribute::Config
