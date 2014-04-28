@@ -16,14 +16,14 @@
 # limitations under the License.
 #
 
-require 'chef/encrypted_attribute/encrypted_mash/base'
+require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/encrypted_attribute/exceptions'
 
 # Version0 format: using RSA without shared secret
 class Chef
   class EncryptedAttribute
     class EncryptedMash
-      class Version0 < Chef::EncryptedAttribute::EncryptedMash::Base
+      class Version0 < Chef::EncryptedAttribute::EncryptedMash
 
         def encrypt(value, public_keys)
           value_json = json_encode(value)

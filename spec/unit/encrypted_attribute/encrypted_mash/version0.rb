@@ -22,7 +22,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
   before(:all) do
     @key1 = OpenSSL::PKey::RSA.new(256)
     @key2 = OpenSSL::PKey::RSA.new(256)
-    @EncryptedMashBase = Chef::EncryptedAttribute::EncryptedMash::Base
+    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     @EncryptedMashVersion0 = Chef::EncryptedAttribute::EncryptedMash::Version0
   end
 
@@ -34,12 +34,12 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
 
     it 'should set the CHEF_TYPE key' do
       o = @EncryptedMashVersion0.new
-      o[@EncryptedMashBase::CHEF_TYPE].should eql(@EncryptedMashBase::CHEF_TYPE_VALUE)
+      o[@EncryptedMash::CHEF_TYPE].should eql(@EncryptedMash::CHEF_TYPE_VALUE)
     end
 
     it 'should set the JSON_CLASS key' do
       o = @EncryptedMashVersion0.new
-      o[@EncryptedMashBase::JSON_CLASS].should eql(@EncryptedMashVersion0.to_s)
+      o[@EncryptedMash::JSON_CLASS].should eql(@EncryptedMashVersion0.to_s)
     end
 
   end # context #new

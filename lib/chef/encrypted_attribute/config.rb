@@ -92,32 +92,20 @@ class Chef
       def update!(config)
         if config.kind_of?(self.class)
           OPTIONS.each do |attr|
-            value = Marshal.load(Marshal.dump(config.send(attr))) # dup
+            value = dup_object(config.send(attr))
             self.instance_variable_set("@#{attr.to_s}", value)
           end
         elsif config.kind_of?(Hash)
           config.each do |attr, value|
             attr = attr.to_sym if attr.kind_of?(String)
             if OPTIONS.include?(attr)
-              value = Marshal.load(Marshal.dump(value)) # dup
+              value = dup_object(value)
               self.send(attr, value)
             else
               Chef::Log.warn("#{self.class.to_s}: configuration method not found: \"#{attr.to_s}\".")
             end
           end
         end
-      end
-
-      def merge(config)
-        config = Config.new(config) if config.kind_of?(Hash)
-        result = Config.new(self)
-        if config.kind_of?(Config)
-          OPTIONS.each do |attr|
-            config_val = config.instance_variable_get("@#{attr.to_s}")
-            result.send(attr, config_val) unless config_val.nil?
-          end
-        end
-        result
       end
 
       def [](key)
@@ -135,6 +123,14 @@ class Chef
       end
 
       protected
+
+      def dup_object(o)
+        begin
+          o.dup
+        rescue TypeError
+          o
+        end
+      end
 
       def config_valid_search_array?(s_ary)
         s_ary.each do |s|
@@ -168,12 +164,19 @@ class Chef
       end
 
       def config_valid_key?(k)
-        return false unless k.kind_of?(String)
-        begin
-          rsa_k = OpenSSL::PKey::RSA.new(k)
-        rescue OpenSSL::PKey::RSAError, TypeError
-          return false
+        rsa_k = case k
+        when OpenSSL::PKey::RSA
+          k
+        when String
+          begin
+            OpenSSL::PKey::RSA.new(k)
+          rescue OpenSSL::PKey::RSAError, TypeError
+            nil
+          end
+        else
+          nil
         end
+        return false if rsa_k.nil?
         rsa_k.public?
       end
 
@@ -188,7 +191,7 @@ class Chef
 
       def config_valid_keys_array_callbacks
         {
-          'should be a valid hash of keys' => lambda do |keys|
+          'should be a valid array of keys' => lambda do |keys|
             config_valid_keys_array?(keys)
           end
         }

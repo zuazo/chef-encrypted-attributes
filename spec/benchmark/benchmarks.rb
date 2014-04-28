@@ -16,7 +16,7 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
       @data_bag_secret = Chef::EncryptedDataBagItem.load_secret
 
       # disable client search
-      Chef::EncryptedAttribute.config.client_search([])
+      Chef::Config[:encrypted_attributes][:client_search] = []
 
       # Some data to encrypt
       @clear_hs = Mash.new({

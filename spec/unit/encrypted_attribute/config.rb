@@ -70,13 +70,14 @@ describe Chef::EncryptedAttribute::Config do
       :keys => {
         :default => [],
         :ok => [
+          [ OpenSSL::PKey::RSA.new(128) ],
           [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
           [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
+          [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, OpenSSL::PKey::RSA.new(128) ],
         ],
         :error => [
           true, false, 1, 0.2, 'any-string', Hash.new,
           OpenSSL::PKey::RSA.new(128),
-          [ OpenSSL::PKey::RSA.new(128) ],
           [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, 4 ],
           [ 'bad-key' ],
           # TODO non-public key string arrays
@@ -201,59 +202,6 @@ describe Chef::EncryptedAttribute::Config do
       end
 
     end # describe #update!
-
-    describe '#merge' do
-      before do
-        @config_prev_hs = {
-          :version => 3,
-          :partial_search => false,
-          :client_search => [ 'admin:*' ],
-          :users => [ 'admin' ],
-          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
-        }
-        @config_prev = @Config.new(@config_prev_hs)
-      end
-
-      it 'should preserve previous values for default configurations' do
-        config2 = @config_prev.merge(@Config.new)
-        config2.version.should eql(@config_prev_hs[:version])
-        config2.partial_search.should eql(@config_prev_hs[:partial_search])
-        config2.client_search.should eql(@config_prev_hs[:client_search])
-        config2.users.should eql(@config_prev_hs[:users])
-        config2.keys.should eql(@config_prev_hs[:keys])
-      end
-
-      it 'should merge version values' do
-        config_new = @Config.new({ :version => 4 })
-        config_res = @config_prev.merge(config_new)
-        config_res.version.should eql(config_new.version)
-      end
-
-      it 'should merge partial_search values' do
-        config_new = @Config.new({ :partial_search => true })
-        config_res = @config_prev.merge(config_new)
-        config_res.partial_search.should eql(config_new.partial_search)
-      end
-
-      it 'should merge client_search values' do
-        config_new = @Config.new({ :client_search => [ 'admin:true' ] })
-        config_res = @config_prev.merge(config_new)
-        config_res.client_search.should eql(config_new.client_search)
-      end
-
-      it 'should merge users values' do
-        config_new = @Config.new({ :users => [ 'dev1' ] })
-        config_res = @config_prev.merge(config_new)
-        config_res.users.should eql(config_new.users)
-      end
-
-      it 'should merge keys values' do
-        config_new = @Config.new({ :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ] })
-        config_res = @config_prev.merge(config_new)
-        config_res.keys.should eql(config_new.keys)
-      end
-
-    end # describe #merge
 
     context '#[]' do
 

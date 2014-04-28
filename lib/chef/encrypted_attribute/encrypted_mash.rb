@@ -16,75 +16,102 @@
 # limitations under the License.
 #
 
-require 'chef/encrypted_attribute/local_node'
-require 'chef/encrypted_attribute/remote_node'
-require 'chef/encrypted_attribute/remote_clients'
-require 'chef/encrypted_attribute/remote_users'
-require 'chef/encrypted_attribute/encrypted_mash/base'
-require 'chef/encrypted_attribute/encrypted_mash/version0'
-require 'chef/encrypted_attribute/encrypted_mash/version1'
+require 'chef/mash'
+require 'chef/encrypted_attribute/exceptions'
 
-# EncryptedMash Factory class for EncryptedMash::Version* classes
 class Chef
   class EncryptedAttribute
-    class EncryptedMash
+    class EncryptedMash < Mash
 
-      def initialize(c=nil)
-        config(c)
+      # This class is oriented to be easily integrable with
+      # chef in the future using JSONCompat
+
+      JSON_CLASS =      'x_json_class'.freeze
+      CHEF_TYPE =       'chef_type'.freeze
+      CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
+
+      VERSION_PREFIX = "#{self.name}::Version"
+
+      def initialize(enc_hs=nil)
+        super
+        self[JSON_CLASS] = self.class.name
+        self[CHEF_TYPE] = CHEF_TYPE_VALUE
+        update_from!(enc_hs) if enc_hs.kind_of?(Hash)
       end
 
-      def config(arg=nil)
-        unless arg.nil?
-          @config = Config.new(arg)
-          @config.keys.push(local_node.public_key)
-        else
-          @config
-        end
-      end
-
-      # Decrypts an encrypted attribute from a (encrypted) Hash
-      def load(enc_hs)
-        body = EncryptedMash::Base.json_create(enc_hs)
-        body.decrypt(local_node.key)
-      end
-
-      # Decrypts a encrypted attribute from a remote node
-      def load_from_node(name, attr_ary)
-        remote_node = RemoteNode.new(name)
-        self.load(remote_node.load_attribute(attr_ary, config.partial_search))
-      end
-
-      # Creates an encrypted attribute from a Hash
-      def create(hs)
-        body = EncryptedMash::Base.create(config.version)
-        body.encrypt(hs, config.keys + remote_client_keys)
-      end
-
-      # Updates the keys for which the attribute is encrypted
-      def update(enc_hs)
-        old_body = EncryptedMash::Base.json_create(enc_hs)
-        if old_body.needs_update?(config.keys + remote_client_keys)
-          hs = old_body.decrypt(local_node.key)
-          new_body = create(hs)
-          enc_hs.replace(new_body)
-          true
-        else
-          false
+      %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
+        define_method(meth) do
+          raise NotImplementedError, "#{self.class.to_s}##{__method__} method not implemented."
         end
       end
 
       def self.exists?(enc_hs)
-        EncryptedMash::Base.exists?(enc_hs)
+        enc_hs.kind_of?(Hash) and
+        enc_hs.has_key?(JSON_CLASS) and
+        enc_hs[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ and
+        enc_hs.has_key?(CHEF_TYPE) and enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
+      end
+
+      def self.create(version)
+        klass = version_klass(version)
+        klass.send(:new)
+      end
+
+      # Serialize this object as a Hash
+      def to_json(*a)
+        for_json.to_json(*a)
+      end
+
+      # Returns a Hash for JSON
+      def for_json
+        to_hash
+      end
+
+      # Update the EncryptedMash from Hash
+      def update_from!(enc_hs)
+        unless self.class.exists?(enc_hs)
+          raise UnacceptableEncryptedAttributeFormat, 'Trying to construct invalid encrypted attribute. Maybe it is not encrypted?'
+        end
+        enc_hs = enc_hs.dup
+        enc_hs.delete(JSON_CLASS)
+        enc_hs.delete(CHEF_TYPE)
+        update(enc_hs)
+      end
+
+      # Create an EncryptedMash::Version from JSON Hash
+      def self.json_create(enc_hs)
+        klass = string_to_klass(enc_hs[JSON_CLASS])
+        if klass.nil?
+          raise UnsupportedEncryptedAttributeFormat, "Unknown chef-encrypted-attribute class \"#{enc_hs[JSON_CLASS]}\""
+        end
+        klass.send(:new, enc_hs)
       end
 
       protected
 
-      def local_node
-        @local_node ||= LocalNode.new
+      def self.string_to_klass(class_name)
+        begin
+          if RUBY_VERSION < '1.9'
+            class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const) }
+          else
+            class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const, scope === Kernel) }
+          end
+        rescue NameError => e
+          Chef::Log.error(e)
+          nil
+        end
       end
 
-      def remote_client_keys
-        RemoteClients.get_public_keys(config.client_search, config.partial_search)
+      def self.version_klass(version)
+        version = version.to_s unless version.kind_of?(String)
+        if version.empty?
+          raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute version \"#{version.inspect}\""
+        end
+        klass = string_to_klass("#{VERSION_PREFIX}#{version}")
+        if klass.nil?
+          raise UnsupportedEncryptedAttributeFormat, "This version of chef-encrypted-attribute does not support encrypted attribute item format version: \"#{version}\""
+        end
+        klass
       end
 
     end
