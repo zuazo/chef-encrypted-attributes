@@ -27,7 +27,7 @@ class Chef
         require 'chef/json_compat'
       end
 
-      banner 'knife encrypted attribute NODE ATTRIBUTE (options)'
+      banner 'knife encrypted attribute show NODE ATTRIBUTE (options)'
 
       def run
         node_name = @name_args[0]
