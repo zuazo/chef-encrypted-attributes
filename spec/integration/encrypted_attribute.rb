@@ -271,7 +271,6 @@ describe Chef::EncryptedAttribute do
             client_hs = @client.save
             @client.public_key(client_hs['public_key'])
             @client.private_key(client_hs['private_key'])
-            @client
             @private_key = OpenSSL::PKey::RSA.new(@client.private_key)
           end
           after do

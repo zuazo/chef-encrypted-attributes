@@ -24,13 +24,44 @@ describe Chef::EncryptedAttribute do
     Chef::EncryptedAttribute::RemoteUsers.cache.clear
   end
   before do
-    Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
+    # Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
+    @client_key = OpenSSL::PKey::RSA.new(2048)
+    Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client_key)
+
     @EncryptedAttribute = Chef::EncryptedAttribute
     @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     @Config = Chef::EncryptedAttribute::Config
   end
 
-  %w{load create update}.each do |meth|
+  context '#self.create' do
+    before do
+      @EncryptedAttribute.any_instance.stub(:create)
+    end
+
+    it 'should create an EncryptedAttribute object' do
+      body = @EncryptedAttribute.new
+      @EncryptedAttribute.should_receive(:new).and_return(body)
+      @EncryptedAttribute.create([ 'a' ])
+    end
+
+    it 'should create an EncryptedAttribute object with a custom config' do
+      orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
+      custom_config = @Config.new({ :partial_search => false })
+      body = @EncryptedAttribute.new
+      @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      @EncryptedAttribute.create([ 'a' ], custom_config)
+    end
+
+    it "should call EncryptedAttribute#create and return its result" do
+      @EncryptedAttribute.any_instance.should_receive(:create).with([ 'a' ]).and_return('create')
+      @EncryptedAttribute.create([ 'a' ]).should eql('create')
+    end
+
+  end # context #self.create
+
+  xit '#self.create_on_node'
+
+  %w{load update}.each do |meth|
 
     context "#self.#{meth}" do
       before do
@@ -52,13 +83,13 @@ describe Chef::EncryptedAttribute do
       end
 
       it "should call EncryptedAttribute##{meth} and return its result" do
-        @EncryptedAttribute.any_instance.should_receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
+        @EncryptedAttribute.any_instance.should_receive(meth.to_sym).with([ 'a' ], @client_key).and_return("#{meth}")
         @EncryptedAttribute.send(meth, [ 'a' ]).should eql("#{meth}")
       end
 
-    end # context #meth
+    end # context #self.meth
 
-  end # each do |meth|
+  end # %w{load update}.each do |meth|
 
   context '#self.load_from_node' do
     before do
@@ -80,7 +111,7 @@ describe Chef::EncryptedAttribute do
     end
 
     it 'should call EncryptedAttribute#load_from_node and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
+      @EncryptedAttribute.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ], @client_key).and_return('load_from_node')
       @EncryptedAttribute.load_from_node('node1', [ 'a' ]).should eql('load_from_node')
     end
 
@@ -93,6 +124,7 @@ describe Chef::EncryptedAttribute do
 
     it 'should not create an EncryptedMash object' do
       @EncryptedMash.should_not_receive(:new)
+      @EncryptedAttribute.exists?([ 'a' ])
     end
 
     it 'should call EncryptedMash#exists? and return its result' do
@@ -103,5 +135,7 @@ describe Chef::EncryptedAttribute do
     end
 
   end # context #exists?
+
+  xit '#self.exists_on_node?'
 
 end # describe Chef::EncryptedAttribute::Config
