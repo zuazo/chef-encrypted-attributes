@@ -45,6 +45,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       @node_client.public_key(@node_client.save['public_key'])
     end
     after do
+      @admin.destroy
       @node.destroy
     end
 
