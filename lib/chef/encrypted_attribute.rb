@@ -45,13 +45,13 @@ class Chef
     end
 
     # Decrypts an encrypted attribute from a (encrypted) Hash
-    def load(enc_hs, key)
+    def load(enc_hs, key=nil)
       body = EncryptedMash.json_create(enc_hs)
-      body.decrypt(key)
+      body.decrypt(key || local_key)
     end
 
     # Decrypts a encrypted attribute from a remote node
-    def load_from_node(name, attr_ary, key)
+    def load_from_node(name, attr_ary, key=nil)
       remote_node = RemoteNode.new(name)
       self.load(remote_node.load_attribute(attr_ary, config.partial_search), key)
     end
@@ -82,10 +82,10 @@ class Chef
     end
 
     # Updates the keys for which the attribute is encrypted
-    def update(enc_hs, key)
+    def update(enc_hs, key=nil)
       old_body = EncryptedMash.json_create(enc_hs)
       if old_body.needs_update?(target_keys)
-        hs = old_body.decrypt(key)
+        hs = old_body.decrypt(key || local_key)
         new_body = create(hs)
         enc_hs.replace(new_body)
         true
@@ -110,6 +110,10 @@ class Chef
       target_keys
     end
 
+    def local_key
+      self.class.local_node.key
+    end
+
     def self.local_node
       LocalNode.new
     end
@@ -126,7 +130,7 @@ class Chef
     def self.load(hs, c={})
       Chef::Log.debug("#{self.class.name}: Loading Local Encrypted Attribute from: #{hs.to_s}")
       body = EncryptedAttribute.new(self.config(c))
-      result = body.load(hs, self.local_node.key)
+      result = body.load(hs)
       Chef::Log.debug("#{self.class.name}: Local Encrypted Attribute loaded.")
       result
     end
@@ -134,7 +138,7 @@ class Chef
     def self.load_from_node(name, attr_ary, c={})
       Chef::Log.debug("#{self.class.name}: Loading Remote Encrypted Attribute from #{name}: #{attr_ary.to_s}")
       body = EncryptedAttribute.new(self.config(c))
-      result = body.load_from_node(name, attr_ary, self.local_node.key)
+      result = body.load_from_node(name, attr_ary)
       Chef::Log.debug("#{self.class.name}: Remote Encrypted Attribute loaded.")
       result
     end
@@ -158,7 +162,7 @@ class Chef
     def self.update(hs, c={})
       Chef::Log.debug("#{self.class.name}: Updating Encrypted Attribute: #{hs.to_s}")
       body = EncryptedAttribute.new(self.config(c))
-      result = body.update(hs, self.local_node.key)
+      result = body.update(hs)
       if result
         Chef::Log.debug("#{self.class.name}: Encrypted Attribute updated.")
       else

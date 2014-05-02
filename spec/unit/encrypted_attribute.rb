@@ -83,7 +83,7 @@ describe Chef::EncryptedAttribute do
       end
 
       it "should call EncryptedAttribute##{meth} and return its result" do
-        @EncryptedAttribute.any_instance.should_receive(meth.to_sym).with([ 'a' ], @client_key).and_return("#{meth}")
+        @EncryptedAttribute.any_instance.should_receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
         @EncryptedAttribute.send(meth, [ 'a' ]).should eql("#{meth}")
       end
 
@@ -111,7 +111,7 @@ describe Chef::EncryptedAttribute do
     end
 
     it 'should call EncryptedAttribute#load_from_node and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ], @client_key).and_return('load_from_node')
+      @EncryptedAttribute.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
       @EncryptedAttribute.load_from_node('node1', [ 'a' ]).should eql('load_from_node')
     end
 
