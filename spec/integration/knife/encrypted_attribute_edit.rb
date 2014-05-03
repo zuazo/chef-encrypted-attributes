@@ -23,8 +23,12 @@ describe Chef::Knife::EncryptedAttributeEdit do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
-
     before do
+      Chef::Config[:encrypted_attributes] = Mash.new
+      Chef::EncryptedAttribute::RemoteClients.cache.clear
+      Chef::EncryptedAttribute::RemoteUsers.cache.clear
+      Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
+
       Chef::Knife::EncryptedAttributeEdit.load_deps
 
       @admin = Chef::ApiClient.new

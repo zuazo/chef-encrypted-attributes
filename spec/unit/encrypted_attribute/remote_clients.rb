@@ -21,6 +21,8 @@ require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::RemoteClients do
   before do
+    Chef::EncryptedAttribute::RemoteClients.cache.clear
+
     @RemoteClients = Chef::EncryptedAttribute::RemoteClients
     @RemoteClients.stub(:search)
   end
@@ -39,8 +41,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
         OpenSSL::PKey::RSA.new(128).public_key.to_pem,
       ]
       @clients = @public_keys.map { |x| { 'public_key' => x } }
-
-      Chef::EncryptedAttribute::RemoteClients.cache.clear
     end
 
     it 'should get client public_keys using SearchHelper' do

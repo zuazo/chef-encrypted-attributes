@@ -22,8 +22,14 @@ describe Chef::EncryptedAttribute::LocalNode do
   before do
     @LocalNode = Chef::EncryptedAttribute::LocalNode
     @local_node = @LocalNode.new
+    @prev_node_name = Chef::Config[:node_name]
     Chef::Config[:node_name] = 'server1'
+    @prev_client_key = Chef::Config[:client_key]
     Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../../data/client.pem"
+  end
+  after(:all) do
+    Chef::Config[:node_name] = @prev_node_name
+    Chef::Config[:client_key] = @prev_client_key
   end
 
   it 'should create a local node without errors' do

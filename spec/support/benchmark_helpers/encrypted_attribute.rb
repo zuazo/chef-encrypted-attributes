@@ -24,6 +24,7 @@ module BenchmarkHelpers::EncryptedAttribute
       benchmark_it "#{desc} (v=#{version})" do
         instance_eval(&block)
       end
+      Chef::Config[:encrypted_attributes].delete(:version)
     end
   end
 

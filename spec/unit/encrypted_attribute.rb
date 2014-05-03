@@ -24,7 +24,8 @@ describe Chef::EncryptedAttribute do
     Chef::EncryptedAttribute::RemoteUsers.cache.clear
   end
   before do
-    # Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../data/client.pem"
+    Chef::Config[:encrypted_attributes] = Mash.new
+
     @client_key = OpenSSL::PKey::RSA.new(2048)
     Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client_key)
 

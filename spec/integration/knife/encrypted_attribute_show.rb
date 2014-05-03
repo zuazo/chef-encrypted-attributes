@@ -23,8 +23,11 @@ describe Chef::Knife::EncryptedAttributeShow do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
-
     before do
+      Chef::EncryptedAttribute::RemoteClients.cache.clear
+      Chef::EncryptedAttribute::RemoteUsers.cache.clear
+      Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
+
       Chef::Knife::EncryptedAttributeShow.load_deps
       @knife = Chef::Knife::EncryptedAttributeShow.new
 

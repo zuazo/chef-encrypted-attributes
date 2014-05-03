@@ -21,10 +21,12 @@ require 'spec_helper'
 describe Chef::EncryptedAttribute::RemoteUsers do
   before(:all) do
     Chef::EncryptedAttribute::RemoteUsers.cache.max_size(20)
-    Chef::EncryptedAttribute::RemoteUsers.cache.clear
   end
   before do
+    Chef::EncryptedAttribute::RemoteUsers.cache.clear
+
     @RemoteUsers = Chef::EncryptedAttribute::RemoteUsers
+    @prev_chef_server = Chef::Config[:chef_server_url]
     Chef::Config[:chef_server_url] = 'https://api.opscode.com/organizations/opscode'
     user_list = {}
     @users = (0..2).step.map do |n|
@@ -36,6 +38,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
     Chef::User.stub(:load).and_return(@users[0])
     Chef::User.stub(:list).and_return(user_list)
+  end
+  after(:all) do
+    Chef::Config[:chef_server_url] = @prev_chef_server
   end
 
   describe '#get_public_keys' do
@@ -49,7 +54,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     it 'should return cached users with multiples "*"' do
-      Chef::EncryptedAttribute::RemoteUsers.cache.clear
       @RemoteUsers.should_receive(:get_all_public_keys).once.and_return('users1')
       @RemoteUsers.get_public_keys('*').should eql('users1')
       @RemoteUsers.get_public_keys('*').should eql('users1') # cached
@@ -60,7 +64,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     it 'should return cached public keys on multiple calls' do
-      Chef::EncryptedAttribute::RemoteUsers.cache.clear
       Chef::User.should_receive(:load).with('user0').once.and_return(@users[0])
       @RemoteUsers.get_public_keys([ 'user0' ] ).should eql([ @users[0].public_key ])
       @RemoteUsers.get_public_keys([ 'user0' ] ).should eql([ @users[0].public_key ]) # cached
