@@ -46,8 +46,8 @@ class Chef
 
     # Decrypts an encrypted attribute from a (encrypted) Hash
     def load(enc_hs, key=nil)
-      body = EncryptedMash.json_create(enc_hs)
-      body.decrypt(key || local_key)
+      enc_attr = EncryptedMash.json_create(enc_hs)
+      enc_attr.decrypt(key || local_key)
     end
 
     # Decrypts a encrypted attribute from a remote node
@@ -58,40 +58,47 @@ class Chef
 
     # Creates an encrypted attribute from a Hash
     def create(hs, keys=nil)
-      body = EncryptedMash.create(config.version)
-      body.encrypt(hs, target_keys(keys))
+      enc_attr = EncryptedMash.create(config.version)
+      enc_attr.encrypt(hs, target_keys(keys))
     end
 
     def create_on_node(name, attr_ary, hs)
-      # TODO check attr_ary
-      # read the client public key and the node
-      node = Chef::Node.load(name)
+      # read the client public key
       node_public_key = Chef::ApiClient.load(name).public_key
 
       # create the encrypted attribute
       enc_attr = self.create(hs, [ node_public_key ])
 
       # save encrypted attribute
-      last = attr_ary.pop
-      node_attr = attr_ary.reduce(node.normal) do |a, k|
-        a[k] = Mash.new unless a.has_key?(k)
-        a[k]
-      end
-      node_attr[last] = enc_attr
-      node.save
+      remote_node = RemoteNode.new(name)
+      remote_node.save_attribute(attr_ary, enc_attr, config.partial_search)
     end
 
     # Updates the keys for which the attribute is encrypted
     def update(enc_hs, key=nil)
-      old_body = EncryptedMash.json_create(enc_hs)
-      if old_body.needs_update?(target_keys)
-        hs = old_body.decrypt(key || local_key)
-        new_body = create(hs)
-        enc_hs.replace(new_body)
+      old_enc_attr = EncryptedMash.json_create(enc_hs)
+      if old_enc_attr.needs_update?(target_keys)
+        hs = old_enc_attr.decrypt(key || local_key)
+        new_enc_attr = create(hs)
+        enc_hs.replace(new_enc_attr)
         true
       else
         false
       end
+    end
+
+    def update_on_node(name, attr_ary)
+      # update the encrypted attribute
+      remote_node = RemoteNode.new(name)
+      enc_hs = remote_node.load_attribute(attr_ary, config.partial_search)
+      updated = update(enc_hs)
+
+      # save encrypted attribute
+      if updated
+        # TODO Node is accessed twice (here and RemoteNode#load_attribute above)
+        remote_node.save_attribute(attr_ary, enc_hs, config.partial_search)
+      end
+      updated
     end
 
     protected
@@ -129,44 +136,56 @@ class Chef
 
     def self.load(hs, c={})
       Chef::Log.debug("#{self.class.name}: Loading Local Encrypted Attribute from: #{hs.to_s}")
-      body = EncryptedAttribute.new(self.config(c))
-      result = body.load(hs)
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.load(hs)
       Chef::Log.debug("#{self.class.name}: Local Encrypted Attribute loaded.")
       result
     end
 
     def self.load_from_node(name, attr_ary, c={})
       Chef::Log.debug("#{self.class.name}: Loading Remote Encrypted Attribute from #{name}: #{attr_ary.to_s}")
-      body = EncryptedAttribute.new(self.config(c))
-      result = body.load_from_node(name, attr_ary)
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.load_from_node(name, attr_ary)
       Chef::Log.debug("#{self.class.name}: Remote Encrypted Attribute loaded.")
       result
     end
 
     def self.create(hs, c={})
       Chef::Log.debug("#{self.class.name}: Creating Encrypted Attribute.")
-      body = EncryptedAttribute.new(self.config(c))
-      result = body.create(hs)
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.create(hs)
       Chef::Log.debug("#{self.class.name}: Encrypted Attribute created.")
       result
     end
 
     def self.create_on_node(name, attr_ary, hs, c={})
       Chef::Log.debug("#{self.class.name}: Creating Remote Encrypted Attribute on #{name}: #{attr_ary.to_s}")
-      body = EncryptedAttribute.new(self.config(c))
-      result = body.create_on_node(name, attr_ary, hs)
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.create_on_node(name, attr_ary, hs)
       Chef::Log.debug("#{self.class.name}: Encrypted Remote Attribute created.")
       result
     end
 
     def self.update(hs, c={})
       Chef::Log.debug("#{self.class.name}: Updating Encrypted Attribute: #{hs.to_s}")
-      body = EncryptedAttribute.new(self.config(c))
-      result = body.update(hs)
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.update(hs)
       if result
         Chef::Log.debug("#{self.class.name}: Encrypted Attribute updated.")
       else
         Chef::Log.debug("#{self.class.name}: Encrypted Attribute not updated.")
+      end
+      result
+    end
+
+    def self.update_on_node(name, attr_ary, c={})
+      Chef::Log.debug("#{self.class.name}: Updating Remote Encrypted Attribute on #{name}: #{attr_ary.to_s}")
+      enc_attr = EncryptedAttribute.new(self.config(c))
+      result = enc_attr.update_on_node(name, attr_ary)
+      if result
+        Chef::Log.debug("#{self.class.name}: Encrypted Remote Attribute updated.")
+      else
+        Chef::Log.debug("#{self.class.name}: Encrypted Remote Attribute not updated.")
       end
       result
     end
@@ -182,13 +201,10 @@ class Chef
       result
     end
 
-    def self.exists_on_node?(name, attr_ary)
-      # TODO check attr_ary
+    def self.exists_on_node?(name, attr_ary, c={})
       Chef::Log.debug("#{self.class.name}: Checking if Remote Encrypted Attribute exists on #{name}")
-      node = Chef::Node.load(name)
-      node_attr = attr_ary.reduce(node.attributes) do |a, k|
-        a.kind_of?(Hash) && a.has_key?(k) ? a[k] : nil
-      end
+      remote_node = RemoteNode.new(name)
+      node_attr = remote_node.load_attribute(attr_ary, self.config(c).partial_search)
       Chef::EncryptedAttribute.exists?(node_attr)
     end
 

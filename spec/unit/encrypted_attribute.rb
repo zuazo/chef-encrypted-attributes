@@ -118,6 +118,8 @@ describe Chef::EncryptedAttribute do
 
   end # context #load_from_node
 
+  xit '#self.update_on_node'
+
   context '#self.exists?' do
     before do
       @EncryptedMash.any_instance.stub(:exists?)

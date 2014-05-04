@@ -61,6 +61,20 @@ class Chef
         end
       end
 
+      def save_attribute(attr_ary, value, partial_search=true)
+        unless attr_ary.kind_of?(Array)
+          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+        end
+        node = Chef::Node.load(name)
+        last = attr_ary.pop
+        node_attr = attr_ary.reduce(node.normal) do |a, k|
+          a[k] = Mash.new unless a.has_key?(k)
+          a[k]
+        end
+        node_attr[last] = value
+        node.save
+      end
+
       protected
 
       def cache_key(name, attr_ary)

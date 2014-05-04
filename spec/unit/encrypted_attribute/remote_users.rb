@@ -40,7 +40,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     Chef::User.stub(:list).and_return(user_list)
   end
   after(:all) do
-    Chef::Config[:chef_server_url] = @prev_chef_server
+    Chef::Config[:chef_server_url] = @prev_chef_server if @prev_chef_server.kind_of?(String)
   end
 
   describe '#get_public_keys' do

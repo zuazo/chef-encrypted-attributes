@@ -67,9 +67,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
     [
       5, true, {},
-      { @EncryptedMash::JSON_CLASS => '@EncryptedMash' },
+      { @EncryptedMash::JSON_CLASS => @EncryptedMash.name },
       {
-        @EncryptedMash::JSON_CLASS => '@EncryptedMash',
+        @EncryptedMash::JSON_CLASS => @EncryptedMash.name,
         @EncryptedMash::CHEF_TYPE => 'bad_type',
       },
     ].each do |o|
@@ -167,9 +167,16 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       new['key1'].should eql('value1')
     end
 
+    it 'should throw an error if empty attribute is passed as arg' do
+      Chef::Log.stub(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
+      lambda { @EncryptedMash.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+    end
+
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
       Chef::Log.stub(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      lambda { @EncryptedMash.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      lambda { @EncryptedMash.json_create({
+        @EncryptedMash::JSON_CLASS => 'NonExistent::Class',
+      }) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
   end # context #self.json_create

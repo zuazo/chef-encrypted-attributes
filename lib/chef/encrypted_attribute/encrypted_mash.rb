@@ -90,6 +90,9 @@ class Chef
       protected
 
       def self.string_to_klass(class_name)
+        unless class_name.kind_of?(String)
+          raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute class name \"#{class_name.inspect}\""
+        end
         begin
           if RUBY_VERSION < '1.9'
             class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const) }
