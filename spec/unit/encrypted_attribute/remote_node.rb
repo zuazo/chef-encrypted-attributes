@@ -20,6 +20,7 @@ require 'spec_helper'
 
 describe Chef::EncryptedAttribute::RemoteNode do
   before do
+    Chef::EncryptedAttribute::RemoteNode.cache.clear
     @RemoteNode = Chef::EncryptedAttribute::RemoteNode
     @RemoteNode.any_instance.stub(:search)
   end
@@ -51,9 +52,6 @@ describe Chef::EncryptedAttribute::RemoteNode do
   end
 
   describe '#load_attribute' do
-    before do
-      Chef::EncryptedAttribute::RemoteNode.cache.clear
-    end
 
     it 'should read the node attribute using SearchHelper' do
       attr_ary = [ 'attr1', 'subattr1' ]
@@ -142,5 +140,37 @@ describe Chef::EncryptedAttribute::RemoteNode do
     end
 
   end
+
+  context '#save_attribute' do
+    before do
+      @node = Chef::Node.new
+      @node.name('node1')
+      @remote_node = Chef::EncryptedAttribute::RemoteNode.new('node1')
+      Chef::Node.stub(:load).with('node1').and_return(@node)
+    end
+
+    it 'should save the node attribute' do
+      @node.should_receive(:save).once
+      Chef::Node.should_receive(:load).with('node1').once.and_return(@node)
+      @remote_node.save_attribute([ 'attr1', 'subattr1' ], 'value1')
+      @node['attr1']['subattr1'].should eql('value1')
+    end
+
+    it 'should cache the saved attribute' do
+      Chef::EncryptedAttribute::RemoteNode.cache.max_size(10)
+      @node.should_receive(:save).once
+      @remote_node.save_attribute([ 'attr1', 'subattr1' ], 'value1')
+
+      @remote_node2 = Chef::EncryptedAttribute::RemoteNode.new('node1')
+      @remote_node2.should_not_receive(:search)
+      @remote_node2.load_attribute([ 'attr1', 'subattr1' ]).should eql('value1') # cached
+    end
+
+    it 'should raise an error if the attribute list is incorrect' do
+      @node.should_not_receive(:save)
+      lambda { @remote_node.save_attribute('incorrect-attr-ary', 'value1') }.should raise_error(ArgumentError)
+    end
+
+  end # context #save_attribute
 
 end

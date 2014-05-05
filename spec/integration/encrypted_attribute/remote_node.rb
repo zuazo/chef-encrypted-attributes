@@ -71,5 +71,26 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     end # context #load_attribute
 
+    context '#save_attribute' do
+
+      it 'should save the attribute' do
+        @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
+        Chef::EncryptedAttribute::RemoteUsers.cache.clear
+        @remote_node.load_attribute([ 'saved-attr', 'subattr2' ]).should eql('A precious value')
+      end
+
+      it 'should save attributes in the cache' do
+        Chef::EncryptedAttribute::RemoteUsers.cache.max_size(20)
+        Chef::EncryptedAttribute::RemoteUsers.cache.clear
+        @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
+        @remote_node.load_attribute([ 'saved-attr', 'subattr2' ]).should eql('A precious value') # cached
+      end
+
+      it 'should raise an error if the attribute list is incorrect' do
+        lambda { @remote_node.save_attribute('incorrect-attr-ary', 'some value') }.should raise_error(ArgumentError)
+      end
+
+    end # context #save_attribute
+
   end # when_the_chef_server is ready to rock!
 end
