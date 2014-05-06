@@ -71,7 +71,7 @@ class Chef
 
       # save encrypted attribute
       remote_node = RemoteNode.new(name)
-      remote_node.save_attribute(attr_ary, enc_attr, config.partial_search)
+      remote_node.save_attribute(attr_ary, enc_attr)
     end
 
     # Updates the keys for which the attribute is encrypted
@@ -96,7 +96,7 @@ class Chef
       # save encrypted attribute
       if updated
         # TODO Node is accessed twice (here and RemoteNode#load_attribute above)
-        remote_node.save_attribute(attr_ary, enc_hs, config.partial_search)
+        remote_node.save_attribute(attr_ary, enc_hs)
       end
       updated
     end
