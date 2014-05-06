@@ -67,6 +67,13 @@ describe Chef::Knife::EncryptedAttributeCreate do
       Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql('5')
     end
 
+    it 'should print error message when the attribute exists' do
+      Chef::EncryptedAttribute.create_on_node('node1', [ 'existent' ], 'random-data')
+      knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'existent' ])
+      knife.ui.should_receive(:fatal).with('Encrypted attribute already exists')
+      lambda { knife.run }.should raise_error(SystemExit)
+    end
+
     it 'should print usage and exit when a node name is not provided' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([])
       knife.should_receive(:show_usage)

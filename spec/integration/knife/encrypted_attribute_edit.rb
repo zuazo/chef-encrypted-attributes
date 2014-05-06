@@ -64,12 +64,51 @@ describe Chef::Knife::EncryptedAttributeEdit do
       lambda { Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
-    it 'should be able to read the encrypted attribute if allowed' do
+    it 'should be able to read the encrypted attribute if the client is allowed' do
       new_content = '5'
       knife = Chef::Knife::EncryptedAttributeEdit.new(['node1', 'encrypted.attribute', '--client-search', 'admin:true'])
       knife.should_receive(:edit_data).with(@orig_content, nil).and_return(new_content)
       knife.run
       Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql(new_content)
+    end
+
+    it 'should be able to read the encrypted attribute without using partial search' do
+      new_content = '5'
+      knife = Chef::Knife::EncryptedAttributeEdit.new(['node1', 'encrypted.attribute', '--client-search', 'admin:true', '--disable-partial-search'])
+      knife.should_receive(:edit_data).with(@orig_content, nil).and_return(new_content)
+      knife.run
+      Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql(new_content)
+    end
+
+    it 'should be able to read the encrypted attribute if the user is allowed' do
+      user = Chef::User.new
+      user.name('user1')
+      user = user.create
+      private_key = OpenSSL::PKey::RSA.new(user.private_key)
+      Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(private_key)
+
+      Chef::EncryptedAttribute.create_on_node('node1', [ 'encrypted', 'attribute' ], @orig_content)
+      new_content = '5'
+      knife = Chef::Knife::EncryptedAttributeEdit.new(['node1', 'encrypted.attribute', '--encrypted-attribute-user', 'user1'])
+      knife.should_receive(:edit_data).with(@orig_content, nil).and_return(new_content)
+      knife.run
+      Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql(new_content)
+
+      user.destroy
+    end
+
+    it 'should be able to use version 1 encrypted attribute' do
+      new_content = '5'
+      knife = Chef::Knife::EncryptedAttributeEdit.new(['node1', 'encrypted.attribute', '--client-search', 'admin:true', '--encrypted-attribute-version', '1'])
+      knife.should_receive(:edit_data).with(@orig_content, nil).and_return(new_content)
+      knife.run
+      Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql(new_content)
+    end
+
+    it 'should print error message when the attribute does not exists' do
+      knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'non.existent' ])
+      knife.ui.should_receive(:fatal).with('Encrypted attribute not found')
+      lambda { knife.run }.should raise_error(SystemExit)
     end
 
     it 'should print usage and exit when a node name is not provided' do

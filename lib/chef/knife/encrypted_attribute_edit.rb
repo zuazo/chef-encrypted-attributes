@@ -25,6 +25,11 @@ class Chef
 
       include Knife::Core::EncryptedAttributeEditorOptions
 
+      option :input_format,
+        :short => '-i FORMAT',
+        :long => '--input-format FORMAT',
+        :description => 'Input (EDITOR) format, supported formats are "plain" (default) and "json"'
+
       banner 'knife encrypted attribute edit NODE ATTRIBUTE (options)'
 
       def run

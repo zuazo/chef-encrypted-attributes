@@ -58,23 +58,24 @@ class Chef
                 Chef::Config[:encrypted_attributes][:users] << i
               }
 
-            option :input_format,
-              :short => '-i FORMAT',
-              :long => '--input-format FORMAT',
-              :description => 'Input (EDITOR) format, supported formats are "plain" (default) and "json"'
-
             # TODO option :keys
 
             # Modified Chef::Knife::UI#edit_data method with plain text format support
             def edit_data(data=nil, format='plain')
               output = case format
               when 'JSON', 'json'
-                data.nil? ? {} : Chef::JSONCompat.to_json_pretty(data)
+                begin
+                  data.nil? ? {} : Chef::JSONCompat.to_json_pretty(data)
+                rescue JSON::GeneratorError
+                  ui.warn('Previous data is not in JSON, it will be overwritten.')
+                  sleep(2) # TODO a better pause/delay?
+                  Chef::JSONCompat.to_json_pretty({})
+                end
               else
                 data.nil? ? '' : data
               end
 
-              if (!config[:disable_editing])
+              if !config[:disable_editing]
                 Tempfile.open([ 'knife-edit-', '.json' ]) do |tf|
                   tf.sync = true
                   tf.puts output
@@ -82,6 +83,7 @@ class Chef
                   raise 'Please set EDITOR environment variable' unless system("#{config[:editor]} #{tf.path}")
 
                   output = IO.read(tf.path)
+                  tf.unlink # not needed, but recommended
                 end
               end
 
