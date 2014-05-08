@@ -15,10 +15,12 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.files = %w(Rakefile LICENSE README.md) + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
+  s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
-  # Rake 10.2 drops Ruby 1.8 support
-  s.add_development_dependency('rake', '~> 10.1.0')
-
+  # if RUBY_VERSION < '1.9'
+  #   s.add_development_dependency 'rake', '< 10.2'
+  #   s.add_development_dependency 'mime-types', '< 2.0'
+  # end
   s.add_development_dependency 'chef', chef_version
   s.add_development_dependency 'chef-zero'
   s.add_development_dependency 'rake'
