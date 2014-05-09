@@ -37,7 +37,7 @@ class Chef
           :default => 1024,
           :callbacks => begin
             { 'should not be lower that zero' => lambda { |x| x >= 0 } }
-          end,
+          end
         )
         pop_tail unless arg.nil?
         @max_size
