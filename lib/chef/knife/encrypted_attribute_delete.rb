@@ -16,21 +16,25 @@
 # limitations under the License.
 #
 
+require 'chef/knife'
 require 'chef/knife/encrypted_attribute_show'
-require 'chef/knife/core/encrypted_attribute_editor_options'
+require 'chef/encrypted_attribute/remote_node'
 
 class Chef
   class Knife
-    class EncryptedAttributeCreate < EncryptedAttributeShow
+    class EncryptedAttributeDelete < EncryptedAttributeShow
 
-      include Knife::Core::EncryptedAttributeEditorOptions
+      deps do
+        require 'chef/encrypted_attribute'
+        require 'chef/json_compat'
+      end
 
-      option :input_format,
-        :short => '-i FORMAT',
-        :long => '--input-format FORMAT',
-        :description => 'Input (EDITOR) format, supported formats are "plain" (default) and "json"'
+      banner 'knife encrypted attribute delete NODE ATTRIBUTE (options)'
 
-      banner 'knife encrypted attribute create NODE ATTRIBUTE (options)'
+      option :force,
+        :long => '--force',
+        :description => 'Force the attribute deletion even if you cannot read it',
+        :boolean => true
 
       def run
         node_name = @name_args[0]
@@ -49,17 +53,16 @@ class Chef
         end
 
         attr_ary = attribute_path_to_ary(attr_path)
-
-        # check if the encrypted attribute already exists
         if Chef::EncryptedAttribute.exists_on_node?(node_name, attr_ary)
-          ui.fatal('Encrypted attribute already exists')
-          exit 1
+          # TODO move this to lib/EncryptedAttribute
+          unless knife[:force] # try to read the attribute
+            Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
+          end
+          remote_node = RemoteNode.new(node_name)
+          if remote_node.delete_attribute(attr_ary)
+            ui.info('Encrypted attribute deleted.')
+          end
         end
-
-        # create encrypted attribute
-        output = edit_data(nil, config[:input_format])
-        enc_attr = Chef::EncryptedAttribute.new
-        enc_attr.create_on_node(node_name, attr_ary, output)
       end
 
     end

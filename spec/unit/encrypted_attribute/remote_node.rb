@@ -173,4 +173,30 @@ describe Chef::EncryptedAttribute::RemoteNode do
 
   end # context #save_attribute
 
+  context '#delete_attribute' do
+    before do
+      @node = Chef::Node.new
+      @node.name('node1')
+      @node.normal['attr1']['subattr1'] = 'value1'
+      @remote_node = Chef::EncryptedAttribute::RemoteNode.new('node1')
+      Chef::Node.stub(:load).with('node1').and_return(@node)
+    end
+
+    it 'should delete a node attribute' do
+      @node.should_receive(:save).once
+      @remote_node.delete_attribute([ 'attr1', 'subattr1' ]).should eql(true)
+    end
+
+    it 'should not delete a non existent attribute' do
+      @node.should_not_receive(:save)
+      @remote_node.delete_attribute([ 'non-existent' ]).should eql(false)
+    end
+
+    it 'should raise an error if the attribute list is incorrect' do
+      @node.should_not_receive(:save)
+      lambda { @remote_node.delete_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+    end
+
+  end # context #delete_attribute
+
 end

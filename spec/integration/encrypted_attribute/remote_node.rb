@@ -92,5 +92,28 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     end # context #save_attribute
 
+    context '#delete_attribute' do
+
+      it 'should delete a node attribute' do
+        node = Chef::Node.load(@node_name)
+        node['sub-attr']['attr2'].should_not eql(nil)
+
+        @remote_node.delete_attribute([ 'sub-attr', 'attr2']).should eql(true)
+
+        node = Chef::Node.load(@node_name)
+        node['sub-attr']['attr2'].should eql(nil)
+      end
+
+      it 'should ignore if the attribute does not exist' do
+        @node['non-existent-attr'].should eql(nil)
+        @remote_node.delete_attribute(['non-existent-attr']).should eql(false)
+      end
+
+      it 'should raise an error if the attribute list is incorrect' do
+        lambda { @remote_node.delete_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+      end
+
+    end #context #delete_attribute
+
   end # when_the_chef_server is ready to rock!
 end

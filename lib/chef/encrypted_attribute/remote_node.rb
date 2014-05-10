@@ -79,6 +79,27 @@ class Chef
         self.class.cache[cache_key] = value
       end
 
+      def delete_attribute(attr_ary)
+        unless attr_ary.kind_of?(Array)
+          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+        end
+        cache_key = cache_key(name, attr_ary)
+
+        node = Chef::Node.load(name)
+        last = attr_ary.pop
+        node_attr = attr_ary.reduce(node.normal) do |a, k|
+          a.respond_to?(:has_key?) && a.has_key?(k) ? a[k] : nil
+        end
+        if node_attr.respond_to?(:has_key?) && node_attr.has_key?(last)
+          node_attr.delete(last)
+          node.save
+          self.class.cache.delete(cache_key)
+          true
+        else
+          false
+        end
+      end
+
       protected
 
       def cache_key(name, attr_ary)
