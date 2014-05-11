@@ -55,10 +55,10 @@ class Chef
         attr_ary = attribute_path_to_ary(attr_path)
         if Chef::EncryptedAttribute.exists_on_node?(node_name, attr_ary)
           # TODO move this to lib/EncryptedAttribute
-          unless knife[:force] # try to read the attribute
+          unless config[:force] # try to read the attribute
             Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
           end
-          remote_node = RemoteNode.new(node_name)
+          remote_node = Chef::EncryptedAttribute::RemoteNode.new(node_name)
           if remote_node.delete_attribute(attr_ary)
             ui.info('Encrypted attribute deleted.')
           end
