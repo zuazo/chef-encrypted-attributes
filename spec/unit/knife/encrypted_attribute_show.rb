@@ -27,6 +27,7 @@ describe Chef::Knife::EncryptedAttributeShow do
 
     @stdout = StringIO.new
     @knife.ui.stub(:stdout).and_return(@stdout)
+    Chef::EncryptedAttribute.stub(:exists_on_node?).and_return(true)
   end
 
   it 'should load the encrypted attribute' do
@@ -34,6 +35,13 @@ describe Chef::Knife::EncryptedAttributeShow do
     @knife.name_args = %w{node1 encrypted.attribute}
     @knife.run
     @stdout.string.should match(/unicorns drill accurately/)
+  end
+
+  it 'should print error message when the attribute does not exists' do
+    Chef::EncryptedAttribute.should_receive(:exists_on_node?).and_return(false)
+    @knife.name_args = [ 'node1', 'non.existent' ]
+    @knife.ui.should_receive(:fatal).with('Encrypted attribute not found')
+    lambda { @knife.run }.should raise_error(SystemExit)
   end
 
   it 'should print usage and exit when a node name is not provided' do

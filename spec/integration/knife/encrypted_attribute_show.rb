@@ -56,6 +56,12 @@ describe Chef::Knife::EncryptedAttributeShow do
       @stdout.string.should match(/escaped unicorns/)
     end
 
+    it 'should print error message when the attribute does not exists' do
+      @knife.name_args = %w{node1 non.existent}
+      @knife.ui.should_receive(:fatal).with('Encrypted attribute not found')
+      lambda { @knife.run }.should raise_error(SystemExit)
+    end
+
     it 'should print usage and exit when a node name is not provided' do
       @knife.name_args = []
       @knife.should_receive(:show_usage)
