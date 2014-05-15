@@ -125,11 +125,9 @@ class Chef
       protected
 
       def dup_object(o)
-        begin
-          o.dup
-        rescue TypeError
-          o
-        end
+        o.dup
+      rescue TypeError
+        o
       end
 
       def config_valid_search_array?(s_ary)

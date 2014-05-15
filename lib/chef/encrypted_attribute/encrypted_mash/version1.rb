@@ -99,42 +99,35 @@ class Chef
         end
 
         def symmetric_decrypt_value(enc_value, algo=SYMM_ALGORITHM)
-          begin
-            cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
-            cipher.decrypt
-            cipher.iv = Base64.decode64(enc_value['iv'])
-            cipher.key = Base64.decode64(enc_value['secret'])
-            dec_data = cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
-          rescue OpenSSL::Cipher::CipherError => e
-            raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
-          end
-          dec_data
+          cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
+          cipher.decrypt
+          cipher.iv = Base64.decode64(enc_value['iv'])
+          cipher.key = Base64.decode64(enc_value['secret'])
+          cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
+        rescue OpenSSL::Cipher::CipherError => e
+          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
         end
 
         def generate_hmac(data, algo=HMAC_ALGORITHM)
           hmac = Mash.new
-          begin
-            digest = OpenSSL::Digest.new(algo)
-            secret = OpenSSL::Random.random_bytes(digest.block_length)
-            hmac['secret'] = Base64.encode64(secret)
-            hmac['data'] = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
-          rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
-            # RuntimeError is raised for unsupported algorithms
-            raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
-          end
+          digest = OpenSSL::Digest.new(algo)
+          secret = OpenSSL::Random.random_bytes(digest.block_length)
+          hmac['secret'] = Base64.encode64(secret)
+          hmac['data'] = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           hmac
+        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
+          # RuntimeError is raised for unsupported algorithms
+          raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
         end
 
         def hmac_matches?(orig_hmac, data, secret, algo=HMAC_ALGORITHM)
-          begin
-            digest = OpenSSL::Digest.new(algo)
-            secret = Base64.decode64(secret)
-            new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
-          rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
-            # RuntimeError is raised for unsupported algorithms
-            raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
-          end
+          digest = OpenSSL::Digest.new(algo)
+          secret = Base64.decode64(secret)
+          new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           orig_hmac == new_hmac
+        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
+          # RuntimeError is raised for unsupported algorithms
+          raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
         end
 
       end

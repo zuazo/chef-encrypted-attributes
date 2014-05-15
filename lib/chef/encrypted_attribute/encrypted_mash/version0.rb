@@ -59,11 +59,9 @@ class Chef
         end
 
         def pem_to_key(k)
-          begin
-            k.kind_of?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
-          rescue OpenSSL::PKey::RSAError, TypeError => e
-            raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
-          end
+          k.kind_of?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
+        rescue OpenSSL::PKey::RSAError, TypeError => e
+          raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
         end
 
         def parse_public_key(key)
@@ -98,11 +96,9 @@ class Chef
         end
 
         def json_decode(o)
-          begin
-            Yajl::Parser.parse(o.to_s)
-          rescue Yajl::ParseError => e
-            raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
-          end
+          Yajl::Parser.parse(o.to_s)
+        rescue Yajl::ParseError => e
+          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
         end
 
         def node_key(public_key)
@@ -110,19 +106,15 @@ class Chef
         end
 
         def rsa_encrypt_value(value, public_key)
-          begin
-            Base64.encode64(public_key.public_encrypt(value))
-          rescue OpenSSL::PKey::RSAError => e
-            raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
-          end
+          Base64.encode64(public_key.public_encrypt(value))
+        rescue OpenSSL::PKey::RSAError => e
+          raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
         end
 
         def rsa_decrypt_value(value, key)
-          begin
-            key.private_decrypt(Base64.decode64(value.to_s))
-          rescue OpenSSL::PKey::RSAError => e
-            raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
-          end
+          key.private_decrypt(Base64.decode64(value.to_s))
+        rescue OpenSSL::PKey::RSAError => e
+          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
         end
 
         def rsa_encrypt_multi_key(value, public_keys)

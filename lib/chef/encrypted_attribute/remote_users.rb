@@ -46,18 +46,16 @@ class Chef
 
       def self.get_user_public_key(name)
         return cache[name] if cache.has_key?(name)
-        begin
-          user = Chef::User.load(name)
-          cache[name] = user.public_key
-        rescue Net::HTTPServerException => e
-          case e.response.code
-          when '403'
-            raise InsufficientPrivileges, 'Your node needs admin privileges to be able to work with Chef Users.'
-          when '404' # Not Found
-            raise UserNotFound, "Chef User not found: \"#{name}\"."
-          else
-            raise e
-          end
+        user = Chef::User.load(name)
+        cache[name] = user.public_key
+      rescue Net::HTTPServerException => e
+        case e.response.code
+        when '403'
+          raise InsufficientPrivileges, 'Your node needs admin privileges to be able to work with Chef Users.'
+        when '404' # Not Found
+          raise UserNotFound, "Chef User not found: \"#{name}\"."
+        else
+          raise e
         end
       end
 
