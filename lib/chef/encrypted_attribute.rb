@@ -47,7 +47,8 @@ class Chef
     # Decrypts an encrypted attribute from a (encrypted) Hash
     def load(enc_hs, key=nil)
       enc_attr = EncryptedMash.json_create(enc_hs)
-      enc_attr.decrypt(key || local_key)
+      decrypted = enc_attr.decrypt(key || local_key)
+      decrypted['content'] # TODO check this Hash
     end
 
     # Decrypts a encrypted attribute from a remote node
@@ -58,8 +59,10 @@ class Chef
 
     # Creates an encrypted attribute from a Hash
     def create(hs, keys=nil)
+      decrypted = { 'content' => hs }
+
       enc_attr = EncryptedMash.create(config.version)
-      enc_attr.encrypt(hs, target_keys(keys))
+      enc_attr.encrypt(decrypted, target_keys(keys))
     end
 
     def create_on_node(name, attr_ary, hs)
@@ -79,7 +82,7 @@ class Chef
       old_enc_attr = EncryptedMash.json_create(enc_hs)
       if old_enc_attr.needs_update?(target_keys)
         hs = old_enc_attr.decrypt(key || local_key)
-        new_enc_attr = create(hs)
+        new_enc_attr = create(hs['content']) # TODO check this Hash
         enc_hs.replace(new_enc_attr)
         true
       else

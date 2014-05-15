@@ -21,7 +21,9 @@ Gem::Specification.new do |s|
   #   s.add_development_dependency 'rake', '< 10.2'
   #   s.add_development_dependency 'mime-types', '< 2.0'
   # end
-  s.add_development_dependency 'chef', chef_version
+  s.add_dependency 'yajl-ruby', '~> 1.1'
+  s.add_dependency 'chef', chef_version
+
   s.add_development_dependency 'chef-zero'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec-core'

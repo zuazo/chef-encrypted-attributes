@@ -36,7 +36,7 @@ class Chef
           secrets['data'] = encrypted_data.delete('secret') # should no include the secret in clear
           self['encrypted_data'] = encrypted_data
           # generate hmac (encrypt-then-mac), excluding the secret
-          hmac = generate_hmac(json_encode(self['encrypted_data']))
+          hmac = generate_hmac(json_encode(self['encrypted_data'].sort))
           secrets['hmac'] = hmac['secret']
           self['hmac'] = hmac['data']
           # encrypt the shared secrets
@@ -51,7 +51,7 @@ class Chef
           secrets = json_decode(rsa_decrypt_multi_key(self['encrypted_secret'], key))
           enc_value['secret'] = secrets['data']
           # check hmac (encrypt-then-mac -> mac-then-decrypt)
-          unless hmac_matches?(self['hmac'], json_encode(self['encrypted_data']), secrets['hmac'])
+          unless hmac_matches?(self['hmac'], json_encode(self['encrypted_data'].sort), secrets['hmac'])
             raise DecryptionFailure, 'Error decrypting encrypted attribute: invalid hmac. Most likely the data is corrupted.'
           end
           # decrypt the data

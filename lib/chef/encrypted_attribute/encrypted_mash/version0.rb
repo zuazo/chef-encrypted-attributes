@@ -18,6 +18,7 @@
 
 require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/encrypted_attribute/exceptions'
+require 'yajl'
 
 # Version0 format: using RSA without shared secret
 class Chef
@@ -92,14 +93,14 @@ class Chef
         end
 
         def json_encode(o)
-          # Array to avoid using quirks mode, create standard JSON
-          [ o ].to_json
+          # TODO This does not check if the object is correct, should be an Array or a Hash
+          Yajl::Encoder.encode(o)
         end
 
         def json_decode(o)
           begin
-            JSON.parse(o.to_s)[0]
-          rescue JSON::ParserError => e
+            Yajl::Parser.parse(o.to_s)
+          rescue Yajl::ParseError => e
             raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
           end
         end
