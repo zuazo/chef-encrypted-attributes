@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+require 'chef/knife/core/config'
+
 class Chef
   class Knife
     module Core
@@ -32,21 +34,21 @@ class Chef
             option :encrypted_attribute_version,
               :long  => '--encrypted-attribute-version VERSION',
               :description => 'Encrypted Attribute protocol version to use',
-              :proc => lambda { |i| Chef::Config[:encrypted_attributes][:version] = i }
+              :proc => lambda { |i| Chef::Config[:knife][:encrypted_attributes][:version] = i }
 
             option :encrypted_attribute_partial_search,
               :long => '--disable-partial-search',
               :description => 'Disable partial search',
               :boolean => true,
-              :proc => lambda { |i| Chef::Config[:encrypted_attributes][:partial_search] = false }
+              :proc => lambda { |i| Chef::Config[:knife][:encrypted_attributes][:partial_search] = false }
 
             option :encrypted_attribute_client_search,
               :short => '-C CLIENT_SEARCH_QUERY',
               :long => '--client-search CLIENT_SEARCH_QUERY',
               :description => 'Client search query',
               :proc => lambda { |i|
-                Chef::Config[:encrypted_attributes][:client_search] = [] unless Chef::Config[:encrypted_attributes][:client_search].kind_of?(Array)
-                Chef::Config[:encrypted_attributes][:client_search] << i
+                Chef::Config[:knife][:encrypted_attributes][:client_search] = [] unless Chef::Config[:knife][:encrypted_attributes][:client_search].kind_of?(Array)
+                Chef::Config[:knife][:encrypted_attributes][:client_search] << i
               }
 
             option :encrypted_attribute_users,
@@ -54,8 +56,8 @@ class Chef
               :long => '--encrypted-attribute-user USER',
               :description => 'User name to allow access to',
               :proc => lambda { |i|
-                Chef::Config[:encrypted_attributes][:users] = [] unless Chef::Config[:encrypted_attributes][:users].kind_of?(Array)
-                Chef::Config[:encrypted_attributes][:users] << i
+                Chef::Config[:knife][:encrypted_attributes][:users] = [] unless Chef::Config[:knife][:encrypted_attributes][:users].kind_of?(Array)
+                Chef::Config[:knife][:encrypted_attributes][:users] << i
               }
 
             # TODO option :keys

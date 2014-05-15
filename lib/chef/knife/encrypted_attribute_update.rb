@@ -52,7 +52,7 @@ class Chef
         end
 
         # update encrypted attribute
-        enc_attr = Chef::EncryptedAttribute.new
+        enc_attr = Chef::EncryptedAttribute.new(Chef::Config[:knife][:encrypted_attributes])
         if enc_attr.update_on_node(node_name, attr_ary)
           ui.info('Encrypted attribute updated.')
         else

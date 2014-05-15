@@ -57,7 +57,7 @@ class Chef
         end
 
         # edit encrypted attribute
-        enc_attr = Chef::EncryptedAttribute.new
+        enc_attr = Chef::EncryptedAttribute.new(Chef::Config[:knife][:encrypted_attributes])
         input = enc_attr.load_from_node(node_name, attr_ary)
         output = edit_data(input, config[:input_format])
         enc_attr.create_on_node(node_name, attr_ary, output)
