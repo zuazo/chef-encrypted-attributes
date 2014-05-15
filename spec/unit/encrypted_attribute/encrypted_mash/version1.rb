@@ -154,14 +154,14 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
     it 'should throw a DecryptionFailure error if the HMAC does not match' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      body['hmac'] = 'bad-hmac'
+      body['hmac']['data'] = 'bad-hmac'
       lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
     end
 
     it 'should throw a DecryptionFailure error if the algorithm is unknown' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      body['hmac'] = 'bad-hmac'
+      body['hmac']['data'] = 'bad-hmac'
       lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
     end
 

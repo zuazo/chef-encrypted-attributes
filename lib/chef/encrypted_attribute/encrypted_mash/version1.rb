@@ -37,8 +37,8 @@ class Chef
           self['encrypted_data'] = encrypted_data
           # generate hmac (encrypt-then-mac), excluding the secret
           hmac = generate_hmac(json_encode(self['encrypted_data'].sort))
-          secrets['hmac'] = hmac['secret']
-          self['hmac'] = hmac['data']
+          secrets['hmac'] = hmac.delete('secret')
+          self['hmac'] = hmac
           # encrypt the shared secrets
           self['encrypted_secret'] = rsa_encrypt_multi_key(json_encode(secrets), public_keys)
           self
@@ -47,11 +47,13 @@ class Chef
         def decrypt(key)
           key = parse_decryption_key(key)
           enc_value = self['encrypted_data'].dup
+          hmac = self['hmac'].dup
           # decrypt the shared secrets
           secrets = json_decode(rsa_decrypt_multi_key(self['encrypted_secret'], key))
           enc_value['secret'] = secrets['data']
+          hmac['secret'] = secrets['hmac']
           # check hmac (encrypt-then-mac -> mac-then-decrypt)
-          unless hmac_matches?(self['hmac'], json_encode(self['encrypted_data'].sort), secrets['hmac'])
+          unless hmac_matches?(hmac, json_encode(self['encrypted_data'].sort))
             raise DecryptionFailure, 'Error decrypting encrypted attribute: invalid hmac. Most likely the data is corrupted.'
           end
           # decrypt the data
@@ -80,7 +82,9 @@ class Chef
           self['encrypted_data'].has_key?('data') and
           self['encrypted_data']['data'].kind_of?(String) and
           self['encrypted_secret'].kind_of?(Hash) and
-          self['hmac'].kind_of?(String)
+          self['hmac'].kind_of?(Hash) and
+          self['hmac'].has_key?('data') and
+          self['hmac']['data'].kind_of?(String)
         end
 
         def symmetric_encrypt_value(value, algo=SYMM_ALGORITHM)
@@ -109,7 +113,7 @@ class Chef
         end
 
         def generate_hmac(data, algo=HMAC_ALGORITHM)
-          hmac = Mash.new
+          hmac = Mash.new({ 'cipher' => algo }) # [cipher] is ignored, only as info
           digest = OpenSSL::Digest.new(algo)
           secret = OpenSSL::Random.random_bytes(digest.block_length)
           hmac['secret'] = Base64.encode64(secret)
@@ -120,11 +124,11 @@ class Chef
           raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
         end
 
-        def hmac_matches?(orig_hmac, data, secret, algo=HMAC_ALGORITHM)
+        def hmac_matches?(orig_hmac, data, algo=HMAC_ALGORITHM)
           digest = OpenSSL::Digest.new(algo)
-          secret = Base64.decode64(secret)
+          secret = Base64.decode64(orig_hmac['secret'])
           new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
-          orig_hmac == new_hmac
+          orig_hmac['data'] == new_hmac
         rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
           # RuntimeError is raised for unsupported algorithms
           raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
