@@ -40,31 +40,48 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       private_key = OpenSSL::PKey::RSA.new(@admin.private_key)
       Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(private_key)
 
-      @node = Chef::Node.new
-      @node.name('node1')
-      @node.save
-      @node_client = Chef::ApiClient.new
-      @node_client.name('node1')
-      @node_client.admin(false)
-      node_hs = @node_client.save
-      @node_client.public_key(node_hs['public_key'])
-      @node_client.private_key(node_hs['private_key'])
+      @node1 = Chef::Node.new
+      @node1.name('node1')
+      @node1.save
+      @node1_client = Chef::ApiClient.new
+      @node1_client.name('node1')
+      @node1_client.admin(false)
+      node_hs = @node1_client.save
+      @node1_client.public_key(node_hs['public_key'])
+      @node1_client.private_key(node_hs['private_key'])
 
-      Chef::EncryptedAttribute.create_on_node('node1', [ 'encrypted', 'attribute' ], 'random-data')
+      @node2 = Chef::Node.new
+      @node2.name('node2')
+      @node2.save
+      @node2_client = Chef::ApiClient.new
+      @node2_client.name('node2')
+      @node2_client.admin(false)
+      @node2_client.save
+
+      Chef::EncryptedAttribute.create_on_node('node1', [ 'encrypted', 'attribute' ], 'random-data', { :client_search => 'admin:true' })
 
       @stdout = StringIO.new
       Chef::Knife::UI.any_instance.stub(:stdout).and_return(@stdout)
     end
     after do
       @admin.destroy
-      @node.destroy
-      @node_client.destroy
+      @node1.destroy
+      @node1_client.destroy
     end
 
-    it 'the client should not be able to read the encrypted attribute by default' do
+    it 'the written node should be able to read the encrypted key after update' do
+      knife = Chef::Knife::EncryptedAttributeUpdate.new([ 'node1', 'encrypted.attribute' ])
+      knife.run
+
+      node_private_key = OpenSSL::PKey::RSA.new(@node1_client.private_key)
+      Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(node_private_key)
+      Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql('random-data')
+    end
+
+    it 'the client should not be able to update the encrypted attribute by default' do
       enc_attr = Chef::EncryptedAttribute.new
       enc_attr.create_on_node('node1', [ 'encrypted', 'attribute' ], 'random-data')
-      knife = Chef::Knife::EncryptedAttributeUpdate.new([ 'node1', 'encrypted.attribute' ])
+      knife = Chef::Knife::EncryptedAttributeUpdate.new([ 'node1', 'encrypted.attribute', '--client-search', '*:*' ])
       lambda { knife.run }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key/)
     end
 

@@ -78,11 +78,11 @@ class Chef
     end
 
     # Updates the keys for which the attribute is encrypted
-    def update(enc_hs, key=nil)
+    def update(enc_hs, keys=nil)
       old_enc_attr = EncryptedMash.json_create(enc_hs)
-      if old_enc_attr.needs_update?(target_keys)
-        hs = old_enc_attr.decrypt(key || local_key)
-        new_enc_attr = create(hs['content']) # TODO check this Hash
+      if old_enc_attr.needs_update?(target_keys(keys))
+        hs = old_enc_attr.decrypt(local_key)
+        new_enc_attr = create(hs['content'], keys) # TODO check this Hash
         enc_hs.replace(new_enc_attr)
         true
       else
@@ -91,10 +91,13 @@ class Chef
     end
 
     def update_on_node(name, attr_ary)
+      # read the client public key
+      node_public_key = Chef::ApiClient.load(name).public_key
+
       # update the encrypted attribute
       remote_node = RemoteNode.new(name)
       enc_hs = remote_node.load_attribute(attr_ary, config.partial_search)
-      updated = update(enc_hs)
+      updated = update(enc_hs, [ node_public_key ])
 
       # save encrypted attribute
       if updated

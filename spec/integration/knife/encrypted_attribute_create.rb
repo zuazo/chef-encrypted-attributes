@@ -46,11 +46,23 @@ describe Chef::Knife::EncryptedAttributeCreate do
       @node_client = Chef::ApiClient.new
       @node_client.name('node1')
       @node_client.admin(false)
-      @node_client.public_key(@node_client.save['public_key'])
+      node_hs = @node_client.save
+      @node_client.public_key(node_hs['public_key'])
+      @node_client.private_key(node_hs['private_key'])
     end
     after do
       @admin.destroy
       @node.destroy
+    end
+
+    it 'the written node should be able to read the encrypted key' do
+      knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
+      knife.should_receive(:edit_data).with(nil, nil).and_return('5')
+      knife.run
+
+      node_private_key = OpenSSL::PKey::RSA.new(@node_client.private_key)
+      Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(node_private_key)
+      Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]).should eql('5')
     end
 
     it 'should not be able to read the encrypted attribute by default' do
