@@ -58,19 +58,19 @@ class Chef
     end
 
     # Creates an encrypted attribute from a Hash
-    def create(hs, keys=nil)
-      decrypted = { 'content' => hs }
+    def create(value, keys=nil)
+      decrypted = { 'content' => value }
 
       enc_attr = EncryptedMash.create(config.version)
       enc_attr.encrypt(decrypted, target_keys(keys))
     end
 
-    def create_on_node(name, attr_ary, hs)
+    def create_on_node(name, attr_ary, value)
       # read the client public key
       node_public_key = Chef::ApiClient.load(name).public_key
 
       # create the encrypted attribute
-      enc_attr = self.create(hs, [ node_public_key ])
+      enc_attr = self.create(value, [ node_public_key ])
 
       # save encrypted attribute
       remote_node = RemoteNode.new(name)
@@ -156,18 +156,18 @@ class Chef
       result
     end
 
-    def self.create(hs, c={})
+    def self.create(value, c={})
       Chef::Log.debug("#{self.class.name}: Creating Encrypted Attribute.")
       enc_attr = EncryptedAttribute.new(self.config(c))
-      result = enc_attr.create(hs)
+      result = enc_attr.create(value)
       Chef::Log.debug("#{self.class.name}: Encrypted Attribute created.")
       result
     end
 
-    def self.create_on_node(name, attr_ary, hs, c={})
+    def self.create_on_node(name, attr_ary, value, c={})
       Chef::Log.debug("#{self.class.name}: Creating Remote Encrypted Attribute on #{name}: #{attr_ary.to_s}")
       enc_attr = EncryptedAttribute.new(self.config(c))
-      result = enc_attr.create_on_node(name, attr_ary, hs)
+      result = enc_attr.create_on_node(name, attr_ary, value)
       Chef::Log.debug("#{self.class.name}: Encrypted Remote Attribute created.")
       result
     end

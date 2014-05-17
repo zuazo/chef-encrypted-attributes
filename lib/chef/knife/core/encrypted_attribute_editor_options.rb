@@ -45,7 +45,7 @@ class Chef
             option :encrypted_attribute_client_search,
               :short => '-C CLIENT_SEARCH_QUERY',
               :long => '--client-search CLIENT_SEARCH_QUERY',
-              :description => 'Client search query',
+              :description => 'Client search query. Can be specified multiple times',
               :proc => lambda { |i|
                 Chef::Config[:knife][:encrypted_attributes][:client_search] = [] unless Chef::Config[:knife][:encrypted_attributes][:client_search].kind_of?(Array)
                 Chef::Config[:knife][:encrypted_attributes][:client_search] << i
@@ -54,7 +54,7 @@ class Chef
             option :encrypted_attribute_users,
               :short => '-U USER',
               :long => '--encrypted-attribute-user USER',
-              :description => 'User name to allow access to',
+              :description => 'User name to allow access to. Can be specified multiple times',
               :proc => lambda { |i|
                 Chef::Config[:knife][:encrypted_attributes][:users] = [] unless Chef::Config[:knife][:encrypted_attributes][:users].kind_of?(Array)
                 Chef::Config[:knife][:encrypted_attributes][:users] << i
