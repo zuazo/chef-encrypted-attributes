@@ -37,6 +37,7 @@ class Chef
               :proc => lambda { |i| Chef::Config[:knife][:encrypted_attributes][:version] = i }
 
             option :encrypted_attribute_partial_search,
+              :short => '-P',
               :long => '--disable-partial-search',
               :description => 'Disable partial search',
               :boolean => true,

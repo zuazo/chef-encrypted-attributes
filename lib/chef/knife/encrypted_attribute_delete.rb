@@ -32,6 +32,7 @@ class Chef
       banner 'knife encrypted attribute delete NODE ATTRIBUTE (options)'
 
       option :force,
+        :short => '-f',
         :long => '--force',
         :description => 'Force the attribute deletion even if you cannot read it',
         :boolean => true

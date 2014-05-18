@@ -248,7 +248,7 @@ For example:
     <td>create, edit, update</td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
+    <td>-P</td>
     <td>--disable-partial-search</td>
     <td>Disable partial search</td>
     <td>&nbsp;</td>
@@ -276,7 +276,7 @@ For example:
     <td>create, edit</td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
+    <td>-f</td>
     <td>--force</td>
     <td>Force the attribute deletion even if you cannot read it</td>
     <td>&nbsp;</td>
