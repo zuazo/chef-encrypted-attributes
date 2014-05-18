@@ -1,14 +1,14 @@
 # Testing
 
-## All the tests
+## All the Tests
 
     $ rake test
 
-## Unit tests
+## Unit Tests
 
     $ rake unit
 
-## Integration tests
+## Integration Tests
 
     $ rake integration
 

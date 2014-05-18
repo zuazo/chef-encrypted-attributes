@@ -138,7 +138,7 @@ This are the currently available caches:
 * `Chef::EncryptedAttribute::RemoteUsers.cache` - Caches the Chef Users public keys (max_size: `1024`).
 * `Chef::EncryptedAttribute::RemoteNode.cache` - Caches the node (encrypted) attributes. Disabled by default (max_size: `0`).
 
-### Clear All The Caches
+### Clear All the Caches
 
 You can clear all the caches with the following code:
 
@@ -148,7 +148,7 @@ Chef::EncryptedAttribute::RemoteUsers.cache.clear
 Chef::EncryptedAttribute::RemoteNode.cache.clear
 ```
 
-### Disable All The Caches
+### Disable All the Caches
 
 You can disable all the caches with the following code:
 

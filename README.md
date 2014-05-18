@@ -14,9 +14,9 @@ Node clients with read access can be specified using a `client_search` query. In
 * Chef `>= 11` (not tested with older versions)
 * yajl-ruby `~> 1.1` (included with Chef)
 
-## Usage In Recipes
+## Usage in Recipes
 
-### Installing And Including The Gem
+### Installing and Including the Gem
 
 You need to install and include the `chef-encrypted-attributes` gem before using encrypted attributes inside a cookbook.
 
@@ -151,7 +151,7 @@ The `ATTRIBUTE` name must be specified using *dots* notation. For example, for `
 
 Read the [Chef Users Limitation](README.md#chef-users-limitation) caveat before trying to use any knife command.
 
-### Installing The Required Gem
+### Installing the Required Gem
 
 You need to install the `chef-encrypted-attributes` gem before using this knife commands.
 
