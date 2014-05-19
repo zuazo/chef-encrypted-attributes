@@ -187,7 +187,7 @@ For example:
 
     $ export EDITOR=vi
     $ knife encrypted attribute create ftp.example.com myapp.ftp_password \
-        --user bob --user alice
+        -U bob -U alice
 
 ### knife encrypted attribute update
 
@@ -202,7 +202,7 @@ For example:
     $ knife encrypted attribute update ftp.example.com myapp.ftp_password \
         --client-search admin:true \
         --client-search role:webapp \
-        --user bob --user alice
+        -U bob -U alice
 
 ### knife encrypted attribute edit
 
@@ -218,7 +218,7 @@ For example:
     $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
         --client-search admin:true \
         --client-search role:webapp \
-        --user bob --user alice
+        -U bob -U alice
 
 ### knife encrypted attribute delete
 
