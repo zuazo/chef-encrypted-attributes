@@ -26,9 +26,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'chef-zero'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec-core'
-  s.add_development_dependency 'rspec-expectations'
-  s.add_development_dependency 'rspec-mocks'
+  s.add_development_dependency 'rspec-core', '~> 2.14'
+  s.add_development_dependency 'rspec-expectations', '~> 2.14'
+  s.add_development_dependency 'rspec-mocks', '~> 2.14'
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'simplecov'
 end
