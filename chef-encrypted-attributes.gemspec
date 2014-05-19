@@ -25,7 +25,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'chef', chef_version
 
   s.add_development_dependency 'chef-zero'
-  s.add_development_dependency 'rake'
+  if RUBY_VERSION < '1.9'
+    s.add_development_dependency 'rake'
+  end
   s.add_development_dependency 'rspec-core', '~> 2.14'
   s.add_development_dependency 'rspec-expectations', '~> 2.14'
   s.add_development_dependency 'rspec-mocks', '~> 2.14'
