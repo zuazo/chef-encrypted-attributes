@@ -57,34 +57,34 @@ describe Chef::EncryptedAttribute::SearchHelper do
         context "partial_search=#{partial_search}" do
 
           it 'should search node attributes without errors' do
-            @SearchHelper.search(:node, 'name:*', { 'value' => [ 'some', 'deep' ] }, 1000, partial_search).should eql(
+            expect(@SearchHelper.search(:node, 'name:*', { 'value' => [ 'some', 'deep' ] }, 1000, partial_search)).to eql(
               @nodes.map { |n| { 'value' => n['some']['deep'] } }
             )
           end
 
           it 'should search all client public_keys without errors' do
-            @SearchHelper.search(:client, '*:*', { 'key' => [ 'public_key' ] }, 1000, partial_search).should eql(
+            expect(@SearchHelper.search(:client, '*:*', { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql(
               (@default_clients + @new_clients).map { |n| { 'key' => n.public_key } }
             )
           end
 
           it 'should search some client public_keys without errors' do
             search_ary = @new_clients.map { |c| "name:#{c.name}" }
-            @SearchHelper.search(:client, search_ary, { 'key' => [ 'public_key' ] }, 1000, partial_search).should eql(
+            expect(@SearchHelper.search(:client, search_ary, { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql(
               @new_clients.map { |n| { 'key' => n.public_key } }
             )
           end
 
           it 'should return empty results without errors' do
-            @SearchHelper.search(:client, 'empty-result:true', { 'key' => [ 'public_key' ] }, 1000, partial_search).should eql([])
+            expect(@SearchHelper.search(:client, 'empty-result:true', { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql([])
           end
 
           it 'should return empty results without bad types' do
-            @SearchHelper.search(:bad_type, '*:*' , { 'key' => [ 'public_key' ] }, 1000, partial_search).should eql([])
+            expect(@SearchHelper.search(:bad_type, '*:*' , { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql([])
           end
 
           it 'should throw an error for invalid keys' do
-            lambda { @SearchHelper.search(:node, '*:*', { :invalid => 'query' }, 1000, partial_search) }.should raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
+            expect { @SearchHelper.search(:node, '*:*', { :invalid => 'query' }, 1000, partial_search) }.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
           end
 
         end # context partial_search=?

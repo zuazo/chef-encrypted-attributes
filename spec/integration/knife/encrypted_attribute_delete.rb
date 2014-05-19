@@ -39,7 +39,7 @@ describe Chef::Knife::EncryptedAttributeDelete do
       @admin.public_key(admin_hs['public_key'])
       @admin.private_key(admin_hs['private_key'])
       private_key = OpenSSL::PKey::RSA.new(@admin.private_key)
-      Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(private_key)
+      allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
 
       @node = Chef::Node.new
       @node.name('node1')
@@ -50,7 +50,7 @@ describe Chef::Knife::EncryptedAttributeDelete do
       @node_client.public_key(@node_client.save['public_key'])
       @enc_attr_content = '5'
       Chef::EncryptedAttribute.create_on_node('node1', [ 'encrypted', 'attribute' ], @enc_attr_content)
-      Chef::Knife::EncryptedAttributeEdit.any_instance.stub(:edit_data).with(@enc_attr_content, nil).and_return(@enc_attr_content)
+      allow_any_instance_of(Chef::Knife::EncryptedAttributeEdit).to receive(:edit_data).with(@enc_attr_content, nil).and_return(@enc_attr_content)
     end
     after do
       @admin.destroy
@@ -62,7 +62,7 @@ describe Chef::Knife::EncryptedAttributeDelete do
       knife_edit.run
 
       knife_delete = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'encrypted.attribute' ])
-      lambda { knife_delete.run }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+      expect { knife_delete.run }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
     it 'should be able to delete the encrypted attribute if not allowed but forced' do
@@ -70,42 +70,42 @@ describe Chef::Knife::EncryptedAttributeDelete do
       knife_edit.run
 
       knife_delete = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'encrypted.attribute', '--force' ])
-      knife_delete.ui.should_receive(:info).with('Encrypted attribute deleted.')
-      lambda { knife_delete.run }.should_not raise_error
-      Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ]).should eql(false)
+      expect(knife_delete.ui).to receive(:info).with('Encrypted attribute deleted.')
+      expect { knife_delete.run }.not_to raise_error
+      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
     end
 
     it 'should be able to delete the encrypted attribute if allowed' do
       knife_edit = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--client-search', 'admin:true' ])
       knife_edit.run
-      Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ]).should eql(true)
+      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(true)
 
       knife_delete = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'encrypted.attribute' ])
-      knife_delete.ui.should_receive(:info).with('Encrypted attribute deleted.')
+      expect(knife_delete.ui).to receive(:info).with('Encrypted attribute deleted.')
       knife_delete.run
-      Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ]).should eql(false)
+      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
     end
 
     it 'should do nothing when the encrypted attribute does not exist' do
-      Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ]).should eql(false)
+      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
       knife = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'non.existent.attribute' ])
-      knife.ui.should_not_receive(:info).with('Encrypted attribute deleted.')
-      Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ]).should eql(false)
+      expect(knife.ui).not_to receive(:info).with('Encrypted attribute deleted.')
+      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
       knife.run
     end
 
     it 'should print usage and exit when a node name is not provided' do
       knife = Chef::Knife::EncryptedAttributeDelete.new([])
-      knife.should_receive(:show_usage)
-      knife.ui.should_receive(:fatal)
-      lambda { knife.run }.should raise_error(SystemExit)
+      expect(knife).to receive(:show_usage)
+      expect(knife.ui).to receive(:fatal)
+      expect { knife.run }.to raise_error(SystemExit)
     end
 
     it 'should print usage and exit when an attribute is not provided' do
       knife = Chef::Knife::EncryptedAttributeDelete.new([ 'node1' ])
-      knife.should_receive(:show_usage)
-      knife.ui.should_receive(:fatal)
-      lambda { knife.run }.should raise_error(SystemExit)
+      expect(knife).to receive(:show_usage)
+      expect(knife.ui).to receive(:fatal)
+      expect { knife.run }.to raise_error(SystemExit)
     end
 
   end

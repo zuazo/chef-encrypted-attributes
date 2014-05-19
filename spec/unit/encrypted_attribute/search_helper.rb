@@ -31,11 +31,11 @@ describe Chef::EncryptedAttribute::SearchHelper do
   context '#query' do
 
     it 'should return a Chef Search Query instance' do
-       @SearchHelper.query.should be_a(Chef::Search::Query)
+       expect(@SearchHelper.query).to be_a(Chef::Search::Query)
     end
 
     it 'should create a new instance each time called' do
-      Chef::Search::Query.should_receive(:new).exactly(4).times
+      expect(Chef::Search::Query).to receive(:new).exactly(4).times
       (1..4).step.each { |x| @SearchHelper.query }
     end
 
@@ -56,7 +56,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     }.each do |orig_str, escaped|
 
       it "should escape #{orig_str.inspect} properly" do
-        @SearchHelper.escape(orig_str).should eql(escaped)
+        expect(@SearchHelper.escape(orig_str)).to eql(escaped)
       end
 
     end # each do |orig_ster, escaped|
@@ -73,7 +73,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     }.each do |escaped, orig_str|
 
       it "should join with ORs and escape #{orig_str.inspect} properly" do
-        @SearchHelper.escape_query(orig_str).should eql(@SearchHelper.escape(escaped))
+        expect(@SearchHelper.escape_query(orig_str)).to eql(@SearchHelper.escape(escaped))
       end
 
     end # each do |escaped, orig_str|
@@ -88,7 +88,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     ].each do |keys|
 
       it "should return true for #{keys.inspect}" do
-        @SearchHelper.valid_search_keys?(keys).should eql(true)
+        expect(@SearchHelper.valid_search_keys?(keys)).to eql(true)
       end
 
     end # each do |keys|
@@ -102,7 +102,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     ].each do |bad_keys|
 
       it "should return false for #{bad_keys.inspect}" do
-        @SearchHelper.valid_search_keys?(bad_keys).should eql(false)
+        expect(@SearchHelper.valid_search_keys?(bad_keys)).to eql(false)
       end
 
     end # each do |bad_keys|
@@ -112,18 +112,18 @@ describe Chef::EncryptedAttribute::SearchHelper do
   context '#search' do
 
     it 'should not search for empty searches' do
-      @SearchHelper.should_not_receive(:partial_search)
-      @SearchHelper.should_not_receive(:normal_search)
+      expect(@SearchHelper).not_to receive(:partial_search)
+      expect(@SearchHelper).not_to receive(:normal_search)
       @SearchHelper.search(1, [], 3, 4, true)
     end
 
     it 'should call #partial_search when partial_search=true' do
-      @SearchHelper.should_receive(:partial_search).with(1, 2, 3, 4)
+      expect(@SearchHelper).to receive(:partial_search).with(1, 2, 3, 4)
       @SearchHelper.search(1, 2, 3, 4, true)
     end
 
     it 'should call #normal_search when partial_search=false' do
-      @SearchHelper.should_receive(:normal_search).with(1, 2, 3, 4)
+      expect(@SearchHelper).to receive(:normal_search).with(1, 2, 3, 4)
       @SearchHelper.search(1, 2, 3, 4, false)
     end
 
@@ -131,13 +131,13 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
   context '#normal_search' do
     before do
-      Chef::Search::Query.any_instance.stub(:search).and_return(
+      allow_any_instance_of(Chef::Search::Query).to receive(:search).and_return(
         [ [
           { 'attr1' => { 'subattr1'  => 'leo' }},
           { 'attr1'  => { 'subattr1' => :donnie }},
           { 'attr1' => begin # respond_to?(:subattr1)
               o = Object.new
-              o.stub(:subattr1).and_return('ralph')
+              allow(o).to receive(:subattr1).and_return('ralph')
               o
             end
           },
@@ -151,7 +151,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'should return search results without errors' do
-      @SearchHelper.normal_search(:node, '*:*', { :value => [ 'attr1', 'subattr1' ] }).should eql([
+      expect(@SearchHelper.normal_search(:node, '*:*', { :value => [ 'attr1', 'subattr1' ] })).to eql([
         { :value => 'leo' },
         { :value => :donnie },
         { :value =>  'ralph' },
@@ -160,39 +160,39 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'should throw an error for invalid keys' do
-      @SearchHelper.should_receive(:valid_search_keys?).and_return(false)
-      lambda { @SearchHelper.normal_search(:node, '*:*', 'invalid_query') }.should raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
+      expect(@SearchHelper).to receive(:valid_search_keys?).and_return(false)
+      expect { @SearchHelper.normal_search(:node, '*:*', 'invalid_query') }.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
     end
 
     it 'should throw fatal error for invalid search results' do
-      Chef::Search::Query.any_instance.should_receive(:search).and_return('bad result :(')
-      lambda { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFatalError)
+      expect_any_instance_of(Chef::Search::Query).to receive(:search).and_return('bad result :(')
+      expect { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
 
     it 'should return empty result for HTTP Not Found errors' do
-      Chef::Search::Query.any_instance.should_receive(:search).and_raise(
+      expect_any_instance_of(Chef::Search::Query).to receive(:search).and_raise(
         Net::HTTPServerException.new('Net::HTTPServerException',
           Net::HTTPResponse.new('1.1', '404', 'Not Found')
         )
       )
-      @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }).should eql([])
+      expect(@SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] })).to eql([])
     end
 
     it 'should throw search error for HTTP Server Exception errors' do
-      Chef::Search::Query.any_instance.should_receive(:search).and_raise(Net::HTTPServerException.new('unit test', 0))
-      lambda { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFailure)
+      expect_any_instance_of(Chef::Search::Query).to receive(:search).and_raise(Net::HTTPServerException.new('unit test', 0))
+      expect { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFailure)
     end
 
     it 'should throw search error for HTTP Fatal errors' do
-      Chef::Search::Query.any_instance.should_receive(:search).and_raise(Net::HTTPFatalError.new('unit test', 0))
-      lambda { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFailure)
+      expect_any_instance_of(Chef::Search::Query).to receive(:search).and_raise(Net::HTTPFatalError.new('unit test', 0))
+      expect { @SearchHelper.normal_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFailure)
     end
 
   end
 
   context '#partial_search' do
     before do
-      Chef::REST.any_instance.stub(:post_rest).and_return(
+      allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
         {
           'rows' => [
             {
@@ -209,44 +209,44 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'should return search results without errors' do
-      @SearchHelper.partial_search(:node, '*:*', { :D => [ 'valid_keys' ] }).should eql([
+      expect(@SearchHelper.partial_search(:node, '*:*', { :D => [ 'valid_keys' ] })).to eql([
         { 'leo' => 'donnie' },
         { 'raph' => 'mikey' },
       ])
     end
 
     it 'should throw an error for invalid keys' do
-      @SearchHelper.should_receive(:valid_search_keys?).and_return(false)
-      lambda { @SearchHelper.partial_search(:node, '*:*', 'invalid_query') }.should raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
+      expect(@SearchHelper).to receive(:valid_search_keys?).and_return(false)
+      expect { @SearchHelper.partial_search(:node, '*:*', 'invalid_query') }.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
     end
 
     it 'should throw fatal error for invalid search results' do
-      Chef::REST.any_instance.should_receive(:post_rest).and_return({ 'rows' => ':(' })
-      lambda { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFatalError)
+      expect_any_instance_of(Chef::REST).to receive(:post_rest).and_return({ 'rows' => ':(' })
+      expect { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
 
     it 'should throw fatal error for invalid row results' do
-      Chef::REST.any_instance.should_receive(:post_rest).and_return({ 'rows' => [ 'bad_data' => ':(' ] })
-      lambda { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFatalError)
+      expect_any_instance_of(Chef::REST).to receive(:post_rest).and_return({ 'rows' => [ 'bad_data' => ':(' ] })
+      expect { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
 
     it 'should return empty result for HTTP Not Found errors' do
-      Chef::REST.any_instance.should_receive(:post_rest).and_raise(
+      expect_any_instance_of(Chef::REST).to receive(:post_rest).and_raise(
         Net::HTTPServerException.new('Net::HTTPServerException',
           Net::HTTPResponse.new('1.1', '404', 'Not Found')
         )
       )
-      @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }).should eql([])
+      expect(@SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] })).to eql([])
     end
 
     it 'should throw search error for HTTP Server Exception errors' do
-      Chef::REST.any_instance.should_receive(:post_rest).and_raise(Net::HTTPServerException.new('unit test', 0))
-      lambda { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFailure)
+      expect_any_instance_of(Chef::REST).to receive(:post_rest).and_raise(Net::HTTPServerException.new('unit test', 0))
+      expect { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFailure)
     end
 
     it 'should throw search error for HTTP Fatal errors' do
-      Chef::REST.any_instance.should_receive(:post_rest).and_raise(Net::HTTPFatalError.new('unit test', 0))
-      lambda { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.should raise_error(Chef::EncryptedAttribute::SearchFailure)
+      expect_any_instance_of(Chef::REST).to receive(:post_rest).and_raise(Net::HTTPFatalError.new('unit test', 0))
+      expect { @SearchHelper.partial_search(:node, '*:*', { 'valid' => [ 'keys' ] }) }.to raise_error(Chef::EncryptedAttribute::SearchFailure)
     end
 
   end

@@ -27,7 +27,7 @@ describe Chef::EncryptedAttribute do
     Chef::Config[:encrypted_attributes] = Mash.new
 
     @client_key = OpenSSL::PKey::RSA.new(2048)
-    Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@client_key)
+    allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@client_key)
 
     @EncryptedAttribute = Chef::EncryptedAttribute
     @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
@@ -37,12 +37,12 @@ describe Chef::EncryptedAttribute do
 
   context '#self.create' do
     before do
-      @EncryptedAttribute.any_instance.stub(:create)
+      allow_any_instance_of(@EncryptedAttribute).to receive(:create)
     end
 
     it 'should create an EncryptedAttribute object' do
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).and_return(body)
       @EncryptedAttribute.create([ 'a' ])
     end
 
@@ -50,25 +50,25 @@ describe Chef::EncryptedAttribute do
       orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
       custom_config = @Config.new({ :partial_search => false })
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).with(an_instance_of(@Config)).once.and_return(body)
       @EncryptedAttribute.create([ 'a' ], custom_config)
     end
 
     it 'should call EncryptedAttribute#create and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:create).with([ 'a' ]).and_return('create')
-      @EncryptedAttribute.create([ 'a' ]).should eql('create')
+      expect_any_instance_of(@EncryptedAttribute).to receive(:create).with([ 'a' ]).and_return('create')
+      expect(@EncryptedAttribute.create([ 'a' ])).to eql('create')
     end
 
   end # context #self.create
 
   context '#self.create_on_node' do
     before do
-      @EncryptedAttribute.any_instance.stub(:create_on_node)
+      allow_any_instance_of(@EncryptedAttribute).to receive(:create_on_node)
     end
 
     it 'should create an EncryptedAttribute object' do
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).and_return(body)
       @EncryptedAttribute.create_on_node('node1', [ 'a' ], 'value')
     end
 
@@ -76,13 +76,13 @@ describe Chef::EncryptedAttribute do
       orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
       custom_config = @Config.new({ :partial_search => false })
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).with(an_instance_of(@Config)).once.and_return(body)
       @EncryptedAttribute.create_on_node('node1', [ 'a' ], 'value', custom_config)
     end
 
     it 'should call EncryptedAttribute#create_on_node and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:create_on_node).with('node1', [ 'a' ], 'value').and_return('create_on_node')
-      @EncryptedAttribute.create_on_node('node1', [ 'a' ], 'value').should eql('create_on_node')
+      expect_any_instance_of(@EncryptedAttribute).to receive(:create_on_node).with('node1', [ 'a' ], 'value').and_return('create_on_node')
+      expect(@EncryptedAttribute.create_on_node('node1', [ 'a' ], 'value')).to eql('create_on_node')
     end
 
   end # context #self.exists_on_node?
@@ -91,12 +91,12 @@ describe Chef::EncryptedAttribute do
 
     context "#self.#{meth}" do
       before do
-        @EncryptedAttribute.any_instance.stub(meth.to_sym)
+        allow_any_instance_of(@EncryptedAttribute).to receive(meth.to_sym)
       end
 
       it 'should create an EncryptedAttribute object' do
         body = @EncryptedAttribute.new
-        @EncryptedAttribute.should_receive(:new).and_return(body)
+        expect(@EncryptedAttribute).to receive(:new).and_return(body)
         @EncryptedAttribute.send(meth, [ 'a' ])
       end
 
@@ -104,13 +104,13 @@ describe Chef::EncryptedAttribute do
         orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
         custom_config = @Config.new({ :partial_search => false })
         body = @EncryptedAttribute.new
-        @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+        expect(@EncryptedAttribute).to receive(:new).with(an_instance_of(@Config)).once.and_return(body)
         @EncryptedAttribute.send(meth, [ 'a' ], custom_config)
       end
 
       it "should call EncryptedAttribute##{meth} and return its result" do
-        @EncryptedAttribute.any_instance.should_receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
-        @EncryptedAttribute.send(meth, [ 'a' ]).should eql("#{meth}")
+        expect_any_instance_of(@EncryptedAttribute).to receive(meth.to_sym).with([ 'a' ]).and_return("#{meth}")
+        expect(@EncryptedAttribute.send(meth, [ 'a' ])).to eql("#{meth}")
       end
 
     end # context #self.meth
@@ -119,12 +119,12 @@ describe Chef::EncryptedAttribute do
 
   context '#self.load_from_node' do
     before do
-      @EncryptedAttribute.any_instance.stub(:load_from_node)
+      allow_any_instance_of(@EncryptedAttribute).to receive(:load_from_node)
     end
 
     it 'should create an EncryptedAttribute object' do
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).and_return(body)
       @EncryptedAttribute.load_from_node('node1', [ 'a' ])
     end
 
@@ -132,25 +132,25 @@ describe Chef::EncryptedAttribute do
       orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
       custom_config = @Config.new({ :partial_search => false })
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).with(an_instance_of(@Config)).once.and_return(body)
       @EncryptedAttribute.load_from_node('node1', [ 'a' ], custom_config)
     end
 
     it 'should call EncryptedAttribute#load_from_node and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
-      @EncryptedAttribute.load_from_node('node1', [ 'a' ]).should eql('load_from_node')
+      expect_any_instance_of(@EncryptedAttribute).to receive(:load_from_node).with('node1', [ 'a' ]).and_return('load_from_node')
+      expect(@EncryptedAttribute.load_from_node('node1', [ 'a' ])).to eql('load_from_node')
     end
 
   end # context #load_from_node
 
   context '#self.update_on_node' do
     before do
-      @EncryptedAttribute.any_instance.stub(:update_on_node)
+      allow_any_instance_of(@EncryptedAttribute).to receive(:update_on_node)
     end
 
     it 'should update an EncryptedAttribute object' do
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).and_return(body)
       @EncryptedAttribute.update_on_node('node1', [ 'a' ])
     end
 
@@ -158,32 +158,32 @@ describe Chef::EncryptedAttribute do
       orig_config = Chef::Config[:encrypted_attributes] = { :partial_search => true }
       custom_config = @Config.new({ :partial_search => false })
       body = @EncryptedAttribute.new
-      @EncryptedAttribute.should_receive(:new).with(an_instance_of(@Config)).once.and_return(body)
+      expect(@EncryptedAttribute).to receive(:new).with(an_instance_of(@Config)).once.and_return(body)
       @EncryptedAttribute.update_on_node('node1', [ 'a' ], custom_config)
     end
 
     it 'should call EncryptedAttribute#update_on_node and return its result' do
-      @EncryptedAttribute.any_instance.should_receive(:update_on_node).with('node1', [ 'a' ]).and_return('update_on_node')
-      @EncryptedAttribute.update_on_node('node1', [ 'a' ]).should eql('update_on_node')
+      expect_any_instance_of(@EncryptedAttribute).to receive(:update_on_node).with('node1', [ 'a' ]).and_return('update_on_node')
+      expect(@EncryptedAttribute.update_on_node('node1', [ 'a' ])).to eql('update_on_node')
     end
 
   end # context #update_on_node
 
   context '#self.exists?' do
     before do
-      @EncryptedMash.any_instance.stub(:exists?)
+      allow_any_instance_of(@EncryptedMash).to receive(:exists?)
     end
 
     it 'should not create an EncryptedMash object' do
-      @EncryptedMash.should_not_receive(:new)
+      expect(@EncryptedMash).not_to receive(:new)
       @EncryptedAttribute.exists?([ 'a' ])
     end
 
     it 'should call EncryptedMash#exists? and return its result' do
-      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return(true)
-      @EncryptedAttribute.exists?([ 'a' ]).should eql(true)
-      @EncryptedMash.should_receive(:exists?).with([ 'a' ]).and_return(false)
-      @EncryptedAttribute.exists?([ 'a' ]).should eql(false)
+      expect(@EncryptedMash).to receive(:exists?).with([ 'a' ]).and_return(true)
+      expect(@EncryptedAttribute.exists?([ 'a' ])).to eql(true)
+      expect(@EncryptedMash).to receive(:exists?).with([ 'a' ]).and_return(false)
+      expect(@EncryptedAttribute.exists?([ 'a' ])).to eql(false)
     end
 
   end # context #exists?
@@ -191,10 +191,10 @@ describe Chef::EncryptedAttribute do
   context '#self.exists_on_node?' do
 
     it 'should load the remote attribute and call #exists?' do
-      @Config.any_instance.should_receive(:partial_search).and_return('partial_search')
-      @RemoteNode.any_instance.should_receive(:load_attribute).with(['attr'], 'partial_search').and_return('load_attribute')
-      @EncryptedAttribute.should_receive(:exists?).with('load_attribute').and_return('exists?')
-      @EncryptedAttribute.exists_on_node?('node1', ['attr']).should eql('exists?')
+      expect_any_instance_of(@Config).to receive(:partial_search).and_return('partial_search')
+      expect_any_instance_of(@RemoteNode).to receive(:load_attribute).with(['attr'], 'partial_search').and_return('load_attribute')
+      expect(@EncryptedAttribute).to receive(:exists?).with('load_attribute').and_return('exists?')
+      expect(@EncryptedAttribute.exists_on_node?('node1', ['attr'])).to eql('exists?')
     end
 
   end # context #self.exists_on_node?

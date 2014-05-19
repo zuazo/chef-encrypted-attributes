@@ -56,18 +56,18 @@ describe Chef::EncryptedAttribute::RemoteClients do
     context '#get_public_keys' do
 
       it 'should get all client public_keys by default' do
-        @RemoteClients.get_public_keys.sort.should eql(@clients.map { |c| c.public_key }.sort)
+        expect(@RemoteClients.get_public_keys.sort).to eql(@clients.map { |c| c.public_key }.sort)
       end
 
       it 'should read the correct clients when a search query is passed as arg' do
         query = 'admin:true'
         @admins = @clients.reject { |c| !c.admin }
-        @RemoteClients.get_public_keys(query).sort.should eql(@admins.map { |c| c.public_key }.sort)
+        expect(@RemoteClients.get_public_keys(query).sort).to eql(@admins.map { |c| c.public_key }.sort)
       end
 
       it 'should return empty array for empty search results' do
         query = 'this_will_return_no_results:true'
-        @RemoteClients.get_public_keys(query).sort.should eql([])
+        expect(@RemoteClients.get_public_keys(query).sort).to eql([])
       end
 
     end # context #get_public_keys

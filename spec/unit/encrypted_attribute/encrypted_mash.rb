@@ -30,20 +30,20 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#new' do
 
     it 'should create an EncryptedMash object without errors' do
-      lambda { @EncryptedMash.new }.should_not raise_error
+      expect { @EncryptedMash.new }.not_to raise_error
     end
 
     it 'should be able to create an EncryptedMash from another EncryptedMash instance passed as arg' do
       body0 = @EncryptedMash.new
-      @EncryptedMash.any_instance.should_receive(:update_from!).with(body0)
-      lambda { @EncryptedMash.new(body0) }.should_not raise_error
+      expect_any_instance_of(@EncryptedMash).to receive(:update_from!).with(body0)
+      expect { @EncryptedMash.new(body0) }.not_to raise_error
     end
 
     %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
 
       it "##{meth} method should raise a NotImplementedError error" do
         body = @EncryptedMash.new
-        lambda { body.send(meth) }.should raise_error(NotImplementedError)
+        expect { body.send(meth) }.to raise_error(NotImplementedError)
       end
 
     end # each do |meth|
@@ -61,7 +61,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       },
     ].each do |o|
       it "should return true for #{o.inspect}" do
-        @EncryptedMash.exists?(o).should be_true
+        expect(@EncryptedMash.exists?(o)).to be_true
       end
     end
 
@@ -74,7 +74,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       },
     ].each do |o|
       it "should return false for #{o.inspect}" do
-        @EncryptedMash.exists?(o).should be_false
+        expect(@EncryptedMash.exists?(o)).to be_false
       end
     end
 
@@ -84,30 +84,30 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
     it 'should create a EncryptedMash subclass object' do
       o = @EncryptedMash.create(0)
-      o.should be_kind_of(@EncryptedMash)
-      o.should_not be_an_instance_of(@EncryptedMash)
+      expect(o).to be_kind_of(@EncryptedMash)
+      expect(o).not_to be_an_instance_of(@EncryptedMash)
     end
 
     it 'should throw an Unsupported exception for unknown versions' do
-      Chef::Log.stub(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      lambda { @EncryptedMash.create(1000) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
+      expect { @EncryptedMash.create(1000) }.to raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
     [ nil, ''].each do |version|
       it "should throw an Unacceptable exception for #{version.inspect} versions" do
-        lambda { @EncryptedMash.create(version) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+        expect { @EncryptedMash.create(version) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
       end
     end
 
     it 'should use #const_get in a Ruby 1.8 compatible way' do
       stub_const('RUBY_VERSION', '1.8.7')
-      Kernel.should_receive(:const_get).with('Chef').once.and_return(Chef)
+      expect(Kernel).to receive(:const_get).with('Chef').once.and_return(Chef)
       @EncryptedMash.create(0)
     end
 
     it 'should use #const_get in a Ruby 1.9 compatible way', :if => RUBY_VERSION >= '1.9' do
       stub_const('RUBY_VERSION', '1.9.0')
-      Kernel.should_receive(:const_get).with('Chef', true).once.and_return(Chef)
+      expect(Kernel).to receive(:const_get).with('Chef', true).once.and_return(Chef)
       @EncryptedMash.create(0)
     end
 
@@ -117,13 +117,13 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
     it 'should return a JSON object' do
       o = @EncryptedMash.create(0)
-      o.to_json.should eql(o.to_hash.to_json)
+      expect(o.to_json).to eql(o.to_hash.to_json)
     end
 
     it 'should pass arguments to Hash#to_json method' do
       o = @EncryptedMash.create(0)
-      @EncryptedMash.any_instance.should_receive(:for_json).and_return(o.to_hash)
-      Hash.any_instance.should_receive(:to_json).with(1, 2, 3, 4)
+      expect_any_instance_of(@EncryptedMash).to receive(:for_json).and_return(o.to_hash)
+      expect_any_instance_of(Hash).to receive(:to_json).with(1, 2, 3, 4)
       o.to_json(1, 2, 3, 4)
     end
 
@@ -133,8 +133,8 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
     it 'should return a Hash object' do
       o = @EncryptedMash.new
-      o.for_json.should be_instance_of(Hash)
-      o.for_json.should eql(o.to_hash)
+      expect(o.for_json).to be_instance_of(Hash)
+      expect(o.for_json).to eql(o.to_hash)
     end
 
   end # context #for_json
@@ -146,12 +146,12 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       orig['key1'] = 'value1'
       new = @EncryptedMash.new
       new.update_from!(orig)
-      new['key1'].should eql('value1')
+      expect(new['key1']).to eql('value1')
     end
 
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
       o = @EncryptedMash.new
-      lambda { o.update_from!({}) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+      expect { o.update_from!({}) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
     end
 
   end # context #update_from!
@@ -162,21 +162,21 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       orig = @EncryptedMash.new
       orig['key1'] = 'value1'
       new = @EncryptedMash.json_create(orig)
-      new.should be_kind_of(@EncryptedMash)
-      new.should_not equal(orig)
-      new['key1'].should eql('value1')
+      expect(new).to be_kind_of(@EncryptedMash)
+      expect(new).not_to equal(orig)
+      expect(new['key1']).to eql('value1')
     end
 
     it 'should throw an error if empty attribute is passed as arg' do
-      Chef::Log.stub(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      lambda { @EncryptedMash.json_create({}) }.should raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
+      expect { @EncryptedMash.json_create({}) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
     end
 
     it 'should throw an error if a wrong encrypted attribute is passed as arg' do
-      Chef::Log.stub(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      lambda { @EncryptedMash.json_create({
+      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
+      expect { @EncryptedMash.json_create({
         @EncryptedMash::JSON_CLASS => 'NonExistent::Class',
-      }) }.should raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      }) }.to raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
     end
 
   end # context #self.json_create

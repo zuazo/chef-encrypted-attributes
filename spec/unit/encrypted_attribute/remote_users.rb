@@ -36,8 +36,8 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       user_list[user.name] = "#{Chef::Config[:chef_server_url]}/users/#{user.name}"
       user
     end
-    Chef::User.stub(:load).and_return(@users[0])
-    Chef::User.stub(:list).and_return(user_list)
+    allow(Chef::User).to receive(:load).and_return(@users[0])
+    allow(Chef::User).to receive(:list).and_return(user_list)
   end
   after(:all) do
     Chef::Config[:chef_server_url] = @prev_chef_server if @prev_chef_server.kind_of?(String)
@@ -46,27 +46,27 @@ describe Chef::EncryptedAttribute::RemoteUsers do
   describe '#get_public_keys' do
 
     it 'should return empty array by default' do
-      @RemoteUsers.get_public_keys.should eql([])
+      expect(@RemoteUsers.get_public_keys).to eql([])
     end
 
     it 'should return all users with "*"' do
-      @RemoteUsers.get_public_keys('*').count.should eql(@users.count)
+      expect(@RemoteUsers.get_public_keys('*').count).to eql(@users.count)
     end
 
     it 'should return cached users with multiples "*"' do
-      @RemoteUsers.should_receive(:get_all_public_keys).once.and_return('users1')
-      @RemoteUsers.get_public_keys('*').should eql('users1')
-      @RemoteUsers.get_public_keys('*').should eql('users1') # cached
+      expect(@RemoteUsers).to receive(:get_all_public_keys).once.and_return('users1')
+      expect(@RemoteUsers.get_public_keys('*')).to eql('users1')
+      expect(@RemoteUsers.get_public_keys('*')).to eql('users1') # cached
     end
 
     it 'should return only public keys specified' do
-      @RemoteUsers.get_public_keys([ 'user0', 'user1' ] ).count.should eql(2)
+      expect(@RemoteUsers.get_public_keys([ 'user0', 'user1' ] ).count).to eql(2)
     end
 
     it 'should return cached public keys on multiple calls' do
-      Chef::User.should_receive(:load).with('user0').once.and_return(@users[0])
-      @RemoteUsers.get_public_keys([ 'user0' ] ).should eql([ @users[0].public_key ])
-      @RemoteUsers.get_public_keys([ 'user0' ] ).should eql([ @users[0].public_key ]) # cached
+      expect(Chef::User).to receive(:load).with('user0').once.and_return(@users[0])
+      expect(@RemoteUsers.get_public_keys([ 'user0' ] )).to eql([ @users[0].public_key ])
+      expect(@RemoteUsers.get_public_keys([ 'user0' ] )).to eql([ @users[0].public_key ]) # cached
     end
 
     [
@@ -75,17 +75,17 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     ].each do |bad_users|
 
       it "should thrown an ArgumentError for user list of kind #{bad_users.class.name} (#{bad_users.inspect})" do
-        lambda { @RemoteUsers.get_public_keys(bad_users) }.should raise_error(ArgumentError)
+        expect { @RemoteUsers.get_public_keys(bad_users) }.to raise_error(ArgumentError)
       end
 
     end # each do |bad_users|
 
     it 'should return valid public keys' do
       pkey_pem = @RemoteUsers.get_public_keys([ 'user0' ])[0]
-      pkey_pem.should be_a(String)
+      expect(pkey_pem).to be_a(String)
       pkey = OpenSSL::PKey::RSA.new(pkey_pem)
-      pkey.public?.should be_true
-      pkey.private?.should be_false
+      expect(pkey.public?).to be_true
+      expect(pkey.private?).to be_false
     end
 
     {
@@ -95,14 +95,14 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     }.each do |code, exception|
 
       it "should throw an #{exception.to_s} exception if the server returns a #{code} code" do
-        Chef::User.stub(:load) do
+        allow(Chef::User).to receive(:load) do
           raise Net::HTTPServerException.new('Net::HTTPServerException',
             Net::HTTPResponse.new('1.1', code, 'Net::HTTPResponse')
           )
         end
-        lambda do
+        expect do
           @RemoteUsers.get_public_keys([ 'random_user' ] )
-        end.should raise_error(exception)
+        end.to raise_error(exception)
       end
 
     end # each do |code, exception|

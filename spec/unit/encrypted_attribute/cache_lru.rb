@@ -26,11 +26,11 @@ describe Chef::EncryptedAttribute::CacheLru do
   describe '#new' do
 
     it 'should create a cache without errors' do
-      lambda { @CacheLru.new }.should_not raise_error
+      expect { @CacheLru.new }.not_to raise_error
     end
 
     it 'should a cache with max_size as argument ' do
-      @CacheLru.any_instance.should_receive(:max_size).with(25).once
+      expect_any_instance_of(@CacheLru).to receive(:max_size).with(25).once
       @CacheLru.new(25)
     end
 
@@ -40,13 +40,13 @@ describe Chef::EncryptedAttribute::CacheLru do
 
     it 'should return 1024 by default' do
       cache = @CacheLru.new
-      cache.max_size.should eql(1024)
+      expect(cache.max_size).to eql(1024)
     end
 
     it 'should be able to change the maximum size' do
       cache = @CacheLru.new
-      cache.max_size(25).should eql(25)
-      cache.max_size.should eql(25)
+      expect(cache.max_size(25)).to eql(25)
+      expect(cache.max_size).to eql(25)
     end
 
     it 'should reduce the cache size if max_size is decreased' do
@@ -54,9 +54,9 @@ describe Chef::EncryptedAttribute::CacheLru do
       (1..25).step.each do |x|
         cache[x.to_s] = x
       end
-      cache.size.should eql(25)
+      expect(cache.size).to eql(25)
       cache.max_size(10)
-      cache.size.should eql(10)
+      expect(cache.size).to eql(10)
     end
 
   end
@@ -68,11 +68,11 @@ describe Chef::EncryptedAttribute::CacheLru do
     end
 
     it 'should read a cache value' do
-      @cache['key1'].should eql('value1')
+      expect(@cache['key1']).to eql('value1')
     end
 
     it 'should return nil if the key does not exist' do
-      @cache['key2'].should eql(nil)
+      expect(@cache['key2']).to eql(nil)
     end
 
   end
@@ -84,14 +84,14 @@ describe Chef::EncryptedAttribute::CacheLru do
 
     it 'should set a cache value' do
       @cache['key1'] = 'value1'
-      @cache['key1'].should eql('value1')
+      expect(@cache['key1']).to eql('value1')
     end
 
     it 'should not set more than max_size values' do
       (1..20).step.each do |x|
         @cache[x.to_s] = x
       end
-      @cache.size.should eql(10)
+      expect(@cache.size).to eql(10)
     end
 
     it 'should free items using LRU algorithm' do
@@ -103,9 +103,9 @@ describe Chef::EncryptedAttribute::CacheLru do
       (11..14).step.each { |x| @cache[x] = x }
 
       # expectations
-      (1..3).step.each { |x| @cache.has_key?(x).should be_false }
-      (4..8).step.each { |x| @cache.has_key?(x).should be_true }
-      (10..14).step.each { |x| @cache.has_key?(x).should be_true }
+      (1..3).step.each { |x| expect(@cache.has_key?(x)).to be_false }
+      (4..8).step.each { |x| expect(@cache.has_key?(x)).to be_true }
+      (10..14).step.each { |x| expect(@cache.has_key?(x)).to be_true }
     end
 
   end

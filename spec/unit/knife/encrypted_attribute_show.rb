@@ -26,36 +26,36 @@ describe Chef::Knife::EncryptedAttributeShow do
     @knife = Chef::Knife::EncryptedAttributeShow.new
 
     @stdout = StringIO.new
-    @knife.ui.stub(:stdout).and_return(@stdout)
-    Chef::EncryptedAttribute.stub(:exists_on_node?).and_return(true)
+    allow(@knife.ui).to receive(:stdout).and_return(@stdout)
+    allow(Chef::EncryptedAttribute).to receive(:exists_on_node?).and_return(true)
   end
 
   it 'should load the encrypted attribute' do
-    Chef::EncryptedAttribute.should_receive(:load_from_node).and_return('unicorns drill accurately')
+    expect(Chef::EncryptedAttribute).to receive(:load_from_node).and_return('unicorns drill accurately')
     @knife.name_args = %w{node1 encrypted.attribute}
     @knife.run
-    @stdout.string.should match(/unicorns drill accurately/)
+    expect(@stdout.string).to match(/unicorns drill accurately/)
   end
 
   it 'should print error message when the attribute does not exists' do
-    Chef::EncryptedAttribute.should_receive(:exists_on_node?).and_return(false)
+    expect(Chef::EncryptedAttribute).to receive(:exists_on_node?).and_return(false)
     @knife.name_args = [ 'node1', 'non.existent' ]
-    @knife.ui.should_receive(:fatal).with('Encrypted attribute not found')
-    lambda { @knife.run }.should raise_error(SystemExit)
+    expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
+    expect { @knife.run }.to raise_error(SystemExit)
   end
 
   it 'should print usage and exit when a node name is not provided' do
     @knife.name_args = []
-    @knife.should_receive(:show_usage)
-    @knife.ui.should_receive(:fatal)
-    lambda { @knife.run }.should raise_error(SystemExit)
+    expect(@knife).to receive(:show_usage)
+    expect(@knife.ui).to receive(:fatal)
+    expect { @knife.run }.to raise_error(SystemExit)
   end
 
   it 'should print usage and exit when an attribute is not provided' do
     @knife.name_args = [ 'node1' ]
-    @knife.should_receive(:show_usage)
-    @knife.ui.should_receive(:fatal)
-    lambda { @knife.run }.should raise_error(SystemExit)
+    expect(@knife).to receive(:show_usage)
+    expect(@knife.ui).to receive(:fatal)
+    expect { @knife.run }.to raise_error(SystemExit)
   end
 
   context '#attribute_path_to_ary' do
@@ -71,7 +71,7 @@ describe Chef::Knife::EncryptedAttributeShow do
     }.each do |str, ary|
 
       it "should convert #{str.inspect} to #{ary.inspect}" do
-        @knife.attribute_path_to_ary(str).should eql(ary)
+        expect(@knife.attribute_path_to_ary(str)).to eql(ary)
       end
 
     end # each do |str, ary|

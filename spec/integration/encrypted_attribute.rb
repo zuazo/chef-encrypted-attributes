@@ -50,27 +50,27 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'should create an encrypted attribute' do
-            @enc_attr[@chef_type].should eql(@chef_type_value)
+            expect(@enc_attr[@chef_type]).to eql(@chef_type_value)
           end
 
           it 'should set the encrypted attribute version' do
-            @enc_attr[@json_class].should be_kind_of(String)
+            expect(@enc_attr[@json_class]).to be_kind_of(String)
           end
 
           it 'should set the encrypted attribute version correctly', :if => version == 'default' do
-            @enc_attr[@json_class].should match(/^Chef::EncryptedAttribute::EncryptedMash::Version/)
+            expect(@enc_attr[@json_class]).to match(/^Chef::EncryptedAttribute::EncryptedMash::Version/)
           end
 
           it 'should set the encrypted attribute version correctly', :if => version != 'default' do
-            @enc_attr[@json_class].should eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
+            expect(@enc_attr[@json_class]).to eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
           end
 
           it 'should create the correct version object' do
-            @enc_attr.should be_kind_of(@EncryptedMash)
+            expect(@enc_attr).to be_kind_of(@EncryptedMash)
           end
 
           it 'should create the correct version object', :if => version != 'default' do
-            @enc_attr.class.name.should eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
+            expect(@enc_attr.class.name).to eql("Chef::EncryptedAttribute::EncryptedMash::Version#{version}")
           end
 
         end # context #create
@@ -87,11 +87,11 @@ describe Chef::EncryptedAttribute do
 
           context 'using #load' do
             it 'should be able to decrypt the attribute' do
-              lambda { Chef::EncryptedAttribute.load(@enc_attr) }.should_not raise_error
+              expect { Chef::EncryptedAttribute.load(@enc_attr) }.not_to raise_error
             end
 
             it 'should decrypt the attribute to the correct value' do
-              Chef::EncryptedAttribute.load(@enc_attr).should eql(@clear_attr)
+              expect(Chef::EncryptedAttribute.load(@enc_attr)).to eql(@clear_attr)
             end
           end # context using #load
 
@@ -107,11 +107,11 @@ describe Chef::EncryptedAttribute do
             end
 
             it 'should be able to decrypt the attribute' do
-              lambda { Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'encrypted', 'attribute' ]) }.should_not raise_error
+              expect { Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'encrypted', 'attribute' ]) }.not_to raise_error
             end
 
             it 'should decrypt the attribute to the correct value' do
-              Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'encrypted', 'attribute' ]).should eql(@clear_attr)
+              expect(Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'encrypted', 'attribute' ])).to eql(@clear_attr)
             end
           end # context using #load_from_node
 
@@ -137,7 +137,7 @@ describe Chef::EncryptedAttribute do
 
             it "#load should encrypt and decrypt correctly: #{o.inspect} (#{o.class})" do
               enc_o = Chef::EncryptedAttribute.create(o)
-              Chef::EncryptedAttribute.load(enc_o).should eql(o)
+              expect(Chef::EncryptedAttribute.load(enc_o)).to eql(o)
             end
 
             it "#load_from_node should encrypt and decrypt correctly: #{o.inspect} (#{o.class})" do
@@ -146,7 +146,7 @@ describe Chef::EncryptedAttribute do
               node.name(Chef::Config[:node_name])
               node.set['enc_o'] = enc_o
               node.save
-              Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'enc_o' ] ).should eql(o)
+              expect(Chef::EncryptedAttribute.load_from_node(Chef::Config[:node_name], [ 'enc_o' ] )).to eql(o)
               node.destroy
             end
 
@@ -172,8 +172,8 @@ describe Chef::EncryptedAttribute do
 
           it 'should not update an already updated attribute' do
             enc_orig = @enc_attr.clone
-            Chef::EncryptedAttribute.update(@enc_attr).should eql(false)
-            @enc_attr.should eql(enc_orig)
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(false)
+            expect(@enc_attr).to eql(enc_orig)
           end
 
           it 'should update when there are new clients' do
@@ -184,8 +184,8 @@ describe Chef::EncryptedAttribute do
             client2.save
 
             enc_orig = @enc_attr.clone
-            Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
-            @enc_attr.should_not eql(enc_orig)
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
 
             client2.destroy
           end
@@ -194,8 +194,8 @@ describe Chef::EncryptedAttribute do
             @client1.destroy
 
             enc_orig = @enc_attr.clone
-            Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
-            @enc_attr.should_not eql(enc_orig)
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
 
             @client1.save # avoid error 404 on after { client1.destroy }
           end
@@ -208,8 +208,8 @@ describe Chef::EncryptedAttribute do
             client2.save
 
             enc_orig = @enc_attr.clone
-            Chef::EncryptedAttribute.update(@enc_attr).should eql(true)
-            @enc_attr.should_not eql(enc_orig)
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
 
             client2.destroy
             @client1.save # avoid error 404 on after { client1.destroy }
@@ -239,7 +239,7 @@ describe Chef::EncryptedAttribute do
           clear_attributes.each do |a|
 
             it "should return false for #{a.inspect}" do
-              Chef::EncryptedAttribute.exists?(a).should eql(false)
+              expect(Chef::EncryptedAttribute.exists?(a)).to eql(false)
             end
 
           end
@@ -247,7 +247,7 @@ describe Chef::EncryptedAttribute do
           it 'should return true for an encrypted attribute' do
             enc_attr = Chef::EncryptedAttribute.create('any-data')
 
-            Chef::EncryptedAttribute.exists?(enc_attr).should eql(true)
+            expect(Chef::EncryptedAttribute.exists?(enc_attr)).to eql(true)
           end
 
           it 'should return true for a node encrypted attribute' do
@@ -256,7 +256,7 @@ describe Chef::EncryptedAttribute do
             node.name(Chef::Config[:node_name])
             node.set['encrypted']['attribute'] = enc_attr
 
-            Chef::EncryptedAttribute.exists?(node['encrypted']['attribute']).should eql(true)
+            expect(Chef::EncryptedAttribute.exists?(node['encrypted']['attribute'])).to eql(true)
           end
 
         end # context #exists?
@@ -283,27 +283,27 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'original client should be able to read the attribute' do
-            Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+            expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear)
           end
 
           it 'other clients should not be able to read it by default' do
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
-            lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+            allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
+            expect { expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 
           it 'other clients should be able to read it if added as #udpate arg' do
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [ @client.public_key ] })
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
-            Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+            allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
+            expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear)
           end
 
           it 'other clients should be able to read it if added in global config' do
             Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ]
-            Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']).should eql(true)
+            expect(Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])).to eql(true)
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
-            Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
+            allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
+            expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear)
           end
 
           it 'other clients should not be able to read if they are removed from global config' do
@@ -312,19 +312,17 @@ describe Chef::EncryptedAttribute do
             Chef::Config[:encrypted_attributes][:keys] = [] # remove the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
-            lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+            allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
+            expect { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 
-#           it 'other clients should nbe able to read if they are not removed from global config' do
-          it 'other clients should nbe able to read if they are not removed from global config' do
+          it 'other clients should not be able to read if they are not removed from global config' do
             Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ] # first add the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
 
-            Chef::EncryptedAttribute::LocalNode.any_instance.stub(:key).and_return(@private_key)
-#             Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear)
-            lambda { Chef::EncryptedAttribute.load(@node['encrypted']['attribute']).should eql(@attr_clear) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+            allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
+            expect { expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
           end
 
         end # context working with multiple clients

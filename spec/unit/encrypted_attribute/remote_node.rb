@@ -22,31 +22,31 @@ describe Chef::EncryptedAttribute::RemoteNode do
   before do
     Chef::EncryptedAttribute::RemoteNode.cache.clear
     @RemoteNode = Chef::EncryptedAttribute::RemoteNode
-    @RemoteNode.any_instance.stub(:search)
+    allow_any_instance_of(@RemoteNode).to receive(:search)
   end
 
   it 'should create a remote node without errors' do
-    lambda { @RemoteNode.new('bob') }.should_not raise_error
+    expect { @RemoteNode.new('bob') }.not_to raise_error
   end
 
   it 'should include EncryptedAttribute::SearchHelper methods' do
-    @RemoteNode.new('bob').should be_kind_of(Chef::EncryptedAttribute::SearchHelper)
+    expect(@RemoteNode.new('bob')).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
   describe '#name' do
 
     it 'should return the node name' do
-      @RemoteNode.new('bob').name.should eql('bob')
+      expect(@RemoteNode.new('bob').name).to eql('bob')
     end
 
     it 'should be able to set the node name' do
       remote_node = @RemoteNode.new('bob')
       remote_node.name('alice')
-      remote_node.name.should eql('alice')
+      expect(remote_node.name).to eql('alice')
     end
 
     it 'should raise an error if the name is not valid' do
-      lambda { @RemoteNode.new({}) }.should raise_error(ArgumentError)
+      expect { @RemoteNode.new({}) }.to raise_error(ArgumentError)
     end
 
   end
@@ -56,7 +56,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
     it 'should read the node attribute using SearchHelper' do
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_receive(:search).with(
+      expect(remote_node).to receive(:search).with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
@@ -65,14 +65,14 @@ describe Chef::EncryptedAttribute::RemoteNode do
       ).and_return(
         [ { 'value' => 'value1' } ]
       )
-      remote_node.load_attribute(attr_ary).should eql('value1')
+      expect(remote_node.load_attribute(attr_ary)).to eql('value1')
     end
 
     it 'should not cache the attribute if read multiple times and cache is disabled' do
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_receive(:search).twice.with(
+      expect(remote_node).to receive(:search).twice.with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
@@ -81,15 +81,15 @@ describe Chef::EncryptedAttribute::RemoteNode do
       ).and_return(
         [ { 'value' => 'value1' } ]
       )
-      remote_node.load_attribute(attr_ary).should eql('value1')
-      remote_node.load_attribute(attr_ary).should eql('value1')
+      expect(remote_node.load_attribute(attr_ary)).to eql('value1')
+      expect(remote_node.load_attribute(attr_ary)).to eql('value1')
     end
 
     it 'should cache the attribute if read multiple times and cache is enabled' do
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(10)
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_receive(:search).once.with(
+      expect(remote_node).to receive(:search).once.with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
@@ -98,14 +98,14 @@ describe Chef::EncryptedAttribute::RemoteNode do
       ).and_return(
         [ { 'value' => 'value1' } ]
       )
-      remote_node.load_attribute(attr_ary).should eql('value1')
-      remote_node.load_attribute(attr_ary).should eql('value1') # cached
+      expect(remote_node.load_attribute(attr_ary)).to eql('value1')
+      expect(remote_node.load_attribute(attr_ary)).to eql('value1') # cached
     end
 
     it 'should return nil if the attribute is not found' do
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_receive(:search).with(
+      expect(remote_node).to receive(:search).with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
@@ -114,13 +114,13 @@ describe Chef::EncryptedAttribute::RemoteNode do
       ).and_return(
         [ { 'value' => nil } ]
       )
-      remote_node.load_attribute(attr_ary).should eql(nil)
+      expect(remote_node.load_attribute(attr_ary)).to eql(nil)
     end
 
     it 'should return nil if the search result is wrong' do
       attr_ary = [ 'attr1', 'subattr1' ]
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_receive(:search).with(
+      expect(remote_node).to receive(:search).with(
         :node,
         "name:#{remote_node.name}",
         { 'value' => attr_ary },
@@ -129,14 +129,14 @@ describe Chef::EncryptedAttribute::RemoteNode do
       ).and_return(
         [ { 'bad-value' => 'wrong' } ]
       )
-      remote_node.load_attribute(attr_ary).should eql(nil)
+      expect(remote_node.load_attribute(attr_ary)).to eql(nil)
     end
 
 
     it 'should raise an error if the attribute list is incorrect' do
       remote_node = @RemoteNode.new('bob')
-      remote_node.should_not_receive(:search)
-      lambda { remote_node.load_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+      expect(remote_node).not_to receive(:search)
+      expect { remote_node.load_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
     end
 
   end
@@ -146,29 +146,29 @@ describe Chef::EncryptedAttribute::RemoteNode do
       @node = Chef::Node.new
       @node.name('node1')
       @remote_node = Chef::EncryptedAttribute::RemoteNode.new('node1')
-      Chef::Node.stub(:load).with('node1').and_return(@node)
+      allow(Chef::Node).to receive(:load).with('node1').and_return(@node)
     end
 
     it 'should save the node attribute' do
-      @node.should_receive(:save).once
-      Chef::Node.should_receive(:load).with('node1').once.and_return(@node)
+      expect(@node).to receive(:save).once
+      expect(Chef::Node).to receive(:load).with('node1').once.and_return(@node)
       @remote_node.save_attribute([ 'attr1', 'subattr1' ], 'value1')
-      @node['attr1']['subattr1'].should eql('value1')
+      expect(@node['attr1']['subattr1']).to eql('value1')
     end
 
     it 'should cache the saved attribute' do
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(10)
-      @node.should_receive(:save).once
+      expect(@node).to receive(:save).once
       @remote_node.save_attribute([ 'attr1', 'subattr1' ], 'value1')
 
       @remote_node2 = Chef::EncryptedAttribute::RemoteNode.new('node1')
-      @remote_node2.should_not_receive(:search)
-      @remote_node2.load_attribute([ 'attr1', 'subattr1' ]).should eql('value1') # cached
+      expect(@remote_node2).not_to receive(:search)
+      expect(@remote_node2.load_attribute([ 'attr1', 'subattr1' ])).to eql('value1') # cached
     end
 
     it 'should raise an error if the attribute list is incorrect' do
-      @node.should_not_receive(:save)
-      lambda { @remote_node.save_attribute('incorrect-attr-ary', 'value1') }.should raise_error(ArgumentError)
+      expect(@node).not_to receive(:save)
+      expect { @remote_node.save_attribute('incorrect-attr-ary', 'value1') }.to raise_error(ArgumentError)
     end
 
   end # context #save_attribute
@@ -179,22 +179,22 @@ describe Chef::EncryptedAttribute::RemoteNode do
       @node.name('node1')
       @node.normal['attr1']['subattr1'] = 'value1'
       @remote_node = Chef::EncryptedAttribute::RemoteNode.new('node1')
-      Chef::Node.stub(:load).with('node1').and_return(@node)
+      allow(Chef::Node).to receive(:load).with('node1').and_return(@node)
     end
 
     it 'should delete a node attribute' do
-      @node.should_receive(:save).once
-      @remote_node.delete_attribute([ 'attr1', 'subattr1' ]).should eql(true)
+      expect(@node).to receive(:save).once
+      expect(@remote_node.delete_attribute([ 'attr1', 'subattr1' ])).to eql(true)
     end
 
     it 'should not delete a non existent attribute' do
-      @node.should_not_receive(:save)
-      @remote_node.delete_attribute([ 'non-existent' ]).should eql(false)
+      expect(@node).not_to receive(:save)
+      expect(@remote_node.delete_attribute([ 'non-existent' ])).to eql(false)
     end
 
     it 'should raise an error if the attribute list is incorrect' do
-      @node.should_not_receive(:save)
-      lambda { @remote_node.delete_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+      expect(@node).not_to receive(:save)
+      expect { @remote_node.delete_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
     end
 
   end # context #delete_attribute

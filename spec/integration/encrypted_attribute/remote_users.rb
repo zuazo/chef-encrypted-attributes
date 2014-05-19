@@ -41,27 +41,27 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     context '#get_public_keys' do
 
       it 'should return empty array by default' do
-        @RemoteUsers.get_public_keys.should eql([])
+        expect(@RemoteUsers.get_public_keys).to eql([])
       end
 
       it 'should return all users with "*"' do
-        @RemoteUsers.get_public_keys('*').count.should eql(3 + 1)
+        expect(@RemoteUsers.get_public_keys('*').count).to eql(3 + 1)
       end
 
       it 'should return only public keys specified' do
-        @RemoteUsers.get_public_keys([ 'user1', 'user2' ] ).count.should eql(2)
+        expect(@RemoteUsers.get_public_keys([ 'user1', 'user2' ] ).count).to eql(2)
       end
 
       it 'should return valid public keys' do
         pkey_pem = @RemoteUsers.get_public_keys([ 'user1' ])[0]
-        pkey_pem.should be_a(String)
+        expect(pkey_pem).to be_a(String)
         pkey = OpenSSL::PKey::RSA.new(pkey_pem)
-        pkey.public?.should be_true
-        pkey.private?.should be_false
+        expect(pkey.public?).to be_true
+        expect(pkey.private?).to be_false
       end
 
       it 'should throw an error if the user is not found' do
-        lambda { @RemoteUsers.get_public_keys([ 'unknown1' ] ) }.should raise_error(Chef::EncryptedAttribute::UserNotFound)
+        expect { @RemoteUsers.get_public_keys([ 'unknown1' ] ) }.to raise_error(Chef::EncryptedAttribute::UserNotFound)
       end
 
     end # context #get_public_keys

@@ -43,13 +43,13 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     context '#name' do
 
       it 'should return the node name' do
-        @remote_node.name.should eql(@node_name)
+        expect(@remote_node.name).to eql(@node_name)
       end
 
       it 'should be able to set the node name' do
         new_name = 'alice'
         @remote_node.name(new_name)
-        @remote_node.name.should eql(new_name)
+        expect(@remote_node.name).to eql(new_name)
       end
 
     end # context #name
@@ -57,16 +57,16 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     context '#load_attribute' do
 
       it 'should read an existing node attribute' do
-        @remote_node.load_attribute([ 'attr1' ]).should eql(@attr1)
-        @remote_node.load_attribute([ 'sub-attr', 'attr2' ]).should eql(@attr2)
+        expect(@remote_node.load_attribute([ 'attr1' ])).to eql(@attr1)
+        expect(@remote_node.load_attribute([ 'sub-attr', 'attr2' ])).to eql(@attr2)
       end
 
       it 'should return nil if the attribute is not found' do
-        @remote_node.load_attribute([ 'non-existing', 'attr' ]).should eql(nil)
+        expect(@remote_node.load_attribute([ 'non-existing', 'attr' ])).to eql(nil)
       end
 
       it 'should raise an error if the attribute list is incorrect' do
-        lambda { @remote_node.load_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+        expect { @remote_node.load_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
       end
 
     end # context #load_attribute
@@ -76,18 +76,18 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       it 'should save the attribute' do
         @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
         Chef::EncryptedAttribute::RemoteUsers.cache.clear
-        @remote_node.load_attribute([ 'saved-attr', 'subattr2' ]).should eql('A precious value')
+        expect(@remote_node.load_attribute([ 'saved-attr', 'subattr2' ])).to eql('A precious value')
       end
 
       it 'should save attributes in the cache' do
         Chef::EncryptedAttribute::RemoteUsers.cache.max_size(20)
         Chef::EncryptedAttribute::RemoteUsers.cache.clear
         @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
-        @remote_node.load_attribute([ 'saved-attr', 'subattr2' ]).should eql('A precious value') # cached
+        expect(@remote_node.load_attribute([ 'saved-attr', 'subattr2' ])).to eql('A precious value') # cached
       end
 
       it 'should raise an error if the attribute list is incorrect' do
-        lambda { @remote_node.save_attribute('incorrect-attr-ary', 'some value') }.should raise_error(ArgumentError)
+        expect { @remote_node.save_attribute('incorrect-attr-ary', 'some value') }.to raise_error(ArgumentError)
       end
 
     end # context #save_attribute
@@ -96,21 +96,21 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
       it 'should delete a node attribute' do
         node = Chef::Node.load(@node_name)
-        node['sub-attr']['attr2'].should_not eql(nil)
+        expect(node['sub-attr']['attr2']).not_to eql(nil)
 
-        @remote_node.delete_attribute([ 'sub-attr', 'attr2']).should eql(true)
+        expect(@remote_node.delete_attribute([ 'sub-attr', 'attr2'])).to eql(true)
 
         node = Chef::Node.load(@node_name)
-        node['sub-attr']['attr2'].should eql(nil)
+        expect(node['sub-attr']['attr2']).to eql(nil)
       end
 
       it 'should ignore if the attribute does not exist' do
-        @node['non-existent-attr'].should eql(nil)
-        @remote_node.delete_attribute(['non-existent-attr']).should eql(false)
+        expect(@node['non-existent-attr']).to eql(nil)
+        expect(@remote_node.delete_attribute(['non-existent-attr'])).to eql(false)
       end
 
       it 'should raise an error if the attribute list is incorrect' do
-        lambda { @remote_node.delete_attribute('incorrect-attr-ary') }.should raise_error(ArgumentError)
+        expect { @remote_node.delete_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
       end
 
     end #context #delete_attribute

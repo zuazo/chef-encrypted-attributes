@@ -24,11 +24,11 @@ describe Chef::EncryptedAttribute::RemoteClients do
     Chef::EncryptedAttribute::RemoteClients.cache.clear
 
     @RemoteClients = Chef::EncryptedAttribute::RemoteClients
-    @RemoteClients.stub(:search)
+    allow(@RemoteClients).to receive(:search)
   end
 
   it 'should include EncryptedAttribute::SearchHelper methods' do
-    @RemoteClients.should be_kind_of(Chef::EncryptedAttribute::SearchHelper)
+    expect(@RemoteClients).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
   describe '#get_public_keys' do
@@ -44,18 +44,18 @@ describe Chef::EncryptedAttribute::RemoteClients do
     end
 
     it 'should get client public_keys using SearchHelper' do
-      @RemoteClients.stub(:search).and_return(@clients)
-      @RemoteClients.get_public_keys.should eql(@public_keys)
+      allow(@RemoteClients).to receive(:search).and_return(@clients)
+      expect(@RemoteClients.get_public_keys).to eql(@public_keys)
     end
 
     it 'should return empty array for empty search results' do
-      @RemoteClients.stub(:search).and_return({})
-      @RemoteClients.get_public_keys.should eql([])
+      allow(@RemoteClients).to receive(:search).and_return({})
+      expect(@RemoteClients.get_public_keys).to eql([])
     end
 
     it 'should do a search with the correct arguments' do
       query = 'admin:true'
-      @RemoteClients.should_receive(:search).once.with(
+      expect(@RemoteClients).to receive(:search).once.with(
         :client,
         query,
         { 'public_key' => [ 'public_key' ] },
@@ -66,7 +66,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
     end
 
     it 'should do "*:*" search by default' do
-      @RemoteClients.should_receive(:search).with(
+      expect(@RemoteClients).to receive(:search).with(
         :client,
         '*:*',
         { 'public_key' => [ 'public_key' ] },
@@ -78,7 +78,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
 
     it 'should cache search results for multiple calls' do
       query = 'admin:true'
-      @RemoteClients.should_receive(:search).once.with(
+      expect(@RemoteClients).to receive(:search).once.with(
         :client,
         query,
         { 'public_key' => [ 'public_key' ] },

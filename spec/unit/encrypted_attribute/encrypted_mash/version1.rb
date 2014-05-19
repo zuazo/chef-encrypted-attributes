@@ -33,17 +33,17 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
   context '#new' do
 
     it 'should create an EncryptedMash::Version1 object without errors' do
-      lambda { @EncryptedMashVersion1.new }.should_not raise_error
+      expect { @EncryptedMashVersion1.new }.not_to raise_error
     end
 
     it 'should set the CHEF_TYPE key' do
       o = @EncryptedMashVersion1.new
-      o[@EncryptedMash::CHEF_TYPE].should eql(@EncryptedMash::CHEF_TYPE_VALUE)
+      expect(o[@EncryptedMash::CHEF_TYPE]).to eql(@EncryptedMash::CHEF_TYPE_VALUE)
     end
 
     it 'should set the JSON_CLASS key' do
       o = @EncryptedMashVersion1.new
-      o[@EncryptedMash::JSON_CLASS].should eql(@EncryptedMashVersion1.to_s)
+      expect(o[@EncryptedMash::JSON_CLASS]).to eql(@EncryptedMashVersion1.to_s)
     end
 
   end # context #new
@@ -52,61 +52,61 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
 
     it 'should encrypt a value passing a OpenSSL::PKey::RSA key' do
       body = @EncryptedMashVersion1.new
-      body.can_be_decrypted_by?(@key1).should eql(false)
+      expect(body.can_be_decrypted_by?(@key1)).to eql(false)
       body.encrypt('value1', @key1.public_key)
-      body.can_be_decrypted_by?(@key1).should eql(true)
+      expect(body.can_be_decrypted_by?(@key1)).to eql(true)
     end
 
     it 'should encrypt a value passing a PEM String key' do
       body = @EncryptedMashVersion1.new
-      body.can_be_decrypted_by?(@key1).should eql(false)
+      expect(body.can_be_decrypted_by?(@key1)).to eql(false)
       body.encrypt('value1', @key1.public_key.to_pem)
-      body.can_be_decrypted_by?(@key1).should eql(true)
+      expect(body.can_be_decrypted_by?(@key1)).to eql(true)
     end
 
     it 'should encrypt a value passing a OpenSSL::PKey::RSA array' do
       keys = [ @key1, @key2 ]
       body = @EncryptedMashVersion1.new
-      body.can_be_decrypted_by?(keys).should eql(false)
+      expect(body.can_be_decrypted_by?(keys)).to eql(false)
       body.encrypt('value1', keys.map { |k| k.public_key })
-      body.can_be_decrypted_by?(keys).should eql(true)
+      expect(body.can_be_decrypted_by?(keys)).to eql(true)
     end
 
     it 'should encrypt a value passing a Strings array' do
       keys = [ @key1, @key2 ]
       body = @EncryptedMashVersion1.new
-      body.can_be_decrypted_by?(keys).should eql(false)
+      expect(body.can_be_decrypted_by?(keys)).to eql(false)
       body.encrypt('value1', keys.map { |k| k.public_key.to_pem })
-      body.can_be_decrypted_by?(keys).should eql(true)
+      expect(body.can_be_decrypted_by?(keys)).to eql(true)
     end
 
     it 'should throw an InvalidPrivateKey error if the key is invalid' do
       body = @EncryptedMashVersion1.new
-      lambda { body.encrypt('value1', 'invalid-key') }.should raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
+      expect { body.encrypt('value1', 'invalid-key') }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
     end
 
     it 'should throw an InvalidPrivateKey error if the public key is missing' do
-      OpenSSL::PKey::RSA.any_instance.stub(:public?).and_return(false)
+      allow_any_instance_of(OpenSSL::PKey::RSA).to receive(:public?).and_return(false)
       body = @EncryptedMashVersion1.new
-      lambda { body.encrypt('value1', @key1.public_key) }.should raise_error(Chef::EncryptedAttribute::InvalidPublicKey)
+      expect { body.encrypt('value1', @key1.public_key) }.to raise_error(Chef::EncryptedAttribute::InvalidPublicKey)
     end
 
     it 'should throw an error if there is an RSA Error' do
       key = OpenSSL::PKey::RSA.new(32) # will raise "OpenSSL::PKey::RSAError: data too large for key size" on encryption
       body = @EncryptedMashVersion1.new
-      lambda { body.encrypt('value1', key) }.should raise_error(Chef::EncryptedAttribute::EncryptionFailure)
+      expect { body.encrypt('value1', key) }.to raise_error(Chef::EncryptedAttribute::EncryptionFailure)
     end
 
     it 'should throw an error if the encryption fails' do
       body = @EncryptedMashVersion1.new
-      OpenSSL::Cipher.any_instance.should_receive(:update).and_raise(OpenSSL::Cipher::CipherError.new(''))
-      lambda { body.encrypt('value1', @key1) }.should raise_error(Chef::EncryptedAttribute::EncryptionFailure, /OpenSSL::Cipher::CipherError/)
+      expect_any_instance_of(OpenSSL::Cipher).to receive(:update).and_raise(OpenSSL::Cipher::CipherError.new(''))
+      expect { body.encrypt('value1', @key1) }.to raise_error(Chef::EncryptedAttribute::EncryptionFailure, /OpenSSL::Cipher::CipherError/)
     end
 
     it 'should throw an error if the hmac generation fails' do
       body = @EncryptedMashVersion1.new
-      OpenSSL::HMAC.should_receive(:digest).and_raise(OpenSSL::HMACError)
-      lambda { body.encrypt('value1', @key1) }.should raise_error(Chef::EncryptedAttribute::MessageAuthenticationFailure, /OpenSSL::HMACError/)
+      expect(OpenSSL::HMAC).to receive(:digest).and_raise(OpenSSL::HMACError)
+      expect { body.encrypt('value1', @key1) }.to raise_error(Chef::EncryptedAttribute::MessageAuthenticationFailure, /OpenSSL::HMACError/)
     end
 
   end # context #encrypt and #can_be_decrypted_by?
@@ -119,27 +119,27 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       it "should decrypt an encrypted #{v}" do
         body = @EncryptedMashVersion1.new
         body.encrypt(v, @key1.public_key)
-        body.decrypt(@key1).should eql(v)
+        expect(body.decrypt(@key1)).to eql(v)
       end
     end
 
     it 'should throw an InvalidPrivateKey error if the private key is invalid' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      lambda { body.decrypt('invalid-private-key') }.should raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
+      expect { body.decrypt('invalid-private-key') }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
     end
 
     it 'should throw an InvalidPrivateKey error if only the public key is provided' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      lambda { body.decrypt(@key1.public_key) }.should raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key for decryption is invalid, a valid public and private key is required\./)
+      expect { body.decrypt(@key1.public_key) }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key for decryption is invalid, a valid public and private key is required\./)
     end
 
     it 'should throw a DecryptionFailure error if the private key cannot decrypt it' do
       bad_key = @key2
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      lambda { body.decrypt(bad_key) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+      expect { body.decrypt(bad_key) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
     %w{cipher iv data}.each do |data_key|
@@ -147,7 +147,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
         body = @EncryptedMashVersion1.new
         body.encrypt('value1', @key1.public_key)
         body['encrypted_data'][data_key] = 'bad-key-data'
-        lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
+        expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
       end
     end
 
@@ -155,28 +155,28 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
       body['hmac']['data'] = 'bad-hmac'
-      lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
+      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
     end
 
     it 'should throw a DecryptionFailure error if the algorithm is unknown' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
       body['hmac']['data'] = 'bad-hmac'
-      lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
+      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /invalid hmac/)
     end
 
     it 'should throw an error if the decryption fails' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      OpenSSL::Cipher.any_instance.should_receive(:update).and_raise(OpenSSL::Cipher::CipherError.new(''))
-      lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::DecryptionFailure, /OpenSSL::Cipher::CipherError/)
+      expect_any_instance_of(OpenSSL::Cipher).to receive(:update).and_raise(OpenSSL::Cipher::CipherError.new(''))
+      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /OpenSSL::Cipher::CipherError/)
     end
 
     it 'should throw an error if the hmac generation for checking fails' do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', @key1.public_key)
-      OpenSSL::HMAC.should_receive(:digest).and_raise(OpenSSL::HMACError)
-      lambda { body.decrypt(@key1) }.should raise_error(Chef::EncryptedAttribute::MessageAuthenticationFailure, /OpenSSL::HMACError/)
+      expect(OpenSSL::HMAC).to receive(:digest).and_raise(OpenSSL::HMACError)
+      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::MessageAuthenticationFailure, /OpenSSL::HMACError/)
     end
 
   end # context #decrypt
@@ -187,7 +187,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       keys = [ @key1.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys )
-      body.needs_update?(keys).should be_false
+      expect(body.needs_update?(keys)).to be_false
     end
 
     it 'should return true if there are new keys' do
@@ -195,21 +195,21 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
       keys.push(@key2.public_key)
-      body.needs_update?(keys).should be_true
+      expect(body.needs_update?(keys)).to be_true
     end
 
     it 'should return true if some keys are removed' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
-      body.needs_update?(keys[0]).should be_true
+      expect(body.needs_update?(keys[0])).to be_true
     end
 
     it 'should return false if the keys are the same, but in different order or format' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
-      body.needs_update?([ keys[1], keys[0].to_pem ]).should be_false
+      expect(body.needs_update?([ keys[1], keys[0].to_pem ])).to be_false
     end
 
   end # context #needs_update?
