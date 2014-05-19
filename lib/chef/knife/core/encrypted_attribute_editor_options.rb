@@ -67,13 +67,7 @@ class Chef
             def edit_data(data=nil, format='plain')
               output = case format
               when 'JSON', 'json'
-                begin
-                  data.nil? ? {} : Chef::JSONCompat.to_json_pretty(data)
-                rescue JSON::GeneratorError
-                  ui.warn('Previous data is not in JSON, it will be overwritten.')
-                  sleep(2) # TODO a better pause/delay?
-                  Chef::JSONCompat.to_json_pretty({})
-                end
+                data.nil? ? {} : Chef::JSONCompat.to_json_pretty(data, {:quirks_mode => true})
               else
                 data.nil? ? '' : data
               end
@@ -92,7 +86,7 @@ class Chef
 
               case format
               when 'JSON', 'json'
-                Chef::JSONCompat.from_json(output)
+                Yajl::Parser.parse(output)
               else
                 output
               end

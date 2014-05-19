@@ -183,6 +183,8 @@ Creates an encrypted attribute in a node. The attribute cannot already exist.
 
     $ knife encrypted attribute create NODE ATTRIBUTE (options)
 
+If the input is in JSON format (`-i`), you can create a JSON in *quirk* mode like `false`, `5` or `"some string"`. You don't need to create an Array or a Hash as the JSON standard forces.
+
 For example:
 
     $ export EDITOR=vi
@@ -209,6 +211,8 @@ For example:
 Edits an existing encrypted attribute. The attribute must exist.
 
     $ knife encrypted attribute edit NODE ATTRIBUTE (options)
+
+If the input is in JSON format (`-i`), you can create a JSON in *quirk* mode like `false`, `5` or `"some string"`. You don't need to create an Array or a Hash as the JSON standard forces.
 
 **You must be careful to pass the same privilege arguments that you used in its creation** (this will surely be fixed in a future).
 

@@ -52,19 +52,18 @@ describe Chef::Knife::EncryptedAttributeEdit do
       knife.run
     end
 
+    it 'should accept JSON in quirk mode' do
+      knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
+      expect(IO).to receive(:read).and_return('true')
+      expect_any_instance_of(Chef::EncryptedAttribute).to receive(:create_on_node).with('node1', [ 'encrypted', 'attribute' ], true)
+      knife.run
+    end
+
     it 'should throw an error for invalid JSON' do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
       expect(IO).to receive(:read).and_return('Bad-json')
       expect_any_instance_of(Chef::EncryptedAttribute).not_to receive(:create_on_node)
       expect { knife.run }.to raise_error(Yajl::ParseError)
-    end
-
-    it 'should print a message when the previous content was not in JSON' do
-      knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
-      allow_any_instance_of(Chef::EncryptedAttribute).to receive(:load_from_node).and_return('non-json')
-      expect(IO).to receive(:read).and_return('{ "attribute": "in_json" }')
-      expect(knife.ui).to receive(:warn).with('Previous data is not in JSON, it will be overwritten.')
-      knife.run
     end
 
   end # context #edit_data
