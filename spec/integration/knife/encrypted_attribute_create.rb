@@ -31,14 +31,19 @@ describe Chef::Knife::EncryptedAttributeCreate do
 
       Chef::Knife::EncryptedAttributeCreate.load_deps
 
-      @admin = Chef::ApiClient.new
-      @admin.name(Chef::Config[:node_name])
-      @admin.admin(true)
-      admin_hs = @admin.save
-      @admin.public_key(admin_hs['public_key'])
-      @admin.private_key(admin_hs['private_key'])
-      private_key = OpenSSL::PKey::RSA.new(@admin.private_key)
+      @admin_client = Chef::ApiClient.new
+      @admin_client.name(Chef::Config[:node_name])
+      @admin_client.admin(true)
+      admin_client_hs = @admin_client.save
+      @admin_client.public_key(admin_client_hs['public_key'])
+      @admin_client.private_key(admin_client_hs['private_key'])
+      private_key = OpenSSL::PKey::RSA.new(@admin_client.private_key)
       allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
+
+      admin_user = Chef::User.new
+      admin_user.name('admin_user')
+      admin_user.admin(true)
+      @admin_user = admin_user.save
 
       @node = Chef::Node.new
       @node.name('node1')
@@ -51,7 +56,8 @@ describe Chef::Knife::EncryptedAttributeCreate do
       @node_client.private_key(node_hs['private_key'])
     end
     after do
-      @admin.destroy
+      @admin_client.destroy
+      @admin_user.destroy
       @node.destroy
     end
 
@@ -65,17 +71,43 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
     end
 
-    it 'should not be able to read the encrypted attribute by default' do
+    it 'the client should not be able to read the encrypted attribute by default' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
+
+      private_key = OpenSSL::PKey::RSA.new(@admin_client.private_key)
+      allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
       expect { Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
-    it 'should be able to read the encrypted attribute if allowed' do
+    it 'the client should be able to read the encrypted attribute if allowed' do
       knife = Chef::Knife::EncryptedAttributeCreate.new(['node1', 'encrypted.attribute', '--client-search', 'admin:true'])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
+
+      private_key = OpenSSL::PKey::RSA.new(@admin_client.private_key)
+      allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
+      expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
+    end
+
+    it 'the user should not be able to read the encrypted attribute by default' do
+      knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
+      expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
+      knife.run
+
+      private_key = OpenSSL::PKey::RSA.new(@admin_user.private_key)
+      allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
+      expect { Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
+    end
+
+    it 'the user should be able to read the encrypted attribute if allowed' do
+      knife = Chef::Knife::EncryptedAttributeCreate.new(['node1', 'encrypted.attribute', '--encrypted-attribute-user', @admin_user.name])
+      expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
+      knife.run
+
+      private_key = OpenSSL::PKey::RSA.new(@admin_user.private_key)
+      allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(private_key)
       expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
     end
 
