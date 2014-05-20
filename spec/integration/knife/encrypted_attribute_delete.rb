@@ -55,6 +55,7 @@ describe Chef::Knife::EncryptedAttributeDelete do
     after do
       @admin.destroy
       @node.destroy
+      @node_client.destroy
     end
 
     it 'should not be able to delete the encrypted attribute if not allowed' do

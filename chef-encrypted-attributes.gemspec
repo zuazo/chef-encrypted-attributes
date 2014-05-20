@@ -1,6 +1,6 @@
 $:.push File.expand_path('../lib', __FILE__)
 require 'chef/encrypted_attribute/version'
-chef_version = ENV.key?('CHEF_VERSION') ? "#{ENV['CHEF_VERSION']}" : ['>= 11.2.0']
+chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : '>= 11.4.0'
 
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'
