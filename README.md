@@ -133,15 +133,15 @@ See the [API.md](API.md) file for a more detailed documentation about `Chef::Enc
 
 ## Chef Users Limitation
 
-Keep in mind that, from a Chef Node, *Chef User* *public keys* are inaccessible. So you have to pass them in raw mode in the recipe if you need any *Chef User* to be able to use the encrypted attributes (this is **required for** example to use the **knife commands**, as knife is usually used by *Chef Users*). Summarizing, Chef Node inside a recipe (using its *Chef Client* key) will not be able to retrieve the *Chef Users* *public keys*, so you need to pass them using the `[:keys]` configuration value.
+Keep in mind that, from a Chef Node, *Chef User* *public keys* are inaccessible. So you have to pass them in raw mode in the recipe if you need any *Chef User* to be able to use the encrypted attributes (this is **required for** example to use the **knife commands** included in this gem, as knife is usually used by *Chef Users*). Summarizing, Chef Node inside a recipe (using its *Chef Client* key) will not be able to retrieve the *Chef Users* *public keys*, so you need to pass them using the `[:keys]` configuration value.
 
 Chef Nodes (Clients) with *admin* privileges do have access to user public keys, but in most cases this is not a recommended practice.
 
-*Chef Client* *public keys* do not have this problem, you can retrieve them from any place without limitation. You can use knife with an *Chef Admin Client* instead of a *Chef User* key, but this is not common.
+*Chef Client* *public keys* do not have this problem, you can retrieve them from any place without limitation. You can use knife with an *Chef Admin Client* instead of a *Chef Admin User* key, but this is not common.
 
 See the [Example Using User Keys Data Bag](README.md#example-using-user-keys-data-bag) section for a workaround.
 
-**Note:** *Chef Clients* usually are Chef Nodes and *chef-validation*/*chef-webui* keys. *Chef Users* usually are knife users. The main difference between *Chef Users* and *Chef Admin Clients* is that the former are able to log in via *web-ui* (has a password).
+**Note:** *Chef Clients* usually are Chef Nodes and *chef-validation*/*chef-webui* keys. *Chef Users* usually are knife users. The main difference between *Chef Users* and *Chef Clients* is that the former are able to log in via *web-ui* (has a password).
 
 ## Knife Commands
 

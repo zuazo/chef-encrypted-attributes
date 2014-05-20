@@ -70,6 +70,8 @@ Creates an encrypted attribute on a remote node.
 
 An exception is thrown if any error arises in the encryption process.
 
+This method **requires admin privileges**. So in most cases, cannot be used from cookbooks.
+
 ### Chef::EncryptedAttribute.update_on_node(name, attr_ary [, config])
 
 Updates who can read the attribute.
@@ -81,6 +83,8 @@ Updates who can read the attribute.
 Returns `true` if the encrypted attribute has been updated, `false` if not.
 
 An exception is thrown if there is any error in the updating process.
+
+This method **requires admin privileges**. So in most cases, cannot be used from cookbooks.
 
 ### Chef::EncryptedAttribute.exists_on_node?(name, attr_ary [, config])
 
@@ -103,7 +107,7 @@ Both `Chef::Config[:encrypted_attributes]` and methods `config` parameter should
 * `:version` - `EncryptedMash` format version to use, by default `1` is used which is considered best.
 * `:partial_search` - Whether to use Chef Server partial search, enabled by default. It may not work in some old versions of Chef Server.
 * `:client_search` - Search query for clients allowed to read the encrypted attribute. Can be a simple string or an array of queries to be *OR*-ed.
-* `:users` - Array of user names to be allowed to read the encrypted attribute(s). `"*"` to allow access to all users. Keep in mind that only admin clients are allowed to read user public keys. It is not recommended to use this from cookbooks unless you know what you are doing.
+* `:users` - Array of user names to be allowed to read the encrypted attribute(s). `"*"` to allow access to all users. Keep in mind that only admin clients or admin users are allowed to read user public keys. It is **not recommended** to use this from cookbooks unless you know what you are doing.
 * `:keys` - raw RSA public keys to be allowed to read encrypted attributes(s), in PEM (string) format. Can be client public keys, user public keys or any other RSA public key.
 
 For example, to disable Partial Search globally:
