@@ -303,6 +303,8 @@ See the [INTERNAL.md](INTERNAL.md) file for a more low level documentation.
 
 See the [TESTING.md](TESTING.md) file to know how to run the tests properly.
 
+You can also see the [TODO.md](TODO.md) file if you're looking for inspiration.
+
 ## License and Author
 
 |                      |                                          |
