@@ -92,7 +92,7 @@ end
 
 ### Example Using User Keys Data Bag
 
-Suppose we want to store in a data bag users public keys and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](README.md#chef-users-limitation) problem.
+Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](README.md#chef-users-limitation) problem.
 
 You need to create a Data Bag Item with a content similar to the following:
 
@@ -155,7 +155,7 @@ Read the [Chef Users Limitation](README.md#chef-users-limitation) caveat before 
 
 You need to install the `chef-encrypted-attributes` gem before using this knife commands.
 
-    gem install chef-encrypted-attributes
+    $ gem install chef-encrypted-attributes
 
 ### knife.rb
 
