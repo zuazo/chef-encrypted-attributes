@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.email = 'team@onddo.com'
   s.homepage = 'http://onddo.github.io/chef-encrypted-attributes'
   s.require_path = 'lib'
-  s.files = %w(Rakefile LICENSE README.md API.md INTERNAL.md TESTING.md TODO.md CHANGELOG.md) + Dir.glob('lib/**/*')
+  s.files = %w(Rakefile LICENSE README.md API.md INTERNAL.md TESTING.md TODO.md) + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   if RUBY_VERSION < '1.9'
     s.add_development_dependency 'rake', '< 10.2'
    # s.add_development_dependency 'mime-types', '< 2.0'
+  else
+    s.add_development_dependency 'rake'
   end
   s.add_development_dependency 'chef-zero'
   s.add_development_dependency 'rspec-core', '~> 2.14'
