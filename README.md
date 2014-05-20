@@ -81,14 +81,14 @@ Then we can read this attribute from another allowed node (a `"role:webapp"` nod
 chef_gem "chef-encrypted-attributes"
 require "chef-encrypted-attributes"
 
-if Chef::EncryptedAttribute.exists_on_node?("random.example.com", node["myapp"]["encrypted_data"])
+if Chef::EncryptedAttribute.exists_on_node?("random.example.com", ["myapp", "encrypted_data"])
   data = Chef::EncryptedAttribute.load_from_node("random.example.com", ["myapp", "encrypted_data"])
 
   # use `data` for something here ...
 end
 ```
 
-**Note:** Be careful when using `#load_from_node` and remember passing the attribute path to read as **Array of Strings** ~~instead of using `node[...]` (which points to the local node)~~.
+**Note:** Be careful when using `#exists_on_node?` and `#load_from_node` and remember passing the attribute path to read as **Array of Strings** ~~instead of using `node[...]` (which points to the local node)~~.
 
 ### Example Using User Keys Data Bag
 
