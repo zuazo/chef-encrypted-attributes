@@ -23,6 +23,7 @@ This is the first version, considered old. Uses public key cryptography (PKI) to
 If you try to read this encrypted attribute structure, you can see a `Chef::Mash` attribute with the following content:
 
 ```
+EncryptedMash
 └── encrypted_data
     ├── pub_key_hash1: The data encrypted using PKI for the public key 1 (base64)
     ├── pub_key_hash2: The data encrypted using PKI for the public key 2 (base64)
