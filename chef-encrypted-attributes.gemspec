@@ -5,7 +5,7 @@ chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : '>= 11.4.0'
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'
   s.version = ::Chef::EncryptedAttribute::VERSION
-  s.date = '2014-05-20'
+  s.date = '2014-05-21'
   s.platform = Gem::Platform::RUBY
   s.summary = 'Chef Encrypted Attributes'
   s.description = 'Chef plugin to add Node encrypted attributes support using client keys'
@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.email = 'team@onddo.com'
   s.homepage = 'http://onddo.github.io/chef-encrypted-attributes'
   s.require_path = 'lib'
-  s.files = %w(Rakefile LICENSE README.md API.md INTERNAL.md TESTING.md TODO.md) + Dir.glob('lib/**/*')
+  s.files = %w(Rakefile LICENSE README.md API.md INTERNAL.md TESTING.md TODO.md CHANGELOG.md) + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
