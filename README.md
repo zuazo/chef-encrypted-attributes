@@ -1,4 +1,8 @@
 # Chef-Encrypted-Attributes
+[![Gem Version](https://badge.fury.io/rb/chef-encrypted-attributes.png)](http://badge.fury.io/rb/chef-encrypted-attributes)
+[![Dependency Status](https://gemnasium.com/onddo/chef-encrypted-attributes.png)](https://gemnasium.com/onddo/chef-encrypted-attributes)
+[![Build Status](https://travis-ci.org/onddo/chef-encrypted-attributes.png)](https://travis-ci.org/onddo/chef-encrypted-attributes)
+[![Coverage Status](https://coveralls.io/repos/onddo/chef-encrypted-attributes/badge.png?branch=master)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
 
 [Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
 
