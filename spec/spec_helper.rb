@@ -17,7 +17,7 @@
 #
 
 require 'simplecov'
-if ENV['TRAVIS']
+if ENV['TRAVIS'] and RUBY_VERSION >= '1.9.3'
   require 'coveralls'
   SimpleCov.formatter = Coveralls::SimpleCov::Formatter
 end

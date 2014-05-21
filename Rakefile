@@ -37,4 +37,10 @@ require 'rake/testtask'
   end
 end
 
-task :default => :test
+if RUBY_VERSION < '1.9.3'
+  # integration tests are broken in 1.9.2 due to a chef-zero bug
+  # https://github.com/opscode/chef-zero/issues/65
+  task :default => :unit
+else
+  task :default => :test
+end
