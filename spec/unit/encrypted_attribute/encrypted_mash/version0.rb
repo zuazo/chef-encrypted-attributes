@@ -53,6 +53,65 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect(body.can_be_decrypted_by?(@key1)).to eql(true)
     end
 
+    it 'should encrypt a value passing a Ruby 1.9.2 OpenSSL::PKey::RSA key' do
+      private_key = [
+        '-----BEGIN RSA PRIVATE KEY-----',
+        'MIIEpAIBAAKCAQEA5DXvCHjiXlee7SR69w88TQxc+XS7THnNCn2D9vXS8c0XARoE',
+        'OtBF84BtlzF7mIdS/P4CltFYB/Jmg4nTiGwmGZETZ6IeA+OBtLAKKAqyYJCq5UwM',
+        'rm/3dZ4GFUVGKeMNGp7j3xummUFljM6pxjTbF+MsKA41YAzkl2g8sHTnDUaudwIQ',
+        'GNufo3/ZL5qyksPALkzTHvpkIdq75mRB99a4HU47iUfAnrKwOBtvYb43/2auTv6j',
+        'GRMvRNnBPpO2GXlk1mlzOg1rJP2f0DFQNq/G0HwtMOWn4TbJ6pz1ZxxYHrU44eJJ',
+        'ULH9NPFHGOSQQKK8UdQKWZtjW375Mqo5viogmQIDAQABAoIBAQCt2cB9Tcn1YP67',
+        'XZ0ndT3U3GQ/zYOaIPfo0/GiQ2ctubWaqz0pqNyBQgc6tQGZEw5PmRpT1qsfcrRR',
+        '5L93IBxuQazst/3xrHF1Ot6h3nRBSDRIdgT7JmT3/yhXL+zhoAytiPnDT4c9HSrF',
+        'd/KyAjYeHnvXD+vtfiTuiwQg0Q3rd8qlDq09smjYiRAYIxxxnXHkS5cUoDA4rv5A',
+        'RVbeBsGlo+DUvZ6M7ARQiUB08nOJl/HAYDhbxSKo1m7V8cHnd7ZdTlTgvfj20+YU',
+        'aS8hMA54Fgg27Cig1X/qcOASogKbYOlprIJoose0+2CQNZkA0qUKy7ExWIact85w',
+        'QanJpeYBAoGBAPkgc/sbV0tjTtqLo2+yAV26VtTaVozh+TtVmzaK6Y2xxvb/RsgB',
+        'fKBmyUDphowaHLQkPiX7uRiuu4S033IyeOufEEaaM0PJreBl94g+ZZaf4L7VhVDu',
+        'z8BpIfSY/syfbIix7KDgfDF/W5usx8ZQ7VYSZfw22SX/ptVHwC5lRQrhAoGBAOqB',
+        'wNf1tupE1mMQM/1K+QbVpOYDdjtQqZDQRFjYV1GXwEtbCGOnpeX+hI9j6FW93ugA',
+        '4VJxYqtrgJM2dbg9thqTgg+ORTrEAJAV8TKE7vhexf0QJxZYLJlqwD5UFrAm/+SW',
+        'mqSQ9YZYMghbWsuwFlegc0uxOaF0A3umfb06EcS5AoGBAOm2YlgOfESDM7SfD4J3',
+        'sgRmDZO+CTg9vnzFgMkYZKbDQu7w6Uw06N/pzaAR9GF3FbqBzbQAhNL9CXoj3QPb',
+        'Ccmx/ajefH15tJ8xyZiNQOyfrE4bLeiRQWE2v94hsdfxL/bFREJgluIwopZW70vD',
+        'HASFWhvUsL6PKcood8iOxMjBAoGAPgoZtIiC3bNcbFTLDEWbYB2BRIDB9KtAUNlo',
+        'W4DQiPt2mfj5XTPrBc+xziWGP7i9ke85rQ/mJKeKGmgb+KQK2zkO/YKL+iIEbBoB',
+        '93WHqxmXk32EebrWAbhmJ5cjcXK/2/+j5cmbyvDmO6O/f4eUQZZnKi02q+n/SeUf',
+        '+sG0FbECgYAv6SzofP+PbHDhEPZT56nhhsY+SyDyy5fFUFPwNnQZdvCI4KO/x8mf',
+        'j21MQ1vW8XRPZeKH9tfgIPFiWrhuonqwuOdALBj5oOGWxs6DqM0oPiWwEcYGVJOd',
+        '4G2eOZs4QHAlWHvxQqZmBvJdzBzsbNw1rD+hJVLxcMyOsS15rY/Bxw==',
+        '-----END RSA PRIVATE KEY-----',
+      ]
+      public_key_ruby192 = [
+        '-----BEGIN RSA PUBLIC KEY-----',
+        'MIIBCgKCAQEA5DXvCHjiXlee7SR69w88TQxc+XS7THnNCn2D9vXS8c0XARoEOtBF',
+        '84BtlzF7mIdS/P4CltFYB/Jmg4nTiGwmGZETZ6IeA+OBtLAKKAqyYJCq5UwMrm/3',
+        'dZ4GFUVGKeMNGp7j3xummUFljM6pxjTbF+MsKA41YAzkl2g8sHTnDUaudwIQGNuf',
+        'o3/ZL5qyksPALkzTHvpkIdq75mRB99a4HU47iUfAnrKwOBtvYb43/2auTv6jGRMv',
+        'RNnBPpO2GXlk1mlzOg1rJP2f0DFQNq/G0HwtMOWn4TbJ6pz1ZxxYHrU44eJJULH9',
+        'NPFHGOSQQKK8UdQKWZtjW375Mqo5viogmQIDAQAB',
+        '-----END RSA PUBLIC KEY-----',
+      ]
+      public_key_ruby2 = [
+        '-----BEGIN PUBLIC KEY-----',
+        'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5DXvCHjiXlee7SR69w88',
+        'TQxc+XS7THnNCn2D9vXS8c0XARoEOtBF84BtlzF7mIdS/P4CltFYB/Jmg4nTiGwm',
+        'GZETZ6IeA+OBtLAKKAqyYJCq5UwMrm/3dZ4GFUVGKeMNGp7j3xummUFljM6pxjTb',
+        'F+MsKA41YAzkl2g8sHTnDUaudwIQGNufo3/ZL5qyksPALkzTHvpkIdq75mRB99a4',
+        'HU47iUfAnrKwOBtvYb43/2auTv6jGRMvRNnBPpO2GXlk1mlzOg1rJP2f0DFQNq/G',
+        '0HwtMOWn4TbJ6pz1ZxxYHrU44eJJULH9NPFHGOSQQKK8UdQKWZtjW375Mqo5viog',
+        'mQIDAQAB',
+        '-----END PUBLIC KEY-----',
+      ]
+      stub_const('RUBY_VERSION', '1.9.2')
+      key = OpenSSL::PKey::RSA.new(private_key.join("\n"))
+      body = @EncryptedMashVersion0.new
+      expect(body.can_be_decrypted_by?(key)).to eql(false)
+      body.encrypt('value1', public_key_ruby2.join("\n"))
+      expect(body.can_be_decrypted_by?(public_key_ruby192.join("\n"))).to eql(true)
+    end
+
     it 'should encrypt a value passing a PEM String key' do
       body = @EncryptedMashVersion0.new
       expect(body.can_be_decrypted_by?(@key1)).to eql(false)

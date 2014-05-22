@@ -101,8 +101,25 @@ class Chef
           raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
         end
 
+        # Heavily based on @sl4m code: https://gist.github.com/sl4m/1470360
+        def rsa_ensure_x509(rsa)
+          if RUBY_VERSION < '1.9.3'
+            modulus = rsa.n
+            exponent = rsa.e
+
+            oid = OpenSSL::ASN1::ObjectId.new('rsaEncryption')
+            alg_id = OpenSSL::ASN1::Sequence.new([oid, OpenSSL::ASN1::Null.new(nil)])
+            ary = [OpenSSL::ASN1::Integer.new(modulus), OpenSSL::ASN1::Integer.new(exponent)]
+            pub_key = OpenSSL::ASN1::Sequence.new(ary)
+            enc_pk = OpenSSL::ASN1::BitString.new(pub_key.to_der)
+            subject_pk_info = OpenSSL::ASN1::Sequence.new([alg_id, enc_pk])
+          else
+            rsa
+          end
+        end
+
         def node_key(public_key)
-          Digest::SHA1.hexdigest(public_key.to_der)
+          Digest::SHA1.hexdigest(rsa_ensure_x509(public_key).to_der)
         end
 
         def rsa_encrypt_value(value, public_key)
