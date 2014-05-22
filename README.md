@@ -6,6 +6,8 @@
 
 [Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
 
+We recommend using the [encrypted_attributes cookbook](http://community.opscode.com/cookbooks/encrypted_attributes) for easy installation.
+
 ## Description
 
 Node attributes are encrypted using chef client and user keys with public key infrastructure (PKI). You can choose which clients, nodes or users will be able to read the attribute.
