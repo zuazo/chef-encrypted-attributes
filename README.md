@@ -17,7 +17,7 @@ Node clients with read access can be specified using a `client_search` query. In
 ## Requirements
 
 * Ruby `>= 1.9`
-* Chef Client `>= 11.4`
+* Chef Client `~> 11.4`
 * yajl-ruby `~> 1.1` (included with Chef)
 
 ## Usage in Recipes
