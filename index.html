@@ -33,10 +33,12 @@
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://gemnasium.com/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat" alt="Dependency Status"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes?branch=0.1.0"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.1.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.1.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.1.0.svg?style=flat" alt="Coverage Status"></a></p>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes?branch=0.1.1"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.1.1.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.1.1"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.1.1.svg?style=flat" alt="Coverage Status"></a></p>
 
 <p><a href="http://www.getchef.com">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
+
+<p>We recommend using the <a href="http://community.opscode.com/cookbooks/encrypted_attributes">encrypted_attributes cookbook</a> for easy installation.</p>
 
 <h2>
 <a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
@@ -51,7 +53,7 @@
 <ul>
 <li>Ruby <code>&gt;= 1.9</code>
 </li>
-<li>Chef Client <code>&gt;= 11.4</code>
+<li>Chef Client <code>~&gt; 11.4</code>
 </li>
 <li>yajl-ruby <code>~&gt; 1.1</code> (included with Chef)</li>
 </ul><h2>
@@ -169,7 +171,7 @@
 <h2>
 <a name="chefencryptedattribute-api" class="anchor" href="#chefencryptedattribute-api"><span class="octicon octicon-link"></span></a>Chef::EncryptedAttribute API</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.0/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
 
 <h2>
 <a name="chef-users-limitation" class="anchor" href="#chef-users-limitation"><span class="octicon octicon-link"></span></a>Chef Users Limitation</h2>
@@ -350,7 +352,7 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 </table><h2>
 <a name="internal-documentation" class="anchor" href="#internal-documentation"><span class="octicon octicon-link"></span></a>Internal Documentation</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.0/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
 
 <h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
@@ -362,9 +364,9 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 <li>Write your change.</li>
 <li>Run the tests, ensuring they all pass (try as much as possible not to reduce coverage).</li>
 <li>Submit a Pull Request using Github.</li>
-</ol><p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.0/TESTING.md">TESTING.md</a> file to know how to run the tests properly.</p>
+</ol><p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/TESTING.md">TESTING.md</a> file to know how to run the tests properly.</p>
 
-<p>You can also see the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.0/TODO.md">TODO.md</a> file if you're looking for inspiration.</p>
+<p>You can also see the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/TODO.md">TODO.md</a> file if you're looking for inspiration.</p>
 
 <h2>
 <a name="license-and-author" class="anchor" href="#license-and-author"><span class="octicon octicon-link"></span></a>License and Author</h2>
