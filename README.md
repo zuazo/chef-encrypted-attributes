@@ -301,18 +301,19 @@ For example:
 
 See the [INTERNAL.md](INTERNAL.md) file for a more low level documentation.
 
+## Testing
+
+See [TESTING.md](TESTING.md).
+
 ## Contributing
 
-1. Fork the repository on Github.
-2. Create a named feature branch (like `add_component_x`).
-3. Write tests for your change.
-4. Write your change.
-5. Run the tests, ensuring they all pass (try as much as possible not to reduce coverage).
-6. Submit a Pull Request using Github.
+Please do not hesitate to [open an issue](https://github.com/onddo/chef-encrypted-attributes/issues/new) with any questions or problems.
 
-See the [TESTING.md](TESTING.md) file to know how to run the tests properly.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-You can also see the [TODO.md](TODO.md) file if you're looking for inspiration.
+## TODO
+
+See [TODO.md](TODO.md).
 
 ## License and Author
 

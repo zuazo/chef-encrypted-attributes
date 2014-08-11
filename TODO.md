@@ -9,9 +9,9 @@ TODO
 * Add Ruby `1.8` support?
 * Document the Ruby code.
 * Add more info/debug prints.
-* Space-optimized `EncryptedMash::Version2` class.
+* Space-optimized `EncryptedMash::Version3` class.
 * Tests: Add test helper functions (key generation, ApiClients including priv keys, Node creation...).
-* Tests: Add more tests for `EncryptedMash::Version1`.
+* Tests: Add more tests for `EncryptedMash::Version1` and `EncryptedMash::Version2`.
 * Tests: Add unit tests for `EncryptedAttribute`.
 * Tests: Add unit tests for all knife commands.
 * Tests: Tests `raise_error` always include regex.
