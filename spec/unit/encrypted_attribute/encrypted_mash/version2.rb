@@ -42,6 +42,16 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version2, :ruby_gte_20_and_ope
       expect(o[@EncryptedMash::JSON_CLASS]).to eql(@EncryptedMashVersion2.to_s)
     end
 
+    it 'should thrown an error if ruby does not support GCM' do
+      OpenSSL::Cipher.should_receive(:method_defined?).with(:auth_data=).and_return(false)
+      expect { @EncryptedMashVersion2.new }.to raise_error(Chef::EncryptedAttribute::RequirementsFailure, /requires Ruby/)
+    end
+
+    it 'should thrown an error if OpenSSL does not support GCM' do
+      OpenSSL::Cipher.should_receive(:ciphers).and_return([])
+      expect { @EncryptedMashVersion2.new }.to raise_error(Chef::EncryptedAttribute::RequirementsFailure, /requires an OpenSSL/)
+    end
+
   end # context #new
 
   context '#encrypt and #can_be_decrypted_by?' do

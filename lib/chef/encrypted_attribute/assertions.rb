@@ -16,24 +16,21 @@
 # limitations under the License.
 #
 
+require 'chef/encrypted_attribute/exceptions'
+
 class Chef
   class EncryptedAttribute
+    module Assertions
 
-    class RequirementsFailure < StandardError; end
-    class UnsupportedEncryptedAttributeFormat < StandardError; end
-    class UnacceptableEncryptedAttributeFormat < StandardError; end
-    class DecryptionFailure < StandardError; end
-    class EncryptionFailure < StandardError; end
-    class MessageAuthenticationFailure < StandardError; end
-    class InvalidPublicKey < StandardError; end
-    class InvalidPrivateKey < StandardError; end
+      def assert_aead_requirements_met!(algorithm)
+        unless OpenSSL::Cipher.method_defined?(:auth_data=)
+          raise RequirementsFailure, 'The used Encrypted Attributes protocol version requires Ruby >= 1.9'
+        end
+        unless OpenSSL::Cipher.ciphers.include?(algorithm)
+          raise RequirementsFailure, "The used Encrypted Attributes protocol version requires an OpenSSL version with \"#{algorithm}\" algorithm support"
+        end
+      end
 
-    class InsufficientPrivileges < StandardError; end
-    class UserNotFound < StandardError; end
-
-    class SearchFailure < StandardError; end
-    class SearchFatalError < StandardError; end
-    class InvalidSearchKeys < StandardError; end
-
+    end
   end
 end

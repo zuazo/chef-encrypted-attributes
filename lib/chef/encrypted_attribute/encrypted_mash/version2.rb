@@ -18,6 +18,7 @@
 
 require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/encrypted_mash/version1'
+require 'chef/encrypted_attribute/assertions'
 require 'chef/encrypted_attribute/exceptions'
 
 # Version1 format: using RSA with a shared secret and message authentication (HMAC)
@@ -25,7 +26,14 @@ class Chef
   class EncryptedAttribute
     class EncryptedMash
       class Version2 < Chef::EncryptedAttribute::EncryptedMash::Version1
+        include Chef::EncryptedAttribute::Assertions
+
         ALGORITHM = 'aes-256-gcm'
+
+        def initialize(enc_hs=nil)
+          assert_aead_requirements_met!(ALGORITHM)
+          super
+        end
 
         def encrypt(value, public_keys)
           value_json = json_encode(value)
