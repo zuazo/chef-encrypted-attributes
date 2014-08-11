@@ -246,7 +246,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       keys = [ @key1.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys )
-      expect(body.needs_update?(keys)).to be_false
+      expect(body.needs_update?(keys)).to be_falsey
     end
 
     it 'should return true if there are new keys' do
@@ -254,21 +254,21 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
       keys.push(@key2.public_key)
-      expect(body.needs_update?(keys)).to be_true
+      expect(body.needs_update?(keys)).to be_truthy
     end
 
     it 'should return true if some keys are removed' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
-      expect(body.needs_update?(keys[0])).to be_true
+      expect(body.needs_update?(keys[0])).to be_truthy
     end
 
     it 'should return false if the keys are the same, but in different order or format' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion1.new
       body.encrypt('value1', keys)
-      expect(body.needs_update?([ keys[1], keys[0].to_pem ])).to be_false
+      expect(body.needs_update?([ keys[1], keys[0].to_pem ])).to be_falsey
     end
 
   end # context #needs_update?

@@ -62,7 +62,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
     ].each do |o|
       it "should return true for #{o.inspect}" do
         expect(Chef::Log).to_not receive(:warn)
-        expect(@EncryptedMash.exist?(o)).to be_true
+        expect(@EncryptedMash.exist?(o)).to be_truthy
       end
     end
 
@@ -76,7 +76,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
     ].each do |o|
       it "should return false for #{o.inspect}" do
         expect(Chef::Log).to_not receive(:warn)
-        expect(@EncryptedMash.exist?(o)).to be_false
+        expect(@EncryptedMash.exist?(o)).to be_falsey
       end
     end
 
@@ -94,7 +94,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
     ].each do |o|
       it "should return true for #{o.inspect}" do
         expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
-        expect(@EncryptedMash.exists?(o)).to be_true
+        expect(@EncryptedMash.exists?(o)).to be_truthy
       end
     end
 
@@ -108,7 +108,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
     ].each do |o|
       it "should return false for #{o.inspect}" do
         expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
-        expect(@EncryptedMash.exists?(o)).to be_false
+        expect(@EncryptedMash.exists?(o)).to be_falsey
       end
     end
 

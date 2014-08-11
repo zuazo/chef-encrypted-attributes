@@ -56,8 +56,8 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         pkey_pem = @RemoteUsers.get_public_keys([ 'user1' ])[0]
         expect(pkey_pem).to be_a(String)
         pkey = OpenSSL::PKey::RSA.new(pkey_pem)
-        expect(pkey.public?).to be_true
-        expect(pkey.private?).to be_false
+        expect(pkey.public?).to be_truthy
+        expect(pkey.private?).to be_falsey
       end
 
       it 'should throw an error if the user is not found' do

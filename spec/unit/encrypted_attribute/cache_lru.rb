@@ -103,9 +103,9 @@ describe Chef::EncryptedAttribute::CacheLru do
       (11..14).step.each { |x| @cache[x] = x }
 
       # expectations
-      (1..3).step.each { |x| expect(@cache.has_key?(x)).to be_false }
-      (4..8).step.each { |x| expect(@cache.has_key?(x)).to be_true }
-      (10..14).step.each { |x| expect(@cache.has_key?(x)).to be_true }
+      (1..3).step.each { |x| expect(@cache.has_key?(x)).to be_falsey }
+      (4..8).step.each { |x| expect(@cache.has_key?(x)).to be_truthy }
+      (10..14).step.each { |x| expect(@cache.has_key?(x)).to be_truthy }
     end
 
   end

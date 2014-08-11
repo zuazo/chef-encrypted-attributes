@@ -33,6 +33,6 @@ require 'rspec/autorun'
 RSpec.configure do |config|
   config.order = 'random'
 
-  config.color_enabled = true
+  config.color = true
   config.tty = true
 end
