@@ -196,9 +196,9 @@ class Chef
       result
     end
 
-    def self.exists?(hs)
+    def self.exist?(hs)
       Chef::Log.debug("#{self.class.name}: Checking if Encrypted Attribute exists here: #{hs.to_s}")
-      result = EncryptedMash.exists?(hs)
+      result = EncryptedMash.exist?(hs)
       if result
         Chef::Log.debug("#{self.class.name}: Encrypted Attribute found.")
       else
@@ -207,11 +207,21 @@ class Chef
       result
     end
 
-    def self.exists_on_node?(name, attr_ary, c={})
+    def self.exists?(*args)
+      Chef::Log.warn("#{self.name}.exists? is deprecated in favor of #{self.name}.exist?.")
+      exist?(*args)
+    end
+
+    def self.exist_on_node?(name, attr_ary, c={})
       Chef::Log.debug("#{self.class.name}: Checking if Remote Encrypted Attribute exists on #{name}")
       remote_node = RemoteNode.new(name)
       node_attr = remote_node.load_attribute(attr_ary, self.config(c).partial_search)
-      Chef::EncryptedAttribute.exists?(node_attr)
+      Chef::EncryptedAttribute.exist?(node_attr)
+    end
+
+    def self.exists_on_node?(*args)
+      Chef::Log.warn("#{self.name}.exists_on_node? is deprecated in favor of #{self.name}.exist_on_node?.")
+      exist_on_node?(*args)
     end
 
   end

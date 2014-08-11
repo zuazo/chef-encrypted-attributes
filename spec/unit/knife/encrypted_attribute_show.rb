@@ -27,7 +27,7 @@ describe Chef::Knife::EncryptedAttributeShow do
 
     @stdout = StringIO.new
     allow(@knife.ui).to receive(:stdout).and_return(@stdout)
-    allow(Chef::EncryptedAttribute).to receive(:exists_on_node?).and_return(true)
+    allow(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(true)
   end
 
   it 'should load the encrypted attribute' do
@@ -38,7 +38,7 @@ describe Chef::Knife::EncryptedAttributeShow do
   end
 
   it 'should print error message when the attribute does not exists' do
-    expect(Chef::EncryptedAttribute).to receive(:exists_on_node?).and_return(false)
+    expect(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(false)
     @knife.name_args = [ 'node1', 'non.existent' ]
     expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
     expect { @knife.run }.to raise_error(SystemExit)

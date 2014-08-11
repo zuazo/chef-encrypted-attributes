@@ -217,6 +217,53 @@ describe Chef::EncryptedAttribute do
 
         end # context #update
 
+        context '#exist?' do
+
+          clear_attributes = [
+            nil,
+            2,
+            'Spoon-bender',
+            Hash.new,
+            Mash.new,
+            Mash.new({
+              'version' => '1',
+            }),
+            begin
+              node = Chef::Node.new
+              node.name(Chef::Config[:node_name])
+              node.set['clear']['attribute'] = 'clear_node_attribute'
+              node['clear']['attribute']
+            end,
+          ]
+
+          clear_attributes.each do |a|
+
+            it "should return false for #{a.inspect}" do
+              expect(Chef::Log).to_not receive(:warn)
+              expect(Chef::EncryptedAttribute.exist?(a)).to eql(false)
+            end
+
+          end
+
+          it 'should return true for an encrypted attribute' do
+            enc_attr = Chef::EncryptedAttribute.create('any-data')
+
+            expect(Chef::Log).to_not receive(:warn)
+            expect(Chef::EncryptedAttribute.exist?(enc_attr)).to eql(true)
+          end
+
+          it 'should return true for a node encrypted attribute' do
+            enc_attr = Chef::EncryptedAttribute.create('any-data')
+            node = Chef::Node.new
+            node.name(Chef::Config[:node_name])
+            node.set['encrypted']['attribute'] = enc_attr
+
+            expect(Chef::Log).to_not receive(:warn)
+            expect(Chef::EncryptedAttribute.exist?(node['encrypted']['attribute'])).to eql(true)
+          end
+
+        end # context #exist?
+
         context '#exists?' do
 
           clear_attributes = [
@@ -239,6 +286,7 @@ describe Chef::EncryptedAttribute do
           clear_attributes.each do |a|
 
             it "should return false for #{a.inspect}" do
+              expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
               expect(Chef::EncryptedAttribute.exists?(a)).to eql(false)
             end
 
@@ -247,6 +295,7 @@ describe Chef::EncryptedAttribute do
           it 'should return true for an encrypted attribute' do
             enc_attr = Chef::EncryptedAttribute.create('any-data')
 
+            expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
             expect(Chef::EncryptedAttribute.exists?(enc_attr)).to eql(true)
           end
 
@@ -256,6 +305,7 @@ describe Chef::EncryptedAttribute do
             node.name(Chef::Config[:node_name])
             node.set['encrypted']['attribute'] = enc_attr
 
+            expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
             expect(Chef::EncryptedAttribute.exists?(node['encrypted']['attribute'])).to eql(true)
           end
 

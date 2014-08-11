@@ -41,7 +41,7 @@ require "chef-encrypted-attributes"
 
 Chef::Recipe.send(:include, Opscode::OpenSSL::Password) # include the #secure_password method
 
-if Chef::EncryptedAttribute.exists?(node["myapp"]["ftp_password"])
+if Chef::EncryptedAttribute.exist?(node["myapp"]["ftp_password"])
   # update with the new keys
   Chef::EncryptedAttribute.update(node.set["myapp"]["ftp_password"])
 
@@ -69,7 +69,7 @@ require "chef-encrypted-attributes"
 # Allow all webapp nodes to read the attributes encrypted by me
 Chef::Config[:encrypted_attributes][:client_search] = "role:webapp"
 
-if Chef::EncryptedAttribute.exists?(node["myapp"]["encrypted_data"])
+if Chef::EncryptedAttribute.exist?(node["myapp"]["encrypted_data"])
   # when can used #load here as above if we need the `encrypted_data` outside this `if`
 
   # update with the new keys
@@ -87,14 +87,14 @@ Then we can read this attribute from another allowed node (a `"role:webapp"` nod
 chef_gem "chef-encrypted-attributes"
 require "chef-encrypted-attributes"
 
-if Chef::EncryptedAttribute.exists_on_node?("random.example.com", ["myapp", "encrypted_data"])
+if Chef::EncryptedAttribute.exist_on_node?("random.example.com", ["myapp", "encrypted_data"])
   data = Chef::EncryptedAttribute.load_from_node("random.example.com", ["myapp", "encrypted_data"])
 
   # use `data` for something here ...
 end
 ```
 
-**Note:** Be careful when using `#exists_on_node?` and `#load_from_node` and remember passing the attribute path to read as **Array of Strings** ~~instead of using `node[...]` (which points to the local node)~~.
+**Note:** Be careful when using `#exist_on_node?` and `#load_from_node` and remember passing the attribute path to read as **Array of Strings** ~~instead of using `node[...]` (which points to the local node)~~.
 
 ### Example Using User Keys Data Bag
 
@@ -124,7 +124,7 @@ chef_users.delete("id") # remove the data bag "id" to avoid to confuse it with a
 Chef::Log.debug("Admin users able to read the Encrypted Attributes: #{chef_users.keys.inspect}")
 Chef::Config[:encrypted_attributes][:keys] = chef_users.values
 
-# if Chef::EncryptedAttribute.exists_on_node?(...)
+# if Chef::EncryptedAttribute.exist_on_node?(...)
 #   Chef::EncryptedAttribute.update(...)
 # else
 #   node.set[...][...] = Chef::EncryptedAttribute.create(...)

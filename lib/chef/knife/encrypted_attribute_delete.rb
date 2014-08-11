@@ -54,7 +54,7 @@ class Chef
         end
 
         attr_ary = attribute_path_to_ary(attr_path)
-        if Chef::EncryptedAttribute.exists_on_node?(node_name, attr_ary)
+        if Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
           # TODO move this to lib/EncryptedAttribute
           unless config[:force] # try to read the attribute
             Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)

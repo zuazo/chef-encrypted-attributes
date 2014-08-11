@@ -45,11 +45,16 @@ class Chef
         end
       end
 
-      def self.exists?(enc_hs)
+      def self.exist?(enc_hs)
         enc_hs.kind_of?(Hash) and
         enc_hs.has_key?(JSON_CLASS) and
         enc_hs[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ and
         enc_hs.has_key?(CHEF_TYPE) and enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
+      end
+
+      def self.exists?(*args)
+        Chef::Log.warn("#{self.name}.exists? is deprecated in favor of #{self.name}.exist?.")
+        exist?(*args)
       end
 
       def self.create(version)
@@ -69,7 +74,7 @@ class Chef
 
       # Update the EncryptedMash from Hash
       def update_from!(enc_hs)
-        unless self.class.exists?(enc_hs)
+        unless self.class.exist?(enc_hs)
           raise UnacceptableEncryptedAttributeFormat, 'Trying to construct invalid encrypted attribute. Maybe it is not encrypted?'
         end
         enc_hs = enc_hs.dup

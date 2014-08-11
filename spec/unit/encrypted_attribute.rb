@@ -85,7 +85,7 @@ describe Chef::EncryptedAttribute do
       expect(@EncryptedAttribute.create_on_node('node1', [ 'a' ], 'value')).to eql('create_on_node')
     end
 
-  end # context #self.exists_on_node?
+  end # context #self.create_on_node
 
   %w{load update}.each do |meth|
 
@@ -169,32 +169,67 @@ describe Chef::EncryptedAttribute do
 
   end # context #update_on_node
 
-  context '#self.exists?' do
+  context '#self.exist?' do
     before do
-      allow_any_instance_of(@EncryptedMash).to receive(:exists?)
+      allow_any_instance_of(@EncryptedMash).to receive(:exist?)
     end
 
     it 'should not create an EncryptedMash object' do
+      expect(Chef::Log).to_not receive(:warn)
+      expect(@EncryptedMash).not_to receive(:new)
+      @EncryptedAttribute.exist?([ 'a' ])
+    end
+
+    it 'should call EncryptedMash#exist? and return its result' do
+      expect(Chef::Log).to_not receive(:warn)
+      expect(@EncryptedMash).to receive(:exist?).with([ 'a' ]).and_return(true)
+      expect(@EncryptedAttribute.exist?([ 'a' ])).to eql(true)
+      expect(@EncryptedMash).to receive(:exist?).with([ 'a' ]).and_return(false)
+      expect(@EncryptedAttribute.exist?([ 'a' ])).to eql(false)
+    end
+
+  end # context #exist?
+
+  context '#self.exists?' do
+    before do
+      allow_any_instance_of(@EncryptedMash).to receive(:exist?)
+    end
+
+    it 'should not create an EncryptedMash object' do
+      expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
       expect(@EncryptedMash).not_to receive(:new)
       @EncryptedAttribute.exists?([ 'a' ])
     end
 
-    it 'should call EncryptedMash#exists? and return its result' do
-      expect(@EncryptedMash).to receive(:exists?).with([ 'a' ]).and_return(true)
+    it 'should call EncryptedMash#exist? and return its result' do
+      expect(Chef::Log).to receive(:warn).twice.with(/is deprecated in favor of/)
+      expect(@EncryptedMash).to receive(:exist?).with([ 'a' ]).and_return(true)
       expect(@EncryptedAttribute.exists?([ 'a' ])).to eql(true)
-      expect(@EncryptedMash).to receive(:exists?).with([ 'a' ]).and_return(false)
+      expect(@EncryptedMash).to receive(:exist?).with([ 'a' ]).and_return(false)
       expect(@EncryptedAttribute.exists?([ 'a' ])).to eql(false)
     end
-
   end # context #exists?
+
+  context '#self.exist_on_node?' do
+
+    it 'should load the remote attribute and call #exist?' do
+      expect(Chef::Log).to_not receive(:warn)
+      expect_any_instance_of(@Config).to receive(:partial_search).and_return('partial_search')
+      expect_any_instance_of(@RemoteNode).to receive(:load_attribute).with(['attr'], 'partial_search').and_return('load_attribute')
+      expect(@EncryptedAttribute).to receive(:exist?).with('load_attribute').and_return('exist?')
+      expect(@EncryptedAttribute.exist_on_node?('node1', ['attr'])).to eql('exist?')
+    end
+
+  end # context #self.exist_on_node?
 
   context '#self.exists_on_node?' do
 
-    it 'should load the remote attribute and call #exists?' do
+    it 'should load the remote attribute and call #exist?' do
+      expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
       expect_any_instance_of(@Config).to receive(:partial_search).and_return('partial_search')
       expect_any_instance_of(@RemoteNode).to receive(:load_attribute).with(['attr'], 'partial_search').and_return('load_attribute')
-      expect(@EncryptedAttribute).to receive(:exists?).with('load_attribute').and_return('exists?')
-      expect(@EncryptedAttribute.exists_on_node?('node1', ['attr'])).to eql('exists?')
+      expect(@EncryptedAttribute).to receive(:exist?).with('load_attribute').and_return('exist?')
+      expect(@EncryptedAttribute.exists_on_node?('node1', ['attr'])).to eql('exist?')
     end
 
   end # context #self.exists_on_node?

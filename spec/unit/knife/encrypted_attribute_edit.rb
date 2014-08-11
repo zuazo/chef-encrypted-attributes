@@ -31,7 +31,7 @@ describe Chef::Knife::EncryptedAttributeEdit do
 
   context '#edit_data' do
     before do
-      allow(Chef::EncryptedAttribute).to receive(:exists_on_node?).and_return(true)
+      allow(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(true)
       allow_any_instance_of(Chef::EncryptedAttribute).to receive(:load_from_node).and_return({})
       allow_any_instance_of(Chef::EncryptedAttribute).to receive(:create_on_node)
       allow_any_instance_of(Chef::Knife::EncryptedAttributeEdit).to receive(:system).and_return(true)

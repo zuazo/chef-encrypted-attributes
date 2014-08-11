@@ -46,7 +46,7 @@ class Chef
         attr_ary = attribute_path_to_ary(attr_path)
 
         # check if the encrypted attribute already exists
-        unless Chef::EncryptedAttribute.exists_on_node?(node_name, attr_ary)
+        unless Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
           ui.fatal('Encrypted attribute not found')
           exit 1
         end

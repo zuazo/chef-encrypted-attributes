@@ -50,7 +50,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
   end # context #new
 
-  context '#self.exists' do
+  context '#self.exist?' do
 
     @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     [
@@ -61,6 +61,39 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       },
     ].each do |o|
       it "should return true for #{o.inspect}" do
+        expect(Chef::Log).to_not receive(:warn)
+        expect(@EncryptedMash.exist?(o)).to be_true
+      end
+    end
+
+    [
+      5, true, {},
+      { @EncryptedMash::JSON_CLASS => @EncryptedMash.name },
+      {
+        @EncryptedMash::JSON_CLASS => @EncryptedMash.name,
+        @EncryptedMash::CHEF_TYPE => 'bad_type',
+      },
+    ].each do |o|
+      it "should return false for #{o.inspect}" do
+        expect(Chef::Log).to_not receive(:warn)
+        expect(@EncryptedMash.exist?(o)).to be_false
+      end
+    end
+
+  end # context #self.exist?
+
+  context '#self.exists?' do
+
+    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
+    [
+      @EncryptedMash.new,
+      {
+        @EncryptedMash::JSON_CLASS => @EncryptedMash.to_s,
+        @EncryptedMash::CHEF_TYPE => @EncryptedMash::CHEF_TYPE_VALUE,
+      },
+    ].each do |o|
+      it "should return true for #{o.inspect}" do
+        expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
         expect(@EncryptedMash.exists?(o)).to be_true
       end
     end
@@ -74,11 +107,12 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       },
     ].each do |o|
       it "should return false for #{o.inspect}" do
+        expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
         expect(@EncryptedMash.exists?(o)).to be_false
       end
     end
 
-  end # context #self.exists
+  end # context #self.exists?
 
   context '#self.create' do
 

@@ -41,7 +41,7 @@ Returns `true` if the encrypted attribute has been updated, `false` if not.
 
 An exception is thrown if there is any error in the updating process.
 
-### Chef::EncryptedAttribute.exists?(hs)
+### Chef::EncryptedAttribute.exist?(hs)
 
 Checks whether an encrypted attribute exists.
 
@@ -86,7 +86,7 @@ An exception is thrown if there is any error in the updating process.
 
 This method **requires admin privileges**. So in most cases, cannot be used from cookbooks.
 
-### Chef::EncryptedAttribute.exists_on_node?(name, attr_ary [, config])
+### Chef::EncryptedAttribute.exist_on_node?(name, attr_ary [, config])
 
 Checks whether an encrypted attribute exists in a remote node.
 

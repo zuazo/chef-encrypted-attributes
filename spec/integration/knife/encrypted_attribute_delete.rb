@@ -73,25 +73,25 @@ describe Chef::Knife::EncryptedAttributeDelete do
       knife_delete = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'encrypted.attribute', '--force' ])
       expect(knife_delete.ui).to receive(:info).with('Encrypted attribute deleted.')
       expect { knife_delete.run }.not_to raise_error
-      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
+      expect(Chef::EncryptedAttribute.exist_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
     end
 
     it 'should be able to delete the encrypted attribute if allowed' do
       knife_edit = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--client-search', 'admin:true' ])
       knife_edit.run
-      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(true)
+      expect(Chef::EncryptedAttribute.exist_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(true)
 
       knife_delete = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'encrypted.attribute' ])
       expect(knife_delete.ui).to receive(:info).with('Encrypted attribute deleted.')
       knife_delete.run
-      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
+      expect(Chef::EncryptedAttribute.exist_on_node?('node1', [ 'encrypted', 'attribute' ])).to eql(false)
     end
 
     it 'should do nothing when the encrypted attribute does not exist' do
-      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
+      expect(Chef::EncryptedAttribute.exist_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
       knife = Chef::Knife::EncryptedAttributeDelete.new([ 'node1', 'non.existent.attribute' ])
       expect(knife.ui).not_to receive(:info).with('Encrypted attribute deleted.')
-      expect(Chef::EncryptedAttribute.exists_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
+      expect(Chef::EncryptedAttribute.exist_on_node?('node1', [ 'non', 'existent', 'attribute' ])).to eql(false)
       knife.run
     end
 
