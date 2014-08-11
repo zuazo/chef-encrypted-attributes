@@ -110,3 +110,57 @@ Data to calculate the HMAC from
 * The data used to calculate the HMAC is the encrypted data, not the clear text data (**Encrypt-then-MAC**).
 * The secret used to calculate the HMAC is not the same as the secret used to encrypt the data.
 * The secret used to calculate the HMAC is shared inside `encrypted_secret` field with the data secret.
+
+### EncryptedMash::Version2
+
+Uses public key cryptography (PKI) to encrypt a shared secret. Then this shared secret is used to encrypt the data using [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode).
+
+* This protocol version is based on the [Chef 12 Encrypted Data Bags Version 3 implementation](https://github.com/opscode/chef/pull/1591).
+* To use it, the following **special requirements** must be met:
+ * Ruby `>= 2`.
+ * OpenSSL `>= 1.0.1`.
+* This implementation can be improved, is not optimized either for performance or for space.
+* Every time the `EncryptedAttribute` is updated, all the shared secrets are regenerated.
+
+#### EncryptedMash::Version2 Structure
+
+If you try to read this encrypted attribute structure, you can see a *Mash* attribute with the following content:
+
+```
+EncryptedMash
+├── chef_type: "encrypted_attribute" (string).
+├── x_json_class: The used `EncryptedMash` version class name (string).
+├── encrypted_data
+│   ├── cipher: The used PKI algorithm, "aes-256-gcm" (string).
+│   ├── data: PKI encrypted data (base64).
+│   ├── auth_tag: GCM authentication tag (base64).
+│   └── iv: Initialization vector (in base64).
+└── encrypted_secret
+    ├── pub_key_hash1: The shared secret encrypted for the public key 1 (base64).
+    ├── pub_key_hash2: The shared secret encrypted for the public key 2 (base64).
+    └── ...
+```
+
+* `x_json_class` field is used, with the `x_` prefix, to be easily integrated with Chef in the future.
+
+##### EncryptedMash[encrypted_data][data]
+
+The data inside `encrypted_data` is symmetrically encrypted using the secret shared key. The data is converted to *JSON* before the encryption, then encrypted and finally encoded in *base64*. By default, the `"aes-256-gcm"` algorithm is used for encryption.
+
+After decryption, the *JSON* has the following structure:
+
+```
+└── encrypted_data
+    └── data (symmetrically encrypted JSON in base64)
+        └── content: attribute content as a Mash.
+```
+
+* In the future, this structure may contain some metadata like default configuration values.
+
+##### EncryptedMash[encrypted_secret][pub_key_hash1]
+
+The `public_key_hash1` key value is the *SHA1* of the public key used for encryption.
+
+Its content is the encrypted shared secret in *raw*. The encryption is done using the *RSA* algorithm (PKI).
+
+After decryption, you find the the shared secret in *raw* (in *Version1* this is a *JSON* in *base64*).

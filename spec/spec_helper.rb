@@ -17,7 +17,7 @@
 #
 
 require 'simplecov'
-if ENV['TRAVIS'] and RUBY_VERSION >= '1.9.3'
+if ENV['TRAVIS'] and RUBY_VERSION >= '2.0'
   require 'coveralls'
   SimpleCov.formatter = Coveralls::SimpleCov::Formatter
 end
@@ -30,9 +30,17 @@ require 'chef/exceptions'
 
 require 'rspec/autorun'
 
+require 'support/platform_helpers'
+
 RSpec.configure do |config|
   config.order = 'random'
 
   config.color = true
   config.tty = true
+
+  config.filter_run_excluding :ruby_gte_19 => true unless ruby_gte_19?
+  config.filter_run_excluding :ruby_gte_20 => true unless ruby_gte_20?
+  config.filter_run_excluding :ruby_gte_20_and_openssl_gte_101 => true unless (ruby_gte_20? && openssl_gte_101?)
+  config.filter_run_excluding :openssl_lt_101 => true unless openssl_lt_101?
+  config.filter_run_excluding :ruby_lt_20 => true unless ruby_lt_20?
 end

@@ -19,6 +19,9 @@ Node clients with read access can be specified using a `client_search` query. In
 * Ruby `>= 1.9`
 * Chef Client `~> 11.4`
 * yajl-ruby `~> 1.1` (included with Chef)
+* If you want to use protocol version 2 to use [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) (disabled by default):
+ * Ruby `>= 2`.
+ * OpenSSL `>= 1.0.1`.
 
 ## Usage in Recipes
 
@@ -254,7 +257,7 @@ For example:
     <td>&nbsp;</td>
     <td>--encrypted-attribute-version</td>
     <td>Encrypted Attribute protocol version to use</td>
-    <td>"0", "1" <em>(default)</em></td>
+    <td>"0", "1" <em>(default)</em>, "2"</td>
     <td>create, edit, update</td>
   </tr>
   <tr>

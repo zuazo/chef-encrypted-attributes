@@ -92,8 +92,8 @@ class Chef
           begin
             cipher = OpenSSL::Cipher.new(algo)
             cipher.encrypt
-            enc_value['iv'] = Base64.encode64(cipher.iv = cipher.random_iv)
             enc_value['secret'] = Base64.encode64(cipher.key = cipher.random_key)
+            enc_value['iv'] = Base64.encode64(cipher.iv = cipher.random_iv)
             enc_data = cipher.update(value) + cipher.final
           rescue OpenSSL::Cipher::CipherError => e
             raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
@@ -105,8 +105,9 @@ class Chef
         def symmetric_decrypt_value(enc_value, algo=SYMM_ALGORITHM)
           cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
           cipher.decrypt
-          cipher.iv = Base64.decode64(enc_value['iv'])
+          # We must set key before iv: https://bugs.ruby-lang.org/issues/8221
           cipher.key = Base64.decode64(enc_value['secret'])
+          cipher.iv = Base64.decode64(enc_value['iv'])
           cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
         rescue OpenSSL::Cipher::CipherError => e
           raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"

@@ -28,6 +28,7 @@ require 'chef/encrypted_attribute/remote_clients'
 require 'chef/encrypted_attribute/remote_users'
 require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/encrypted_mash/version1'
+require 'chef/encrypted_attribute/encrypted_mash/version2'
 
 Chef::Config[:encrypted_attributes] = Mash.new unless Chef::Config[:encrypted_attributes].kind_of?(Hash)
 

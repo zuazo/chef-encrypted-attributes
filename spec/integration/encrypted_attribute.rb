@@ -32,7 +32,10 @@ describe Chef::EncryptedAttribute do
 
   when_the_chef_server 'is ready to rock!' do
 
-    %w{default 0 1}.each do |version|
+    versions = %w(default 0 1)
+    versions << '2' if ruby_gte_20? && openssl_gte_101?
+
+    versions.each do |version|
       context "EncryptedAttribute version #{version}" do
         before do
           if version != 'default'

@@ -139,7 +139,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       @EncryptedMash.create(0)
     end
 
-    it 'should use #const_get in a Ruby 1.9 compatible way', :if => RUBY_VERSION >= '1.9' do
+    it 'should use #const_get in a Ruby 1.9 compatible way', :ruby_gte_19 => true do
       stub_const('RUBY_VERSION', '1.9.0')
       expect(Kernel).to receive(:const_get).with('Chef', true).once.and_return(Chef)
       @EncryptedMash.create(0)
