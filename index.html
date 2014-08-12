@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -33,8 +33,8 @@
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://gemnasium.com/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat" alt="Dependency Status"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes?branch=0.1.1"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.1.1.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.1.1"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.1.1.svg?style=flat" alt="Coverage Status"></a></p>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes?branch=0.2.0"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.2.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.2.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.2.0.svg?style=flat" alt="Coverage Status"></a></p>
 
 <p><a href="http://www.getchef.com">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
 
@@ -56,6 +56,13 @@
 <li>Chef Client <code>~&gt; 11.4</code>
 </li>
 <li>yajl-ruby <code>~&gt; 1.1</code> (included with Chef)</li>
+<li>If you want to use protocol version 2 to use <a href="http://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM</a> (disabled by default):
+
+<ul>
+<li>Ruby <code>&gt;= 2</code>.</li>
+<li>OpenSSL <code>&gt;= 1.0.1</code>.</li>
+</ul>
+</li>
 </ul><h2>
 <a name="usage-in-recipes" class="anchor" href="#usage-in-recipes"><span class="octicon octicon-link"></span></a>Usage in Recipes</h2>
 
@@ -78,7 +85,7 @@
 
 <span class="no">Chef</span><span class="o">::</span><span class="no">Recipe</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="ss">:include</span><span class="p">,</span> <span class="no">Opscode</span><span class="o">::</span><span class="no">OpenSSL</span><span class="o">::</span><span class="no">Password</span><span class="p">)</span> <span class="c1"># include the #secure_password method</span>
 
-<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="n">node</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"ftp_password"</span><span class="o">]</span><span class="p">)</span>
+<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">node</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"ftp_password"</span><span class="o">]</span><span class="p">)</span>
   <span class="c1"># update with the new keys</span>
   <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"ftp_password"</span><span class="o">]</span><span class="p">)</span>
 
@@ -106,7 +113,7 @@
 <span class="c1"># Allow all webapp nodes to read the attributes encrypted by me</span>
 <span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:client_search</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"role:webapp"</span>
 
-<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="n">node</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
+<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">node</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
   <span class="c1"># when can used #load here as above if we need the `encrypted_data` outside this `if`</span>
 
   <span class="c1"># update with the new keys</span>
@@ -123,14 +130,14 @@
 <div class="highlight highlight-ruby"><pre><span class="n">chef_gem</span> <span class="s2">"chef-encrypted-attributes"</span>
 <span class="nb">require</span> <span class="s2">"chef-encrypted-attributes"</span>
 
-<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exists_on_node?</span><span class="p">(</span><span class="s2">"random.example.com"</span><span class="p">,</span> <span class="o">[</span><span class="s2">"myapp"</span><span class="p">,</span> <span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
+<span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exist_on_node?</span><span class="p">(</span><span class="s2">"random.example.com"</span><span class="p">,</span> <span class="o">[</span><span class="s2">"myapp"</span><span class="p">,</span> <span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
   <span class="n">data</span> <span class="o">=</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">load_from_node</span><span class="p">(</span><span class="s2">"random.example.com"</span><span class="p">,</span> <span class="o">[</span><span class="s2">"myapp"</span><span class="p">,</span> <span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
 
   <span class="c1"># use `data` for something here ...</span>
 <span class="k">end</span>
 </pre></div>
 
-<p><strong>Note:</strong> Be careful when using <code>#exists_on_node?</code> and <code>#load_from_node</code> and remember passing the attribute path to read as <strong>Array of Strings</strong> <del>instead of using <code>node[...]</code> (which points to the local node)</del>.</p>
+<p><strong>Note:</strong> Be careful when using <code>#exist_on_node?</code> and <code>#load_from_node</code> and remember passing the attribute path to read as <strong>Array of Strings</strong> <del>instead of using <code>node[...]</code> (which points to the local node)</del>.</p>
 
 <h3>
 <a name="example-using-user-keys-data-bag" class="anchor" href="#example-using-user-keys-data-bag"><span class="octicon octicon-link"></span></a>Example Using User Keys Data Bag</h3>
@@ -159,7 +166,7 @@
 <span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Admin users able to read the Encrypted Attributes: </span><span class="si">#{</span><span class="n">chef_users</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">inspect</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:keys</span><span class="o">]</span> <span class="o">=</span> <span class="n">chef_users</span><span class="o">.</span><span class="n">values</span>
 
-<span class="c1"># if Chef::EncryptedAttribute.exists_on_node?(...)</span>
+<span class="c1"># if Chef::EncryptedAttribute.exist_on_node?(...)</span>
 <span class="c1">#   Chef::EncryptedAttribute.update(...)</span>
 <span class="c1"># else</span>
 <span class="c1">#   node.set[...][...] = Chef::EncryptedAttribute.create(...)</span>
@@ -171,7 +178,7 @@
 <h2>
 <a name="chefencryptedattribute-api" class="anchor" href="#chefencryptedattribute-api"><span class="octicon octicon-link"></span></a>Chef::EncryptedAttribute API</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
 
 <h2>
 <a name="chef-users-limitation" class="anchor" href="#chef-users-limitation"><span class="octicon octicon-link"></span></a>Chef Users Limitation</h2>
@@ -211,7 +218,7 @@
 <div class="highlight highlight-ruby"><pre><span class="n">knife</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:users</span><span class="o">]</span> <span class="o">=</span> <span class="s1">'*'</span> <span class="c1"># allow access to all knife users</span>
 </pre></div>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/API.md#configuration">API Configuration</a> section for more configuration values.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/API.md#configuration">API Configuration</a> section for more configuration values.</p>
 
 <h3>
 <a name="knife-encrypted-attribute-show" class="anchor" href="#knife-encrypted-attribute-show"><span class="octicon octicon-link"></span></a>knife encrypted attribute show</h3>
@@ -310,8 +317,7 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 <td> </td>
     <td>--encrypted-attribute-version</td>
     <td>Encrypted Attribute protocol version to use</td>
-    <td>"0", "1" <em>(default)</em>
-</td>
+    <td>"0", "1" <em>(default)</em>, "2"</td>
     <td>create, edit, update</td>
   </tr>
 <tr>
@@ -352,21 +358,60 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 </table><h2>
 <a name="internal-documentation" class="anchor" href="#internal-documentation"><span class="octicon octicon-link"></span></a>Internal Documentation</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
+
+<h2>
+<a name="using-signed-gems" class="anchor" href="#using-signed-gems"><span class="octicon octicon-link"></span></a>Using Signed Gems</h2>
+
+<p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain </p>
+
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/certs/team_onddo.crt
+</code></pre>
+
+<p>To be sure the gem you install has not been tampered with:</p>
+
+<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/certs/team_onddo.crt)
+$ gem install chef-encrypted-attributes -P MediumSecurity
+</code></pre>
+
+<p>The <em>MediumSecurity</em> trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all</p>
+
+<p>We recommend to remove our certificate after the gem has been successfully verified and installed:</p>
+
+<pre><code>$ gem cert --remove '/cn=team/dc=onddo/dc=com'
+</code></pre>
+
+<h2>
+<a name="security-notes" class="anchor" href="#security-notes"><span class="octicon octicon-link"></span></a>Security Notes</h2>
+
+<p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the [internal documentation](INTERNAL.</p>
+
+<p>Still, this gem should be considered experimental until audited by professional cryptographers.</p>
+
+<h2>
+<a name="reporting-security-problems" class="anchor" href="#reporting-security-problems"><span class="octicon octicon-link"></span></a>Reporting Security Problems</h2>
+
+<p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-</p>
+
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/zuazo.gpg
+</code></pre>
+
+<p>The key fingerprint is (or should be):</p>
+
+<pre><code>8EFA 5B17 7275 5F1F 42B2  26B4 8E18 8B67 9DE1 9468
+</code></pre>
+
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/TESTING.md">TESTING.md</a>.</p>
 
 <h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<ol>
-<li>Fork the repository on Github.</li>
-<li>Create a named feature branch (like <code>add_component_x</code>).</li>
-<li>Write tests for your change.</li>
-<li>Write your change.</li>
-<li>Run the tests, ensuring they all pass (try as much as possible not to reduce coverage).</li>
-<li>Submit a Pull Request using Github.</li>
-</ol><p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/TESTING.md">TESTING.md</a> file to know how to run the tests properly.</p>
+<p>Please do not hesitate to <a href="https://github.com/onddo/chef-encrypted-attributes/issues/new">open an issue</a> with any questions or problems.</p>
 
-<p>You can also see the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.1.1/TODO.md">TODO.md</a> file if you're looking for inspiration.</p>
+<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
 
 <h2>
 <a name="license-and-author" class="anchor" href="#license-and-author"><span class="octicon octicon-link"></span></a>License and Author</h2>
