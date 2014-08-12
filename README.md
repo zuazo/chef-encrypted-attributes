@@ -301,6 +301,39 @@ For example:
 
 See the [INTERNAL.md](INTERNAL.md) file for a more low level documentation.
 
+## Using Signed Gems
+
+The `chef-encrypted-attributes` gem is cryptographically signed by Onddo Labs's certificate, which identifies as *team@onddo.com*. You can obtain the official signature here:
+
+    https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt
+
+To be sure the gem you install has not been tampered with:
+
+    $ gem cert --add <(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt)
+    $ gem install chef-encrypted-attributes -P MediumSecurity
+
+The *MediumSecurity* trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all of `chef-encrypted-attributes`'s dependencies are signed, so we cannot use *HighSecurity*.
+
+We recommend to remove our certificate after the gem has been successfully verified and installed:
+
+    $ gem cert --remove '/cn=team/dc=onddo/dc=com'
+
+## Security Notes
+
+All the cryptographic systems and algorithms used by `chef-encrypted-attributes` are carefully described in the [internal documentation](INTERNAL.md) for public review. The code was originally based on *Encrypted Data Bags* and [chef-vault](https://github.com/Nordstrom/chef-vault) implementations, then improved.
+
+Still, this gem should be considered experimental until audited by professional cryptographers.
+
+## Reporting Security Problems
+
+If you have discovered a bug in `chef-encrypted-attributes` of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-attributes` users, you can report it securely by sending a GPG encrypted message. Please use the following key:
+
+    https://raw.github.com/onddo/chef-encrypted-attributes/master/zuazo.gpg
+
+The key fingerprint is (or should be):
+
+    8EFA 5B17 7275 5F1F 42B2  26B4 8E18 8B67 9DE1 9468
+
 ## Testing
 
 See [TESTING.md](TESTING.md).
