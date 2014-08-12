@@ -102,9 +102,11 @@ All the methods read the default configuration from the `Chef::Config[:encrypted
 
 If the configuration value to be merged is an array or a hash (for example `keys`), the method argument configuration value has preference over the global configuration. Arrays and hashes are not merged.
 
-Both `Chef::Config[:encrypted_attributes]` and methods `config` parameter should be a hash which may have any of the following keys:
+Both `Chef::Config[:encrypted_attributes]` and method's `config` parameter should be a hash which may have any of the following keys:
 
-* `:version` - `EncryptedMash` format version to use, by default `1` is used which is considered best.
+* `:version` - `EncryptedMash` format version to use, by default `1` is used which is recommended. The version `2` uses [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) and probably should be considered the most secure, but it is disabled by default because it has some more requirements:
+ * Ruby `>= 2`.
+ * OpenSSL `>= 1.0.1`.
 * `:partial_search` - Whether to use Chef Server partial search, enabled by default. It may not work in some old versions of Chef Server.
 * `:client_search` - Search query for clients allowed to read the encrypted attribute. Can be a simple string or an array of queries to be *OR*-ed.
 * `:users` - Array of user names to be allowed to read the encrypted attribute(s). `"*"` to allow access to all users. Keep in mind that only admin clients or admin users are allowed to read user public keys. It is **not recommended** to use this from cookbooks unless you know what you are doing.
@@ -123,6 +125,13 @@ To disable Partial Search locally:
 
 ```ruby
 ftp_pass = Chef::EncryptedAttribute.load(node["myapp"]["ftp_password"], { :partial_search => false })
+```
+
+To use protocol version 2 globally, which uses [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode):
+
+```ruby
+Chef::Config[:encrypted_attributes][:version] = 2
+# ...
 ```
 
 If you want to use knife to work with encrypted attributes, surely you will need to save your Chef User public keys in a Data Bag (there is no need to encrypt them because they are public) and add them to the `:keys` configuration option. See the [Example Using User Keys Data Bag](README.md#example-using-user-keys-data-bag) in the README for more information on this.
