@@ -25,14 +25,14 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'rake', '< 10.2'
    # s.add_development_dependency 'mime-types', '< 2.0'
   else
-    s.add_development_dependency 'rake'
+    s.add_development_dependency 'rake', '~> 10.0'
   end
-  s.add_development_dependency 'chef-zero'
+  s.add_development_dependency 'chef-zero', '~> 2.0'
   s.add_development_dependency 'rspec-core', '~> 2.14'
   s.add_development_dependency 'rspec-expectations', '~> 2.14'
   s.add_development_dependency 'rspec-mocks', '~> 2.14'
-  s.add_development_dependency 'coveralls'
-  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'coveralls', '~> 0.7'
+  s.add_development_dependency 'simplecov', '~> 0.9'
 
   s.cert_chain = [ ::File.join('certs', 'team_onddo.crt') ]
 end
