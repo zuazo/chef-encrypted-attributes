@@ -363,7 +363,7 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 <h2>
 <a name="using-signed-gems" class="anchor" href="#using-signed-gems"><span class="octicon octicon-link"></span></a>Using Signed Gems</h2>
 
-<p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain </p>
+<p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain the official signature here:</p>
 
 <pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/certs/team_onddo.crt
 </code></pre>
@@ -374,7 +374,7 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 $ gem install chef-encrypted-attributes -P MediumSecurity
 </code></pre>
 
-<p>The <em>MediumSecurity</em> trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all</p>
+<p>The <em>MediumSecurity</em> trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all of <code>chef-encrypted-attributes</code>'s dependencies are signed, so we cannot use <em>HighSecurity</em>.</p>
 
 <p>We recommend to remove our certificate after the gem has been successfully verified and installed:</p>
 
@@ -384,14 +384,14 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <h2>
 <a name="security-notes" class="anchor" href="#security-notes"><span class="octicon octicon-link"></span></a>Security Notes</h2>
 
-<p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/INTERNAL.md">internal documentation</a>.</p>
+<p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/INTERNAL.md">internal documentation</a> for public review. The code was originally based on <em>Encrypted Data Bags</em> and <a href="https://github.com/Nordstrom/chef-vault">chef-vault</a> implementations, then improved.</p>
 
 <p>Still, this gem should be considered experimental until audited by professional cryptographers.</p>
 
 <h2>
 <a name="reporting-security-problems" class="anchor" href="#reporting-security-problems"><span class="octicon octicon-link"></span></a>Reporting Security Problems</h2>
 
-<p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-</p>
+<p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of <code>chef-encrypted-attributes</code> users, you can report it securely by sending a GPG encrypted message. Please use the following key:</p>
 
 <pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/zuazo.gpg
 </code></pre>
