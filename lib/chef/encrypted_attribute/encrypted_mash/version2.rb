@@ -21,7 +21,7 @@ require 'chef/encrypted_attribute/encrypted_mash/version1'
 require 'chef/encrypted_attribute/assertions'
 require 'chef/encrypted_attribute/exceptions'
 
-# Version1 format: using RSA with a shared secret and message authentication (HMAC)
+# Version2 format: using RSA with a shared secret and GCM
 class Chef
   class EncryptedAttribute
     class EncryptedMash
