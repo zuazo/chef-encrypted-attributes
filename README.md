@@ -127,7 +127,7 @@ chef_users.delete("id") # remove the data bag "id" to avoid to confuse it with a
 Chef::Log.debug("Admin users able to read the Encrypted Attributes: #{chef_users.keys.inspect}")
 Chef::Config[:encrypted_attributes][:keys] = chef_users.values
 
-# if Chef::EncryptedAttribute.exist_on_node?(...)
+# if Chef::EncryptedAttribute.exist?(...)
 #   Chef::EncryptedAttribute.update(...)
 # else
 #   node.set[...][...] = Chef::EncryptedAttribute.create(...)
