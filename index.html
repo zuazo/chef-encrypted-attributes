@@ -166,7 +166,7 @@
 <span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Admin users able to read the Encrypted Attributes: </span><span class="si">#{</span><span class="n">chef_users</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">inspect</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:keys</span><span class="o">]</span> <span class="o">=</span> <span class="n">chef_users</span><span class="o">.</span><span class="n">values</span>
 
-<span class="c1"># if Chef::EncryptedAttribute.exist_on_node?(...)</span>
+<span class="c1"># if Chef::EncryptedAttribute.exist?(...)</span>
 <span class="c1">#   Chef::EncryptedAttribute.update(...)</span>
 <span class="c1"># else</span>
 <span class="c1">#   node.set[...][...] = Chef::EncryptedAttribute.create(...)</span>
