@@ -33,8 +33,9 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
       Chef::Config[:encrypted_data_bag_secret] = File.join(File.dirname(__FILE__), '../data/encrypted_data_bag_secret')
       @data_bag_secret = Chef::EncryptedDataBagItem.load_secret
 
-      # disable client search
+      # disable client and node search
       Chef::Config[:encrypted_attributes][:client_search] = []
+      Chef::Config[:encrypted_attributes][:node_search] = []
 
       # Some data to encrypt
       @clear_hs = Mash.new({

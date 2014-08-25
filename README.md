@@ -12,7 +12,7 @@ We recommend using the [encrypted_attributes cookbook](http://community.opscode.
 
 Node attributes are encrypted using chef client and user keys with public key infrastructure (PKI). You can choose which clients, nodes or users will be able to read the attribute.
 
-Node clients with read access can be specified using a `client_search` query. In case new nodes are added or removed, the data will be re-encrypted in the next *Chef Run* of the encrypting node (using the `#update` method shown below).
+*Chef Nodes* with read access can be specified using a `node_search` query. In case new nodes are added or removed, the data will be re-encrypted in the next *Chef Run* of the encrypting node (using the `#update` method shown below). Similarly, a `client_search` query can be used to allow *Chef Clients* to read the attribute.
 
 ## Requirements
 
@@ -69,8 +69,11 @@ In this example we only need to save some data from the local node and read it f
 chef_gem "chef-encrypted-attributes"
 require "chef-encrypted-attributes"
 
+# Allow all admin clients to read the attributes encrypted by me
+Chef::Config[:encrypted_attributes][:client_search] = "admin:true"
+
 # Allow all webapp nodes to read the attributes encrypted by me
-Chef::Config[:encrypted_attributes][:client_search] = "role:webapp"
+Chef::Config[:encrypted_attributes][:node_search] = "role:webapp"
 
 if Chef::EncryptedAttribute.exist?(node["myapp"]["encrypted_data"])
   # when can used #load here as above if we need the `encrypted_data` outside this `if`
@@ -202,7 +205,7 @@ For example:
 
 ### knife encrypted attribute update
 
-Updates who can read the attribute (for `:client_search` changes).
+Updates who can read the attribute (for `:client_search` and `:node_search` changes).
 
     $ knife encrypted attribute update NODE ATTRIBUTE (options)
 
@@ -212,7 +215,7 @@ For example:
 
     $ knife encrypted attribute update ftp.example.com myapp.ftp_password \
         --client-search admin:true \
-        --client-search role:webapp \
+        --node-search role:webapp \
         -U bob -U alice
 
 ### knife encrypted attribute edit
@@ -230,7 +233,7 @@ For example:
     $ export EDITOR=vi
     $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
         --client-search admin:true \
-        --client-search role:webapp \
+        --node-search role:webapp \
         -U bob -U alice
 
 ### knife encrypted attribute delete
@@ -271,6 +274,13 @@ For example:
     <td>-C</td>
     <td>--client-search</td>
     <td>Client search query. Can be specified multiple times</td>
+    <td>&nbsp;</td>
+    <td>create, edit, update</td>
+  </tr>
+  <tr>
+    <td>-N</td>
+    <td>--node-search</td>
+    <td>Node search query. Can be specified multiple times</td>
     <td>&nbsp;</td>
     <td>create, edit, update</td>
   </tr>

@@ -25,6 +25,7 @@ describe Chef::Knife::EncryptedAttributeShow do
   when_the_chef_server 'is ready to rock!' do
     before do
       Chef::EncryptedAttribute::RemoteClients.cache.clear
+      Chef::EncryptedAttribute::RemoteNodes.cache.clear
       Chef::EncryptedAttribute::RemoteUsers.cache.clear
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
 

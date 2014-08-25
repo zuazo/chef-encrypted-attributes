@@ -2,7 +2,7 @@ TODO
 ====
 
 * knife encrypted attribute create/edit from file.
-* Save config inside encrypted data: `:client_search` and `:keys` (including user keys).
+* Save config inside encrypted data: `:client_search`, `:node_search` and `:keys` (including user keys).
 * Chef internal node attribute integration monkey-patch. It may require some `EncryptedMash` class rewrite or adding some methods.
 * Support for Chef `< 11.4` (add `JSONCompat#map_to_rb_obj`, disable `Chef::User` for `< 11.2`, ...).
 * Test with Chef `10`.

@@ -52,6 +52,15 @@ class Chef
                 Chef::Config[:knife][:encrypted_attributes][:client_search] << i
               }
 
+            option :encrypted_attribute_node_search,
+              :short => '-N NODE_SEARCH_QUERY',
+              :long => '--node-search NODE_SEARCH_QUERY',
+              :description => 'Node search query. Can be specified multiple times',
+              :proc => lambda { |i|
+                Chef::Config[:knife][:encrypted_attributes][:node_search] = [] unless Chef::Config[:knife][:encrypted_attributes][:node_search].kind_of?(Array)
+                Chef::Config[:knife][:encrypted_attributes][:node_search] << i
+              }
+
             option :encrypted_attribute_users,
               :short => '-U USER',
               :long => '--encrypted-attribute-user USER',

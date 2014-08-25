@@ -27,6 +27,7 @@ class Chef
         :version,
         :partial_search,
         :client_search,
+        :node_search,
         :users,
         :keys,
       ].freeze
@@ -62,6 +63,19 @@ class Chef
         end
         set_or_return(
           :client_search,
+          arg,
+          :kind_of => Array,
+          :default => [],
+          :callbacks => config_search_array_callbacks
+        )
+      end
+
+      def node_search(arg=nil)
+        unless arg.nil? or not arg.kind_of?(String)
+          arg = [ arg ]
+        end
+        set_or_return(
+          :node_search,
           arg,
           :kind_of => Array,
           :default => [],

@@ -31,7 +31,36 @@ describe Chef::EncryptedAttribute::RemoteClients do
     expect(@RemoteClients).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
-  describe '#get_public_keys' do
+  describe '#get_public_key' do
+
+    it 'should get client public key' do
+      fake_client = Chef::ApiClient.new
+      allow(fake_client).to receive(:public_key).and_return('OK')
+      expect(Chef::ApiClient).to receive(:load).with('node1').and_return(fake_client)
+      expect(@RemoteClients.get_public_key('node1')).to eq('OK')
+    end
+
+    {
+      '404' => Chef::EncryptedAttribute::ClientNotFound,
+      'anything_else' => Net::HTTPServerException,
+    }.each do |code, exception|
+
+      it "should throw an #{exception.to_s} exception if the server returns a #{code} code" do
+        allow(Chef::ApiClient).to receive(:load) do
+          raise Net::HTTPServerException.new('Net::HTTPServerException',
+            Net::HTTPResponse.new('1.1', code, 'Net::HTTPResponse')
+          )
+        end
+        expect do
+          @RemoteClients.get_public_key('random_client')
+        end.to raise_error(exception)
+      end
+
+    end
+
+  end # #get_public_key
+
+  describe '#search_public_keys' do
     before(:all) do
       Chef::EncryptedAttribute::RemoteClients.cache.max_size(20)
     end
@@ -45,12 +74,12 @@ describe Chef::EncryptedAttribute::RemoteClients do
 
     it 'should get client public_keys using SearchHelper' do
       allow(@RemoteClients).to receive(:search).and_return(@clients)
-      expect(@RemoteClients.get_public_keys).to eql(@public_keys)
+      expect(@RemoteClients.search_public_keys).to eql(@public_keys)
     end
 
     it 'should return empty array for empty search results' do
       allow(@RemoteClients).to receive(:search).and_return({})
-      expect(@RemoteClients.get_public_keys).to eql([])
+      expect(@RemoteClients.search_public_keys).to eql([])
     end
 
     it 'should do a search with the correct arguments' do
@@ -62,7 +91,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
         1000,
         true
       ).and_return(@clients)
-      @RemoteClients.get_public_keys(query)
+      @RemoteClients.search_public_keys(query)
     end
 
     it 'should do "*:*" search by default' do
@@ -73,7 +102,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
         1000,
         true
       ).and_return(@clients)
-      @RemoteClients.get_public_keys
+      @RemoteClients.search_public_keys
     end
 
     it 'should cache search results for multiple calls' do
@@ -86,10 +115,10 @@ describe Chef::EncryptedAttribute::RemoteClients do
         true
       ).and_return(@clients)
 
-      @RemoteClients.get_public_keys(query)
-      @RemoteClients.get_public_keys(query) # cached
+      @RemoteClients.search_public_keys(query)
+      @RemoteClients.search_public_keys(query) # cached
     end
 
-  end # describe #get_public_keys
+  end # describe #search_public_keys
 
 end

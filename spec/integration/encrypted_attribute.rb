@@ -23,6 +23,7 @@ describe Chef::EncryptedAttribute do
   extend ChefZero::RSpec
   before(:all) do
     Chef::EncryptedAttribute::RemoteClients.cache.clear
+    Chef::EncryptedAttribute::RemoteNodes.cache.clear
     Chef::EncryptedAttribute::RemoteUsers.cache.clear
     Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
   end
@@ -159,18 +160,30 @@ describe Chef::EncryptedAttribute do
         context '#update' do
           before do
             Chef::Config[:encrypted_attributes][:client_search] = [ 'admin:true' ]
+            Chef::Config[:encrypted_attributes][:node_search] = [ 'role:webapp' ]
             # disable remote clients cache
             Chef::EncryptedAttribute::RemoteClients.cache.max_size(0)
+            Chef::EncryptedAttribute::RemoteNodes.cache.max_size(0)
 
             @client1 = Chef::ApiClient.new
             @client1.name('client1')
             @client1.admin(true)
             @client1.save
 
+            @node1 = Chef::Node.new
+            @node1.name('node1')
+            @node1.run_list << 'role[webapp]'
+            @node1.save
+            @node1_client = Chef::ApiClient.new
+            @node1_client.name(@node1.name)
+            @node1_client.save
+
             @enc_attr = Chef::EncryptedAttribute.create('Testing updates')
           end
           after do
             @client1.destroy
+            @node1_client.destroy
+            @node1.destroy
           end
 
           it 'should not update an already updated attribute' do
@@ -180,7 +193,7 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'should update when there are new clients' do
-            # creating a new admin client will require a update
+            # creating a new admin client will require an update
             client2 = Chef::ApiClient.new
             client2.name('client2')
             client2.admin(true)
@@ -216,6 +229,53 @@ describe Chef::EncryptedAttribute do
 
             client2.destroy
             @client1.save # avoid error 404 on after { client1.destroy }
+          end
+
+          it 'should update when there are new nodes' do
+            # creating a new admin node will require an update
+            node2 = Chef::Node.new
+            node2.name('node2')
+            node2.run_list << 'role[webapp]'
+            node2.save
+            node2_client = Chef::ApiClient.new
+            node2_client.name(node2.name)
+            node2_client.save
+
+            enc_orig = @enc_attr.clone
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
+
+            node2_client.destroy
+            node2.destroy
+          end
+
+          it 'should update when some nodes are removed' do
+            @node1.destroy
+
+            enc_orig = @enc_attr.clone
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
+
+            @node1.save # avoid error 404 on after { node1.destroy }
+          end
+
+          it 'should update when some clients are added and others removed' do
+            @node1.destroy
+            node2 = Chef::Node.new
+            node2.name('node2')
+            node2.run_list << 'role[webapp]'
+            node2.save
+            node2_client = Chef::ApiClient.new
+            node2_client.name(node2.name)
+            node2_client.save
+
+            enc_orig = @enc_attr.clone
+            expect(Chef::EncryptedAttribute.update(@enc_attr)).to eql(true)
+            expect(@enc_attr).not_to eql(enc_orig)
+
+            node2_client.destroy
+            node2.destroy
+            @node1.save # avoid error 404 on after { node1.destroy }
           end
 
         end # context #update
@@ -319,20 +379,20 @@ describe Chef::EncryptedAttribute do
             @attr_clear = 'A coconut yogourts lover'
 
             @node = Chef::Node.new
-            @node.name('client1')
+            @node.name('node1')
             @node.set['encrypted']['attribute'] = Chef::EncryptedAttribute.create(@attr_clear)
             @node.save
 
-            @client = Chef::ApiClient.new
-            @client.name('client1')
-            client_hs = @client.save
-            @client.public_key(client_hs['public_key'])
-            @client.private_key(client_hs['private_key'])
-            @private_key = OpenSSL::PKey::RSA.new(@client.private_key)
+            @node_client = Chef::ApiClient.new
+            @node_client.name(@node.name)
+            client_hs = @node_client.save
+            @node_client.public_key(client_hs['public_key'])
+            @node_client.private_key(client_hs['private_key'])
+            @private_key = OpenSSL::PKey::RSA.new(@node_client.private_key)
           end
           after do
             @node.destroy
-            @client.destroy
+            @node_client.destroy
           end
 
           it 'original client should be able to read the attribute' do
@@ -345,14 +405,14 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should be able to read it if added as #udpate arg' do
-            Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [ @client.public_key ] })
+            Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [ @node_client.public_key ] })
 
             allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
             expect(Chef::EncryptedAttribute.load(@node['encrypted']['attribute'])).to eql(@attr_clear)
           end
 
           it 'other clients should be able to read it if added in global config' do
-            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ]
+            Chef::Config[:encrypted_attributes][:keys] = [ @node_client.public_key ]
             expect(Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'])).to eql(true)
 
             allow_any_instance_of(Chef::EncryptedAttribute::LocalNode).to receive(:key).and_return(@private_key)
@@ -360,7 +420,7 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should not be able to read if they are removed from global config' do
-            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ] # first add the key
+            Chef::Config[:encrypted_attributes][:keys] = [ @node_client.public_key ] # first add the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
             Chef::Config[:encrypted_attributes][:keys] = [] # remove the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update without the key
@@ -370,7 +430,7 @@ describe Chef::EncryptedAttribute do
           end
 
           it 'other clients should not be able to read if they are not removed from global config' do
-            Chef::Config[:encrypted_attributes][:keys] = [ @client.public_key ] # first add the key
+            Chef::Config[:encrypted_attributes][:keys] = [ @node_client.public_key ] # first add the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute']) # update with the key
             Chef::EncryptedAttribute.update(@node.set['encrypted']['attribute'], { :keys => [] }) # update without the key
 

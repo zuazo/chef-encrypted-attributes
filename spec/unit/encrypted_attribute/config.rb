@@ -62,6 +62,11 @@ describe Chef::EncryptedAttribute::Config do
         :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ], [] ], # string case is treated below separately
         :error => [ 1, 0.2, Hash.new, Object.new ],
       },
+      :node_search => {
+        :default => [],
+        :ok => [ [ 'role:webapp' ], [ 'role:webapp', 'role:ftp' ], [] ], # string case is treated below separately
+        :error => [ 1, 0.2, Hash.new, Object.new ],
+      },
       :users => {
         :default => [],
         :ok => [ '*', [], [ 'admin1' ], [ 'admin1', 'admin2' ] ],
@@ -114,11 +119,17 @@ describe Chef::EncryptedAttribute::Config do
       expect(@config.client_search).to eql([ 'admin:false' ])
     end
 
+    it '#node_search should accept String type tunrning it into an Array' do
+      expect { @config.node_search('role:webapp') }.not_to raise_error
+      expect(@config.node_search).to eql([ 'role:webapp' ])
+    end
+
     describe '#update!' do
       before do
         @config.version(2)
         @config.partial_search(true)
         @config.client_search([ 'admin:true' ])
+        @config.node_search([])
         @config.users('*')
         @config.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
       end
@@ -142,6 +153,13 @@ describe Chef::EncryptedAttribute::Config do
         config2.client_search([ '*:*' ])
         @config.update!(config2)
         expect(@config.client_search).to eql(config2.client_search)
+      end
+
+      it 'should update node_search values from a @Config class' do
+        config2 = @Config.new
+        config2.node_search([ '*:*' ])
+        @config.update!(config2)
+        expect(@config.node_search).to eql(config2.node_search)
       end
 
       it 'should update users values from a @Config class' do
@@ -176,6 +194,12 @@ describe Chef::EncryptedAttribute::Config do
         expect(@config.client_search).to eql(config2[:client_search])
       end
 
+      it 'should update node_search value from a Hash with symbol keys' do
+        config2 = { :node_search => [ '*:*' ] }
+        @config.update!(config2)
+        expect(@config.node_search).to eql(config2[:node_search])
+      end
+
       it 'should update users value from a Hash with symbol keys' do
         config2 = { :users => [ 'admin' ] }
         @config.update!(config2)
@@ -192,12 +216,14 @@ describe Chef::EncryptedAttribute::Config do
         config2 = {
           'partial_search' => false,
           :client_search => [],
+          :node_search => [],
           :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
         }
         @config.update!(config2)
 
         expect(@config.partial_search).to eql(config2['partial_search'])
         expect(@config.client_search).to eql(config2[:client_search])
+        expect(@config.node_search).to eql(config2[:node_search])
         expect(@config.keys).to eql(config2[:keys])
       end
 

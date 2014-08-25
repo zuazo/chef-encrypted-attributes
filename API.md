@@ -28,9 +28,9 @@ An exception is thrown if any error arises in the encryption process.
 
 ### Chef::EncryptedAttribute.update(hs [, config])
 
-Updates who can read the attribute. This is intended to be used to update to the new nodes returned by the `:client_search` or perhaps global configuration changes.
+Updates who can read the attribute. This is intended to be used to update to the new nodes returned by `:client_search` and `:node_search` or perhaps global configuration changes.
 
-For example, in case new nodes are added or some are removed, and the clients returned by `:client_search` are different, this `#update` method will decrypt the attribute and encrypt it again for the new nodes (or remove the old ones).
+For example, in case new nodes are added or some are removed, and the clients returned by `:client_search` or `:node_search` are different, this `#update` method will decrypt the attribute and encrypt it again for the new nodes (or remove the old ones).
 
 If an update is made, the shared secrets are regenerated.
 
@@ -109,6 +109,7 @@ Both `Chef::Config[:encrypted_attributes]` and method's `config` parameter shoul
  * OpenSSL `>= 1.0.1`.
 * `:partial_search` - Whether to use Chef Server partial search, enabled by default. It may not work in some old versions of Chef Server.
 * `:client_search` - Search query for clients allowed to read the encrypted attribute. Can be a simple string or an array of queries to be *OR*-ed.
+* `:node_search` - Search query for nodes allowed to read the encrypted attribute. Can be a simple string or an array of queries to be *OR*-ed.
 * `:users` - Array of user names to be allowed to read the encrypted attribute(s). `"*"` to allow access to all users. Keep in mind that only admin clients or admin users are allowed to read user public keys. It is **not recommended** to use this from cookbooks unless you know what you are doing.
 * `:keys` - raw RSA public keys to be allowed to read encrypted attributes(s), in PEM (string) format. Can be client public keys, user public keys or any other RSA public key.
 
@@ -148,6 +149,7 @@ This API uses some LRU caches to avoid making many requests to the Chef Server. 
 This are the currently available caches:
 
 * `Chef::EncryptedAttribute::RemoteClients.cache` - Caches the `:client_search` query results (max_size: `1024`).
+* `Chef::EncryptedAttribute::RemoteNodes.cache` - Caches the `:node_search` query results (max_size: `1024`).
 * `Chef::EncryptedAttribute::RemoteUsers.cache` - Caches the Chef Users public keys (max_size: `1024`).
 * `Chef::EncryptedAttribute::RemoteNode.cache` - Caches the node (encrypted) attributes. Disabled by default (max_size: `0`).
 

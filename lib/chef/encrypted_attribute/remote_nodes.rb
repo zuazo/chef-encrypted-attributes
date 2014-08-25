@@ -16,30 +16,18 @@
 # limitations under the License.
 #
 
-require 'chef/api_client'
-
 require 'chef/encrypted_attribute/exceptions'
 require 'chef/encrypted_attribute/search_helper'
 require 'chef/encrypted_attribute/cache_lru'
+require 'chef/encrypted_attribute/remote_clients'
 
 class Chef
   class EncryptedAttribute
-    class RemoteClients
+    class RemoteNodes
       extend ::Chef::EncryptedAttribute::SearchHelper
 
       def self.cache
         @@cache ||= Chef::EncryptedAttribute::CacheLru.new
-      end
-
-      def self.get_public_key(name)
-        Chef::ApiClient.load(name).public_key
-      rescue Net::HTTPServerException => e
-        case e.response.code
-        when '404' # Not Found
-          raise ClientNotFound, "Chef Client not found: \"#{name}\"."
-        else
-          raise e
-        end
       end
 
       def self.search_public_keys(search='*:*', partial_search=true)
@@ -47,10 +35,10 @@ class Chef
         if cache.has_key?(escaped_query)
           cache[escaped_query]
         else
-          cache[escaped_query] = search(:client, search, {
-            'public_key' => [ 'public_key' ]
-          }, 1000, partial_search).map do |client|
-            client['public_key']
+          cache[escaped_query] = search(:node, search, {
+            'name' => [ 'name' ]
+          }, 1000, partial_search).map do |node|
+            RemoteClients.get_public_key(node['name'])
           end.compact
         end
       end

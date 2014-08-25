@@ -20,10 +20,10 @@ require 'chef/encrypted_attribute/config'
 require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/config'
 require 'chef/mash'
-require 'chef/api_client'
 
 require 'chef/encrypted_attribute/local_node'
 require 'chef/encrypted_attribute/remote_node'
+require 'chef/encrypted_attribute/remote_nodes'
 require 'chef/encrypted_attribute/remote_clients'
 require 'chef/encrypted_attribute/remote_users'
 require 'chef/encrypted_attribute/encrypted_mash/version0'
@@ -68,7 +68,7 @@ class Chef
 
     def create_on_node(name, attr_ary, value)
       # read the client public key
-      node_public_key = Chef::ApiClient.load(name).public_key
+      node_public_key = RemoteClients.get_public_key(name)
 
       # create the encrypted attribute
       enc_attr = self.create(value, [ node_public_key ])
@@ -93,7 +93,7 @@ class Chef
 
     def update_on_node(name, attr_ary)
       # read the client public key
-      node_public_key = Chef::ApiClient.load(name).public_key
+      node_public_key = RemoteClients.get_public_key(name)
 
       # update the encrypted attribute
       remote_node = RemoteNode.new(name)
@@ -111,7 +111,11 @@ class Chef
     protected
 
     def remote_client_keys
-      RemoteClients.get_public_keys(config.client_search, config.partial_search)
+      RemoteClients.search_public_keys(config.client_search, config.partial_search)
+    end
+
+    def remote_node_keys
+      RemoteNodes.search_public_keys(config.node_search, config.partial_search)
     end
 
     def remote_user_keys
@@ -119,7 +123,7 @@ class Chef
     end
 
     def target_keys(keys=nil)
-      target_keys = config.keys + remote_client_keys + remote_user_keys
+      target_keys = config.keys + remote_client_keys + remote_node_keys + remote_user_keys
       target_keys += keys if keys.kind_of?(Array)
       target_keys
     end

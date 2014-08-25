@@ -53,24 +53,36 @@ describe Chef::EncryptedAttribute::RemoteClients do
       @client1.destroy
     end
 
-    context '#get_public_keys' do
+    context '#get_public_key' do
+
+      it 'should return client public key' do
+        expect(@RemoteClients.get_public_key('admin1')).to eq(@admin1.public_key)
+      end
+
+      it 'should throw an error if the user is not found' do
+        expect { @RemoteClients.get_public_key('unknown') }.to raise_error(Chef::EncryptedAttribute::ClientNotFound)
+      end
+
+    end
+
+    context '#search_public_keys' do
 
       it 'should get all client public_keys by default' do
-        expect(@RemoteClients.get_public_keys.sort).to eql(@clients.map { |c| c.public_key }.sort)
+        expect(@RemoteClients.search_public_keys.sort).to eql(@clients.map { |c| c.public_key }.sort)
       end
 
       it 'should read the correct clients when a search query is passed as arg' do
         query = 'admin:true'
         @admins = @clients.reject { |c| !c.admin }
-        expect(@RemoteClients.get_public_keys(query).sort).to eql(@admins.map { |c| c.public_key }.sort)
+        expect(@RemoteClients.search_public_keys(query).sort).to eql(@admins.map { |c| c.public_key }.sort)
       end
 
       it 'should return empty array for empty search results' do
         query = 'this_will_return_no_results:true'
-        expect(@RemoteClients.get_public_keys(query).sort).to eql([])
+        expect(@RemoteClients.search_public_keys(query).sort).to eql([])
       end
 
-    end # context #get_public_keys
+    end # context #search_public_keys
 
   end # when_the_chef_server is ready to rock!
 end

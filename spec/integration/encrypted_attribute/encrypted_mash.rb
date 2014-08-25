@@ -23,6 +23,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   extend ChefZero::RSpec
   before(:all) do
     Chef::EncryptedAttribute::RemoteClients.cache.clear
+    Chef::EncryptedAttribute::RemoteNodes.cache.clear
     Chef::EncryptedAttribute::RemoteUsers.cache.clear
   end
 
@@ -35,9 +36,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
       end
 
-      it 'should call RemoteClients#get_public_keys only once' do
+      it 'should call RemoteClients#search_public_keys only once' do
         body = @EncryptedAttribute.create(0)
-        expect(@RemoteClients).to receive(:get_public_keys).once.and_return([])
+        expect(@RemoteClients).to receive(:search_public_keys).once.and_return([])
         @EncryptedAttribute.update(body)
       end
 

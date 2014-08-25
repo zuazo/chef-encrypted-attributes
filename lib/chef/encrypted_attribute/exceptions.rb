@@ -30,6 +30,7 @@ class Chef
 
     class InsufficientPrivileges < StandardError; end
     class UserNotFound < StandardError; end
+    class ClientNotFound < StandardError; end
 
     class SearchFailure < StandardError; end
     class SearchFatalError < StandardError; end

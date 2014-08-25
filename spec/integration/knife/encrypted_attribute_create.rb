@@ -26,6 +26,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
     before do
       Chef::Config[:knife][:encrypted_attributes] = Mash.new
       Chef::EncryptedAttribute::RemoteClients.cache.clear
+      Chef::EncryptedAttribute::RemoteNodes.cache.clear
       Chef::EncryptedAttribute::RemoteUsers.cache.clear
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
 
