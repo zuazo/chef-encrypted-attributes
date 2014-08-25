@@ -2,6 +2,12 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.3.0:
+
+* gemspec: added the missing CONTRIBUTING.md file
+* README: replaced exist_on_node? by exist? in users_data_bag example
+* Added the required `:node_search` option (fixes the `"role:..."` examples).
+
 ## 0.2.0:
 
 * Deprecate `#exists?` methods in favor of `#exist?` methods

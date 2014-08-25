@@ -5,7 +5,7 @@ chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : '~> 11.4'
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'
   s.version = ::Chef::EncryptedAttribute::VERSION
-  s.date = '2014-08-12'
+  s.date = '2014-08-25'
   s.platform = Gem::Platform::RUBY
   s.summary = 'Chef Encrypted Attributes'
   s.description = 'Chef plugin to add Node encrypted attributes support using client keys'
