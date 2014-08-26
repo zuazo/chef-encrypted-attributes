@@ -182,7 +182,7 @@
 <h2>
 <a name="chefencryptedattribute-api" class="anchor" href="#chefencryptedattribute-api"><span class="octicon octicon-link"></span></a>Chef::EncryptedAttribute API</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/API.md">API.md</a> file for a more detailed documentation about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
 
 <h2>
 <a name="chef-users-limitation" class="anchor" href="#chef-users-limitation"><span class="octicon octicon-link"></span></a>Chef Users Limitation</h2>
@@ -222,7 +222,7 @@
 <div class="highlight highlight-ruby"><pre><span class="n">knife</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:users</span><span class="o">]</span> <span class="o">=</span> <span class="s1">'*'</span> <span class="c1"># allow access to all knife users</span>
 </pre></div>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/API.md#configuration">API Configuration</a> section for more configuration values.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/API.md#configuration">API Configuration</a> section for more configuration values.</p>
 
 <h3>
 <a name="knife-encrypted-attribute-show" class="anchor" href="#knife-encrypted-attribute-show"><span class="octicon octicon-link"></span></a>knife encrypted attribute show</h3>
@@ -369,19 +369,19 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 </table><h2>
 <a name="internal-documentation" class="anchor" href="#internal-documentation"><span class="octicon octicon-link"></span></a>Internal Documentation</h2>
 
-<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
+<p>See the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/INTERNAL.md">INTERNAL.md</a> file for a more low level documentation.</p>
 
 <h2>
 <a name="using-signed-gems" class="anchor" href="#using-signed-gems"><span class="octicon octicon-link"></span></a>Using Signed Gems</h2>
 
 <p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain the official signature here:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/certs/team_onddo.crt
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.3.0/certs/team_onddo.crt
 </code></pre>
 
 <p>To be sure the gem you install has not been tampered with:</p>
 
-<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/certs/team_onddo.crt)
+<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.3.0/certs/team_onddo.crt)
 $ gem install chef-encrypted-attributes -P MediumSecurity
 </code></pre>
 
@@ -395,7 +395,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <h2>
 <a name="security-notes" class="anchor" href="#security-notes"><span class="octicon octicon-link"></span></a>Security Notes</h2>
 
-<p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/INTERNAL.md">internal documentation</a> for public review. The code was originally based on <em>Encrypted Data Bags</em> and <a href="https://github.com/Nordstrom/chef-vault">chef-vault</a> implementations, then improved.</p>
+<p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/INTERNAL.md">internal documentation</a> for public review. The code was originally based on <em>Encrypted Data Bags</em> and <a href="https://github.com/Nordstrom/chef-vault">chef-vault</a> implementations, then improved.</p>
 
 <p>Still, this gem should be considered experimental until audited by professional cryptographers.</p>
 
@@ -404,7 +404,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 
 <p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of <code>chef-encrypted-attributes</code> users, you can report it securely by sending a GPG encrypted message. Please use the following key:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.2.0/zuazo.gpg
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.3.0/zuazo.gpg
 </code></pre>
 
 <p>The key fingerprint is (or should be):</p>
@@ -415,14 +415,14 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <h2>
 <a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
 
-<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/TESTING.md">TESTING.md</a>.</p>
+<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/TESTING.md">TESTING.md</a>.</p>
 
 <h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <p>Please do not hesitate to <a href="https://github.com/onddo/chef-encrypted-attributes/issues/new">open an issue</a> with any questions or problems.</p>
 
-<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.2.0/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/0.3.0/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
 
 <h2>
 <a name="license-and-author" class="anchor" href="#license-and-author"><span class="octicon octicon-link"></span></a>License and Author</h2>
