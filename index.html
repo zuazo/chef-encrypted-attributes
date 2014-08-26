@@ -33,8 +33,8 @@
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://gemnasium.com/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat" alt="Dependency Status"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes?branch=0.2.0"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.2.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.2.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.2.0.svg?style=flat" alt="Coverage Status"></a></p>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.3.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.3.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.3.0.svg?style=flat" alt="Coverage Status"></a></p>
 
 <p><a href="http://www.getchef.com">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
 
@@ -45,7 +45,8 @@
 
 <p>Node attributes are encrypted using chef client and user keys with public key infrastructure (PKI). You can choose which clients, nodes or users will be able to read the attribute.</p>
 
-<p>Node clients with read access can be specified using a <code>client_search</code> query. In case new nodes are added or removed, the data will be re-encrypted in the next <em>Chef Run</em> of the encrypting node (using the <code>#update</code> method shown below).</p>
+<p>Node clients with read access can be specified using a <code>client_search</code> query. In case new nodes are added or removed, the data will be re-encrypted in the next <em>Chef Run</em> of the encrypting node (using the <code>#update</code> method shown below).
+<em>Chef Nodes</em> with read access can be specified using a <code>node_search</code> query. In case new nodes are added or removed, the data will be re-encrypted in the next <em>Chef Run</em> of the encrypting node (using the <code>#update</code> method shown below). Similarly, a <code>client_search</code> query can be used to allow <em>Chef Clients</em> to read the attribute.</p>
 
 <h2>
 <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
@@ -110,8 +111,11 @@
 <div class="highlight highlight-ruby"><pre><span class="n">chef_gem</span> <span class="s2">"chef-encrypted-attributes"</span>
 <span class="nb">require</span> <span class="s2">"chef-encrypted-attributes"</span>
 
+<span class="c1"># Allow all admin clients to read the attributes encrypted by me</span>
+<span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:client_search</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"admin:true"</span>
+
 <span class="c1"># Allow all webapp nodes to read the attributes encrypted by me</span>
-<span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:client_search</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"role:webapp"</span>
+<span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">[</span><span class="ss">:encrypted_attributes</span><span class="o">][</span><span class="ss">:node_search</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"role:webapp"</span>
 
 <span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedAttribute</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">node</span><span class="o">[</span><span class="s2">"myapp"</span><span class="o">][</span><span class="s2">"encrypted_data"</span><span class="o">]</span><span class="p">)</span>
   <span class="c1"># when can used #load here as above if we need the `encrypted_data` outside this `if`</span>
@@ -253,7 +257,7 @@ $ knife encrypted attribute create ftp.example.com myapp.ftp_password \
 <h3>
 <a name="knife-encrypted-attribute-update" class="anchor" href="#knife-encrypted-attribute-update"><span class="octicon octicon-link"></span></a>knife encrypted attribute update</h3>
 
-<p>Updates who can read the attribute (for <code>:client_search</code> changes).</p>
+<p>Updates who can read the attribute (for <code>:client_search</code> and <code>:node_search</code> changes).</p>
 
 <pre><code>$ knife encrypted attribute update NODE ATTRIBUTE (options)
 </code></pre>
@@ -264,7 +268,7 @@ $ knife encrypted attribute create ftp.example.com myapp.ftp_password \
 
 <pre><code>$ knife encrypted attribute update ftp.example.com myapp.ftp_password \
     --client-search admin:true \
-    --client-search role:webapp \
+    --node-search role:webapp \
     -U bob -U alice
 </code></pre>
 
@@ -285,7 +289,7 @@ $ knife encrypted attribute create ftp.example.com myapp.ftp_password \
 <pre><code>$ export EDITOR=vi
 $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
     --client-search admin:true \
-    --client-search role:webapp \
+    --node-search role:webapp \
     -U bob -U alice
 </code></pre>
 
@@ -331,6 +335,13 @@ $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
 <td>-C</td>
     <td>--client-search</td>
     <td>Client search query. Can be specified multiple times</td>
+    <td> </td>
+    <td>create, edit, update</td>
+  </tr>
+<tr>
+<td>-N</td>
+    <td>--node-search</td>
+    <td>Node search query. Can be specified multiple times</td>
     <td> </td>
     <td>create, edit, update</td>
   </tr>
