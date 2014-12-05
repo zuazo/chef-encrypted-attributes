@@ -28,7 +28,7 @@ describe Chef::EncryptedAttribute::RemoteNodes do
     allow(@RemoteNodes).to receive(:search)
   end
 
-  it 'should include EncryptedAttribute::SearchHelper methods' do
+  it 'includes EncryptedAttribute::SearchHelper methods' do
     expect(@RemoteNodes).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
@@ -48,17 +48,17 @@ describe Chef::EncryptedAttribute::RemoteNodes do
       end
     end
 
-    it 'should get client public_keys using SearchHelper' do
+    it 'gets client public_keys using SearchHelper' do
       allow(@RemoteNodes).to receive(:search).and_return(@nodes)
       expect(@RemoteNodes.search_public_keys).to eql(@public_keys)
     end
 
-    it 'should return empty array for empty search results' do
+    it 'returns empty array for empty search results' do
       allow(@RemoteNodes).to receive(:search).and_return({})
       expect(@RemoteNodes.search_public_keys).to eql([])
     end
 
-    it 'should do a search with the correct arguments' do
+    it 'does a search with the correct arguments' do
       query = 'role:webapp'
       expect(@RemoteNodes).to receive(:search).once.with(
         :node,
@@ -70,7 +70,7 @@ describe Chef::EncryptedAttribute::RemoteNodes do
       @RemoteNodes.search_public_keys(query)
     end
 
-    it 'should do "*:*" search by default' do
+    it 'does "*:*" search by default' do
       expect(@RemoteNodes).to receive(:search).with(
         :node,
         '*:*',
@@ -81,7 +81,7 @@ describe Chef::EncryptedAttribute::RemoteNodes do
       @RemoteNodes.search_public_keys
     end
 
-    it 'should cache search results for multiple calls' do
+    it 'caches search results for multiple calls' do
       query = 'role:webapp'
       expect(@RemoteNodes).to receive(:search).once.with(
         :node,

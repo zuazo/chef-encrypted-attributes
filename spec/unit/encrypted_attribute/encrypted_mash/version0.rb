@@ -28,16 +28,16 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
 
   context '#new' do
 
-    it 'should create an EncryptedMash::Version0 object without errors' do
+    it 'creates an EncryptedMash::Version0 object without errors' do
       expect { @EncryptedMashVersion0.new }.not_to raise_error
     end
 
-    it 'should set the CHEF_TYPE key' do
+    it 'sets the CHEF_TYPE key' do
       o = @EncryptedMashVersion0.new
       expect(o[@EncryptedMash::CHEF_TYPE]).to eql(@EncryptedMash::CHEF_TYPE_VALUE)
     end
 
-    it 'should set the JSON_CLASS key' do
+    it 'sets the JSON_CLASS key' do
       o = @EncryptedMashVersion0.new
       expect(o[@EncryptedMash::JSON_CLASS]).to eql(@EncryptedMashVersion0.to_s)
     end
@@ -46,14 +46,14 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
 
   context '#encrypt and #can_be_decrypted_by?' do
 
-    it 'should encrypt a value passing a OpenSSL::PKey::RSA key' do
+    it 'encrypts a value passing a OpenSSL::PKey::RSA key' do
       body = @EncryptedMashVersion0.new
       expect(body.can_be_decrypted_by?(@key1)).to eql(false)
       body.encrypt('value1', @key1.public_key)
       expect(body.can_be_decrypted_by?(@key1)).to eql(true)
     end
 
-    it 'should encrypt a value passing a Ruby 1.9.2 OpenSSL::PKey::RSA key' do
+    it 'encrypts a value passing a Ruby 1.9.2 OpenSSL::PKey::RSA key' do
       private_key = [
         '-----BEGIN RSA PRIVATE KEY-----',
         'MIIEpAIBAAKCAQEA5DXvCHjiXlee7SR69w88TQxc+XS7THnNCn2D9vXS8c0XARoE',
@@ -112,14 +112,14 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect(body.can_be_decrypted_by?(public_key_ruby192.join("\n"))).to eql(true)
     end
 
-    it 'should encrypt a value passing a PEM String key' do
+    it 'encrypts a value passing a PEM String key' do
       body = @EncryptedMashVersion0.new
       expect(body.can_be_decrypted_by?(@key1)).to eql(false)
       body.encrypt('value1', @key1.public_key.to_pem)
       expect(body.can_be_decrypted_by?(@key1)).to eql(true)
     end
 
-    it 'should encrypt a value passing a OpenSSL::PKey::RSA array' do
+    it 'encrypts a value passing a OpenSSL::PKey::RSA array' do
       keys = [ @key1, @key2 ]
       body = @EncryptedMashVersion0.new
       expect(body.can_be_decrypted_by?(keys)).to eql(false)
@@ -127,7 +127,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect(body.can_be_decrypted_by?(keys)).to eql(true)
     end
 
-    it 'should encrypt a value passing a Strings array' do
+    it 'encrypts a value passing a Strings array' do
       keys = [ @key1, @key2 ]
       body = @EncryptedMashVersion0.new
       expect(body.can_be_decrypted_by?(keys)).to eql(false)
@@ -135,18 +135,18 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect(body.can_be_decrypted_by?(keys)).to eql(true)
     end
 
-    it 'should throw an InvalidPrivateKey error if the key is invalid' do
+    it 'throws an InvalidPrivateKey error if the key is invalid' do
       body = @EncryptedMashVersion0.new
       expect { body.encrypt('value1', 'invalid-key') }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
     end
 
-    it 'should throw an InvalidPrivateKey error if the public key is missing' do
+    it 'throws an InvalidPrivateKey error if the public key is missing' do
       allow_any_instance_of(OpenSSL::PKey::RSA).to receive(:public?).and_return(false)
       body = @EncryptedMashVersion0.new
       expect { body.encrypt('value1', @key1.public_key) }.to raise_error(Chef::EncryptedAttribute::InvalidPublicKey)
     end
 
-    it 'should throw an error if there is an RSA Error' do
+    it 'throws an error if there is an RSA Error' do
       key = OpenSSL::PKey::RSA.new(32) # will raise "OpenSSL::PKey::RSAError: data too large for key size" on encryption
       body = @EncryptedMashVersion0.new
       expect { body.encrypt('value1', key) }.to raise_error(Chef::EncryptedAttribute::EncryptionFailure)
@@ -159,33 +159,33 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
     [
       true, false, 0, 'value1', [], {}
     ].each do |v|
-      it "should decrypt an encrypted #{v}" do
+      it "decrypts an encrypted #{v}" do
         body = @EncryptedMashVersion0.new
         body.encrypt(v, @key1.public_key)
         expect(body.decrypt(@key1)).to eql(v)
       end
     end
 
-    it 'should throw an InvalidPrivateKey error if the private key is invalid' do
+    it 'throws an InvalidPrivateKey error if the private key is invalid' do
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', @key1.public_key)
       expect { body.decrypt('invalid-private-key') }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key is invalid:/)
     end
 
-    it 'should throw an InvalidPrivateKey error if only the public key is provided' do
+    it 'throws an InvalidPrivateKey error if only the public key is provided' do
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', @key1.public_key)
       expect { body.decrypt(@key1.public_key) }.to raise_error(Chef::EncryptedAttribute::InvalidPrivateKey, /The provided key for decryption is invalid, a valid public and private key is required\./)
     end
 
-    it 'should throw a DecryptionFailure error if the private key cannot decrypt it' do
+    it 'throws a DecryptionFailure error if the private key cannot decrypt it' do
       bad_key = @key2
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', @key1.public_key)
       expect { body.decrypt(bad_key) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
-    it 'should throw a DecryptionFailure error if the data is corrupted and cannot be decrypted' do
+    it 'throws a DecryptionFailure error if the data is corrupted and cannot be decrypted' do
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', @key1.public_key)
       body['encrypted_data'] = Hash[body['encrypted_data'].map do |k, v|
@@ -194,7 +194,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /OpenSSL::PKey::RSAError/)
     end
 
-    it 'should throw a DecryptionFailure error if the embedded JSON is corrupted' do
+    it 'throws a DecryptionFailure error if the embedded JSON is corrupted' do
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', @key1.public_key)
       body['encrypted_data'] = Hash[body['encrypted_data'].map do |k, v|
@@ -207,14 +207,14 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
 
   context '#needs_update?' do
 
-    it 'should return false if there no new keys' do
+    it 'returns false if there no new keys' do
       keys = [ @key1.public_key ]
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', keys)
       expect(body.needs_update?(keys)).to be_falsey
     end
 
-    it 'should return true if there are new keys' do
+    it 'returns true if there are new keys' do
       keys = [ @key1.public_key ]
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', keys)
@@ -222,14 +222,14 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       expect(body.needs_update?(keys)).to be_truthy
     end
 
-    it 'should return true if some keys are removed' do
+    it 'returns true if some keys are removed' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', keys)
       expect(body.needs_update?(keys[0])).to be_truthy
     end
 
-    it 'should return false if the keys are the same, but in different order or format' do
+    it 'returns false if the keys are the same, but in different order or format' do
       keys = [ @key1.public_key, @key2.public_key ]
       body = @EncryptedMashVersion0.new
       body.encrypt('value1', keys)

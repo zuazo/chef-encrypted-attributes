@@ -29,6 +29,7 @@ require 'chef-encrypted-attributes'
 require 'chef/exceptions'
 
 require 'rspec/autorun'
+require 'should_not/rspec'
 
 require 'support/platform_helpers'
 

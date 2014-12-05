@@ -32,28 +32,28 @@ describe Chef::EncryptedAttribute::LocalNode do
     Chef::Config[:client_key] = @prev_client_key
   end
 
-  it 'should create a local node without errors' do
+  it 'creates a local node without errors' do
     expect { @LocalNode.new }.not_to raise_error
   end
 
-  it '#name should return the local node name' do
+  it '#name returns the local node name' do
     expect(@local_node.name).to eql(Chef::Config[:node_name])
   end
 
-  it '#key should return a PKey::RSA instance' do
+  it '#key returns a PKey::RSA instance' do
     expect(@local_node.key).to be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
-  it '#key should return the local node key' do
+  it '#key returns the local node key' do
     key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read())
     expect(@local_node.key.to_s).to eql(key.to_s)
   end
 
-  it '#public_key should return a RSA instance' do
+  it '#public_key returns a RSA instance' do
     expect(@local_node.public_key).to be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
-  it '#public_key should return the local node public_key' do
+  it '#public_key returns the local node public_key' do
     public_key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read()).public_key
     expect(@local_node.public_key.to_s).to eql(public_key.to_s)
   end

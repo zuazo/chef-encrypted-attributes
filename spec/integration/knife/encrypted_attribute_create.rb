@@ -62,7 +62,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       @node.destroy
     end
 
-    it 'the written node should be able to read the encrypted key' do
+    it 'the written node is able to read the encrypted key' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
@@ -72,7 +72,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
     end
 
-    it 'the client should not be able to read the encrypted attribute by default' do
+    it 'the client is not able to read the encrypted attribute by default' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
@@ -82,7 +82,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect { Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
-    it 'the client should be able to read the encrypted attribute if allowed' do
+    it 'the client is able to read the encrypted attribute if allowed' do
       knife = Chef::Knife::EncryptedAttributeCreate.new(['node1', 'encrypted.attribute', '--client-search', 'admin:true'])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
@@ -92,7 +92,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
     end
 
-    it 'the user should not be able to read the encrypted attribute by default' do
+    it 'the user is not able to read the encrypted attribute by default' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'encrypted.attribute' ])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
@@ -102,7 +102,7 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect { Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ]) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key\./)
     end
 
-    it 'the user should be able to read the encrypted attribute if allowed' do
+    it 'the user is able to read the encrypted attribute if allowed' do
       knife = Chef::Knife::EncryptedAttributeCreate.new(['node1', 'encrypted.attribute', '--encrypted-attribute-user', @admin_user.name])
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
@@ -112,21 +112,21 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect(Chef::EncryptedAttribute.load_from_node('node1', [ 'encrypted', 'attribute' ])).to eql('5')
     end
 
-    it 'should print error message when the attribute exists' do
+    it 'prints error message when the attribute exists' do
       Chef::EncryptedAttribute.create_on_node('node1', [ 'existent' ], 'random-data')
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1', 'existent' ])
       expect(knife.ui).to receive(:fatal).with('Encrypted attribute already exists')
       expect { knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when a node name is not provided' do
+    it 'prints usage and exit when a node name is not provided' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([])
       expect(knife).to receive(:show_usage)
       expect(knife.ui).to receive(:fatal)
       expect { knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when an attribute is not provided' do
+    it 'prints usage and exit when an attribute is not provided' do
       knife = Chef::Knife::EncryptedAttributeCreate.new([ 'node1' ])
       expect(knife).to receive(:show_usage)
       expect(knife.ui).to receive(:fatal)

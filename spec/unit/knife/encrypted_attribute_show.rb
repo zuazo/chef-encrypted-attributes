@@ -30,28 +30,28 @@ describe Chef::Knife::EncryptedAttributeShow do
     allow(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(true)
   end
 
-  it 'should load the encrypted attribute' do
+  it 'loads the encrypted attribute' do
     expect(Chef::EncryptedAttribute).to receive(:load_from_node).and_return('unicorns drill accurately')
     @knife.name_args = %w{node1 encrypted.attribute}
     @knife.run
     expect(@stdout.string).to match(/unicorns drill accurately/)
   end
 
-  it 'should print error message when the attribute does not exists' do
+  it 'prints error message when the attribute does not exists' do
     expect(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(false)
     @knife.name_args = [ 'node1', 'non.existent' ]
     expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
     expect { @knife.run }.to raise_error(SystemExit)
   end
 
-  it 'should print usage and exit when a node name is not provided' do
+  it 'prints usage and exit when a node name is not provided' do
     @knife.name_args = []
     expect(@knife).to receive(:show_usage)
     expect(@knife.ui).to receive(:fatal)
     expect { @knife.run }.to raise_error(SystemExit)
   end
 
-  it 'should print usage and exit when an attribute is not provided' do
+  it 'prints usage and exit when an attribute is not provided' do
     @knife.name_args = [ 'node1' ]
     expect(@knife).to receive(:show_usage)
     expect(@knife.ui).to receive(:fatal)
@@ -70,7 +70,7 @@ describe Chef::Knife::EncryptedAttributeShow do
       'encrypted\\.attr.i\\\\\\\\.bu\\\\\\\\\.te' => [ 'encrypted.attr', 'i\\\\\\\\', 'bu\\\\\\\\.te' ],
     }.each do |str, ary|
 
-      it "should convert #{str.inspect} to #{ary.inspect}" do
+      it "converts #{str.inspect} to #{ary.inspect}" do
         expect(@knife.attribute_path_to_ary(str)).to eql(ary)
       end
 

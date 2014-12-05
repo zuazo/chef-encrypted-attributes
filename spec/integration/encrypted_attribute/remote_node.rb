@@ -42,11 +42,11 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     context '#name' do
 
-      it 'should return the node name' do
+      it 'returns the node name' do
         expect(@remote_node.name).to eql(@node_name)
       end
 
-      it 'should be able to set the node name' do
+      it 'is able to set the node name' do
         new_name = 'alice'
         @remote_node.name(new_name)
         expect(@remote_node.name).to eql(new_name)
@@ -56,16 +56,16 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     context '#load_attribute' do
 
-      it 'should read an existing node attribute' do
+      it 'reads an existing node attribute' do
         expect(@remote_node.load_attribute([ 'attr1' ])).to eql(@attr1)
         expect(@remote_node.load_attribute([ 'sub-attr', 'attr2' ])).to eql(@attr2)
       end
 
-      it 'should return nil if the attribute is not found' do
+      it 'returns nil if the attribute is not found' do
         expect(@remote_node.load_attribute([ 'non-existing', 'attr' ])).to eql(nil)
       end
 
-      it 'should raise an error if the attribute list is incorrect' do
+      it 'raises an error if the attribute list is incorrect' do
         expect { @remote_node.load_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
       end
 
@@ -73,20 +73,20 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     context '#save_attribute' do
 
-      it 'should save the attribute' do
+      it 'saves the attribute' do
         @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
         Chef::EncryptedAttribute::RemoteUsers.cache.clear
         expect(@remote_node.load_attribute([ 'saved-attr', 'subattr2' ])).to eql('A precious value')
       end
 
-      it 'should save attributes in the cache' do
+      it 'saves attributes in the cache' do
         Chef::EncryptedAttribute::RemoteUsers.cache.max_size(20)
         Chef::EncryptedAttribute::RemoteUsers.cache.clear
         @remote_node.save_attribute([ 'saved-attr', 'subattr2' ], 'A precious value')
         expect(@remote_node.load_attribute([ 'saved-attr', 'subattr2' ])).to eql('A precious value') # cached
       end
 
-      it 'should raise an error if the attribute list is incorrect' do
+      it 'throws an error if the attribute list is incorrect' do
         expect { @remote_node.save_attribute('incorrect-attr-ary', 'some value') }.to raise_error(ArgumentError)
       end
 
@@ -94,7 +94,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
     context '#delete_attribute' do
 
-      it 'should delete a node attribute' do
+      it 'deletes a node attribute' do
         node = Chef::Node.load(@node_name)
         expect(node['sub-attr']['attr2']).not_to eql(nil)
 
@@ -104,12 +104,12 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         expect(node['sub-attr']['attr2']).to eql(nil)
       end
 
-      it 'should ignore if the attribute does not exist' do
+      it 'ignores if the attribute does not exist' do
         expect(@node['non-existent-attr']).to eql(nil)
         expect(@remote_node.delete_attribute(['non-existent-attr'])).to eql(false)
       end
 
-      it 'should raise an error if the attribute list is incorrect' do
+      it 'raises an error if the attribute list is incorrect' do
         expect { @remote_node.delete_attribute('incorrect-attr-ary') }.to raise_error(ArgumentError)
       end
 

@@ -45,32 +45,32 @@ describe Chef::Knife::EncryptedAttributeShow do
       @node.destroy
     end
 
-    it 'should show the encrypted attribute' do
+    it 'shows the encrypted attribute' do
       @knife.name_args = %w{node1 encrypted.attribute}
       @knife.run
       expect(@stdout.string).to match(/unicorns drill accurately/)
     end
 
-    it 'should show the encrypted attribute if needs to be escaped' do
+    it 'shows the encrypted attribute if needs to be escaped' do
       @knife.name_args = %w{node1 encrypted.attri\.bu\te}
       @knife.run
       expect(@stdout.string).to match(/escaped unicorns/)
     end
 
-    it 'should print error message when the attribute does not exists' do
+    it 'prints error message when the attribute does not exists' do
       @knife.name_args = %w{node1 non.existent}
       expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
       expect { @knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when a node name is not provided' do
+    it 'prints usage and exit when a node name is not provided' do
       @knife.name_args = []
       expect(@knife).to receive(:show_usage)
       expect(@knife.ui).to receive(:fatal)
       expect { @knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when an attribute is not provided' do
+    it 'prints usage and exit when an attribute is not provided' do
       @knife.name_args = [ 'node1' ]
       expect(@knife).to receive(:show_usage)
       expect(@knife.ui).to receive(:fatal)

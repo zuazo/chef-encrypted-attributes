@@ -45,25 +45,25 @@ describe Chef::EncryptedAttribute::RemoteUsers do
 
   describe '#get_public_keys' do
 
-    it 'should return empty array by default' do
+    it 'returns empty array by default' do
       expect(@RemoteUsers.get_public_keys).to eql([])
     end
 
-    it 'should return all users with "*"' do
+    it 'returns all users with "*"' do
       expect(@RemoteUsers.get_public_keys('*').count).to eql(@users.count)
     end
 
-    it 'should return cached users with multiples "*"' do
+    it 'returns cached users with multiples "*"' do
       expect(@RemoteUsers).to receive(:get_all_public_keys).once.and_return('users1')
       expect(@RemoteUsers.get_public_keys('*')).to eql('users1')
       expect(@RemoteUsers.get_public_keys('*')).to eql('users1') # cached
     end
 
-    it 'should return only public keys specified' do
+    it 'returns only public keys specified' do
       expect(@RemoteUsers.get_public_keys([ 'user0', 'user1' ] ).count).to eql(2)
     end
 
-    it 'should return cached public keys on multiple calls' do
+    it 'returns cached public keys on multiple calls' do
       expect(Chef::User).to receive(:load).with('user0').once.and_return(@users[0])
       expect(@RemoteUsers.get_public_keys([ 'user0' ] )).to eql([ @users[0].public_key ])
       expect(@RemoteUsers.get_public_keys([ 'user0' ] )).to eql([ @users[0].public_key ]) # cached
@@ -74,13 +74,13 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       true, false, Hash.new, Object.new,
     ].each do |bad_users|
 
-      it "should thrown an ArgumentError for user list of kind #{bad_users.class.name} (#{bad_users.inspect})" do
+      it "throws an ArgumentError for user list of kind #{bad_users.class.name} (#{bad_users.inspect})" do
         expect { @RemoteUsers.get_public_keys(bad_users) }.to raise_error(ArgumentError)
       end
 
     end # each do |bad_users|
 
-    it 'should return valid public keys' do
+    it 'returns valid public keys' do
       pkey_pem = @RemoteUsers.get_public_keys([ 'user0' ])[0]
       expect(pkey_pem).to be_a(String)
       pkey = OpenSSL::PKey::RSA.new(pkey_pem)
@@ -94,7 +94,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       'anything_else' => Net::HTTPServerException,
     }.each do |code, exception|
 
-      it "should throw an #{exception.to_s} exception if the server returns a #{code} code" do
+      it "throws an #{exception.to_s} exception if the server returns a #{code} code" do
         allow(Chef::User).to receive(:load) do
           raise Net::HTTPServerException.new('Net::HTTPServerException',
             Net::HTTPResponse.new('1.1', code, 'Net::HTTPResponse')

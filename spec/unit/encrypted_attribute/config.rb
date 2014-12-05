@@ -23,18 +23,18 @@ describe Chef::EncryptedAttribute::Config do
     @Config = Chef::EncryptedAttribute::Config
   end
 
-  it 'should create an entire configuration with default values' do
+  it 'creates an entire configuration with default values' do
     expect { @Config.new }.not_to raise_error
   end
 
-  it 'should update the configuration from the constructor' do
+  it 'updates the configuration from the constructor' do
     expect(Chef::Log).not_to receive(:warn)
     config_hs = { :partial_search => true }
     expect_any_instance_of(@Config).to receive(:update!).with(config_hs).once
     config = @Config.new(config_hs)
   end
 
-  it 'should warn about unknown configuration values' do
+  it 'warns about unknown configuration values' do
     expect(Chef::Log).to receive(:warn).once
     @Config.new({
       :unknown_option => 'foo'
@@ -92,19 +92,19 @@ describe Chef::EncryptedAttribute::Config do
 
       describe "##{method}" do
 
-        it "should return the correct default value (#{values[:default].inspect[0..10]}...)" do
+        it "returns the correct default value (#{values[:default].inspect[0..10]}...)" do
           expect(@config.send(method)).to eql(values[:default])
         end
 
         values[:ok].each do |v_ok|
-          it "should accept #{v_ok.class.to_s} type (#{v_ok.inspect.inspect[0..10]}...)" do
+          it "accepts #{v_ok.class.to_s} type (#{v_ok.inspect.inspect[0..10]}...)" do
             expect { @config.send(method, v_ok) }.not_to raise_error
             expect(@config.send(method)).to eql(v_ok)
           end
         end
 
         values[:error].each do |v_error|
-          it "should not accept #{v_error.class.to_s} type (#{v_error.inspect[0..10]}...)" do
+          it "does not accept #{v_error.class.to_s} type (#{v_error.inspect[0..10]}...)" do
             expect { @config.send(method, v_error) }.to raise_error(Chef::Exceptions::ValidationFailed)
           end
         end
@@ -114,12 +114,12 @@ describe Chef::EncryptedAttribute::Config do
 
     end # methods each
 
-    it '#client_search should accept String type tunrning it into an Array' do
+    it '#client_search accepts String type tunrning it into an Array' do
       expect { @config.client_search('admin:false') }.not_to raise_error
       expect(@config.client_search).to eql([ 'admin:false' ])
     end
 
-    it '#node_search should accept String type tunrning it into an Array' do
+    it '#node_search  accepts String type tunrning it into an Array' do
       expect { @config.node_search('role:webapp') }.not_to raise_error
       expect(@config.node_search).to eql([ 'role:webapp' ])
     end
@@ -134,85 +134,85 @@ describe Chef::EncryptedAttribute::Config do
         @config.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
       end
 
-      it 'should update version value from a @Config class' do
+      it 'updates version value from a @Config class' do
         config2 = @Config.new
         config2.version(5)
         @config.update!(config2)
         expect(@config.version).to eql(config2.version)
       end
 
-      it 'should update partial_search values from a @Config class' do
+      it 'updates partial_search values from a @Config class' do
         config2 = @Config.new
         config2.partial_search(false)
         @config.update!(config2)
         expect(@config.partial_search).to eql(config2.partial_search)
       end
 
-      it 'should update client_search values from a @Config class' do
+      it 'updates client_search values from a @Config class' do
         config2 = @Config.new
         config2.client_search([ '*:*' ])
         @config.update!(config2)
         expect(@config.client_search).to eql(config2.client_search)
       end
 
-      it 'should update node_search values from a @Config class' do
+      it 'updates node_search values from a @Config class' do
         config2 = @Config.new
         config2.node_search([ '*:*' ])
         @config.update!(config2)
         expect(@config.node_search).to eql(config2.node_search)
       end
 
-      it 'should update users values from a @Config class' do
+      it 'updates users values from a @Config class' do
         config2 = @Config.new
         config2.users([ 'admin' ])
         @config.update!(config2)
         expect(@config.users).to eql(config2.users)
       end
 
-      it 'should update keys values from a @Config class' do
+      it 'updates keys values from a @Config class' do
         config2 = @Config.new
         config2.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
         @config.update!(config2)
         expect(@config.keys).to eql(config2.keys)
       end
 
-      it 'should update version value from a Hash with symbol keys' do
+      it 'updates version value from a Hash with symbol keys' do
         config2 = { :version => 5 }
         @config.update!(config2)
         expect(@config.version).to eql(config2[:version])
       end
 
-      it 'should update partial_search value from a Hash with symbol keys' do
+      it 'updates partial_search value from a Hash with symbol keys' do
         config2 = { :partial_search => false }
         @config.update!(config2)
         expect(@config.partial_search).to eql(config2[:partial_search])
       end
 
-      it 'should update client_search value from a Hash with symbol keys' do
+      it 'updates client_search value from a Hash with symbol keys' do
         config2 = { :client_search => [ '*:*' ] }
         @config.update!(config2)
         expect(@config.client_search).to eql(config2[:client_search])
       end
 
-      it 'should update node_search value from a Hash with symbol keys' do
+      it 'updates node_search value from a Hash with symbol keys' do
         config2 = { :node_search => [ '*:*' ] }
         @config.update!(config2)
         expect(@config.node_search).to eql(config2[:node_search])
       end
 
-      it 'should update users value from a Hash with symbol keys' do
+      it 'updates users value from a Hash with symbol keys' do
         config2 = { :users => [ 'admin' ] }
         @config.update!(config2)
         expect(@config.users).to eql(config2[:users])
       end
 
-      it 'should update keys value from a Hash with symbol keys' do
+      it 'updates keys value from a Hash with symbol keys' do
         config2 = { :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ] }
         @config.update!(config2)
         expect(@config.keys).to eql(config2[:keys])
       end
 
-      it 'should update multiple values from a Hash with different kind of keys' do
+      it 'updates multiple values from a Hash with different kind of keys' do
         config2 = {
           'partial_search' => false,
           :client_search => [],
@@ -231,33 +231,33 @@ describe Chef::EncryptedAttribute::Config do
 
     context '#[]' do
 
-        it 'should read a configuration variable' do
+        it 'reads a configuration variable' do
           config = @Config.new({ :partial_search => true })
           expect(config[:partial_search]).to eql(true)
         end
 
-        it 'should ignore non existing configuration options' do
+        it 'ignores non existing configuration options' do
           config = @Config.new
           expect { config[:random_config_options] }.not_to raise_error
         end
 
-    end
+    end # context #[]
 
     context '#[]=' do
 
-        it 'should write a configuration variable' do
-          config = @Config.new({ :partial_search => false })
-          expect(config[:partial_search]).to eql(false)
-          config[:partial_search] = true
-          expect(config[:partial_search]).to eql(true)
-        end
+      it 'writes a configuration variable' do
+        config = @Config.new({ :partial_search => false })
+        expect(config[:partial_search]).to eql(false)
+        config[:partial_search] = true
+        expect(config[:partial_search]).to eql(true)
+      end
 
-        it 'should ignore non existing configuration options' do
-          config = @Config.new
-          expect { config[:random_config_options] = 5 }.not_to raise_error
-        end
+      it 'ignores non existing configuration options' do
+        config = @Config.new
+        expect { config[:random_config_options] = 5 }.not_to raise_error
+      end
 
-    end
+    end # context #[]=
 
   end # describe Chef::EncryptedAttribute::Config instance
 

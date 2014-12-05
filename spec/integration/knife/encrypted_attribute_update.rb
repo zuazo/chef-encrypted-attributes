@@ -75,7 +75,7 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       @node1_client.destroy
     end
 
-    it 'the written node should be able to read the encrypted key after update' do
+    it 'the written node is able to read the encrypted key after update' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
         node1 encrypted.attribute
       ))
@@ -88,7 +88,7 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       ))).to eql('random-data')
     end
 
-    it 'the client should not be able to update the encrypted attribute by default' do
+    it 'the client is not able to update the encrypted attribute by default' do
       enc_attr = Chef::EncryptedAttribute.new
       enc_attr.create_on_node('node1', %w(encrypted attribute), 'random-data')
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
@@ -98,7 +98,7 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       expect { knife.run }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Attribute data cannot be decrypted by the provided key/)
     end
 
-    it 'should not update the encrypted attribute if the privileges are the same' do
+    it 'does not update the encrypted attribute if the privileges are the same' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
         node1 encrypted.attribute
         --client-search admin:true
@@ -115,7 +115,7 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       expect(@stdout.string).to match(/Encrypted attribute does not need updating\./)
     end
 
-    it 'should update the encrypted attribute if the privileges has changed' do
+    it 'updates the encrypted attribute if the privileges has changed' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
         node1 encrypted.attribute
         --client-search admin:true
@@ -132,20 +132,20 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       expect(@stdout.string).to match(/Encrypted attribute updated\./)
     end
 
-    it 'should print error message when the attribute does not exists' do
+    it 'prints error message when the attribute does not exists' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(node1 non.existent))
       expect(knife.ui).to receive(:fatal).with('Encrypted attribute not found')
       expect { knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when a node name is not provided' do
+    it 'prints usage and exit when a node name is not provided' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new([])
       expect(knife).to receive(:show_usage)
       expect(knife.ui).to receive(:fatal)
       expect { knife.run }.to raise_error(SystemExit)
     end
 
-    it 'should print usage and exit when an attribute is not provided' do
+    it 'prints usage and exit when an attribute is not provided' do
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(node1))
       expect(knife).to receive(:show_usage)
       expect(knife.ui).to receive(:fatal)

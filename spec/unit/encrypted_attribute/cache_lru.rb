@@ -25,11 +25,11 @@ describe Chef::EncryptedAttribute::CacheLru do
 
   describe '#new' do
 
-    it 'should create a cache without errors' do
+    it 'creates a cache without errors' do
       expect { @CacheLru.new }.not_to raise_error
     end
 
-    it 'should a cache with max_size as argument ' do
+    it 'creates a cache with max_size as argument ' do
       expect_any_instance_of(@CacheLru).to receive(:max_size).with(25).once
       @CacheLru.new(25)
     end
@@ -38,18 +38,18 @@ describe Chef::EncryptedAttribute::CacheLru do
 
   describe '#max_size' do
 
-    it 'should return 1024 by default' do
+    it 'returns 1024 by default' do
       cache = @CacheLru.new
       expect(cache.max_size).to eql(1024)
     end
 
-    it 'should be able to change the maximum size' do
+    it 'is able to change the maximum size' do
       cache = @CacheLru.new
       expect(cache.max_size(25)).to eql(25)
       expect(cache.max_size).to eql(25)
     end
 
-    it 'should reduce the cache size if max_size is decreased' do
+    it 'reduces the cache size if max_size is decreased' do
       cache = @CacheLru.new(25)
       (1..25).step.each do |x|
         cache[x.to_s] = x
@@ -67,11 +67,11 @@ describe Chef::EncryptedAttribute::CacheLru do
       @cache['key1'] = 'value1'
     end
 
-    it 'should read a cache value' do
+    it 'reads a cache value' do
       expect(@cache['key1']).to eql('value1')
     end
 
-    it 'should return nil if the key does not exist' do
+    it 'returns nil if the key does not exist' do
       expect(@cache['key2']).to eql(nil)
     end
 
@@ -82,19 +82,19 @@ describe Chef::EncryptedAttribute::CacheLru do
       @cache = @CacheLru.new(10)
     end
 
-    it 'should set a cache value' do
+    it 'sets a cache value' do
       @cache['key1'] = 'value1'
       expect(@cache['key1']).to eql('value1')
     end
 
-    it 'should not set more than max_size values' do
+    it 'does not set more than max_size values' do
       (1..20).step.each do |x|
         @cache[x.to_s] = x
       end
       expect(@cache.size).to eql(10)
     end
 
-    it 'should free items using LRU algorithm' do
+    it 'frees items using LRU algorithm' do
       # add 1..10
       (1..10).step.each { |x| @cache[x] = x }
       # refresh 4..8

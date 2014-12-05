@@ -36,7 +36,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
       end
 
-      it 'should call RemoteClients#search_public_keys only once' do
+      it 'calls RemoteClients#search_public_keys only once' do
         body = @EncryptedAttribute.create(0)
         expect(@RemoteClients).to receive(:search_public_keys).once.and_return([])
         @EncryptedAttribute.update(body)

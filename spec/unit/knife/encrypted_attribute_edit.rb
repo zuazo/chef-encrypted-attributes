@@ -38,28 +38,28 @@ describe Chef::Knife::EncryptedAttributeEdit do
       allow_any_instance_of(Chef::Knife::EncryptedAttributeEdit).to receive(:sleep)
     end
 
-    it 'should edit data in plain text' do
+    it 'edits data in plain text' do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute' ])
       expect(IO).to receive(:read).and_return('Attribute content')
       expect_any_instance_of(Chef::EncryptedAttribute).to receive(:create_on_node).with('node1', [ 'encrypted', 'attribute' ], 'Attribute content')
       knife.run
     end
 
-    it 'should edit data in JSON' do
+    it 'edits data in JSON' do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
       expect(IO).to receive(:read).and_return('{ "attribute": "in_json" }')
       expect_any_instance_of(Chef::EncryptedAttribute).to receive(:create_on_node).with('node1', [ 'encrypted', 'attribute' ], { 'attribute' => 'in_json' })
       knife.run
     end
 
-    it 'should accept JSON in quirk mode' do
+    it 'accepts JSON in quirk mode' do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
       expect(IO).to receive(:read).and_return('true')
       expect_any_instance_of(Chef::EncryptedAttribute).to receive(:create_on_node).with('node1', [ 'encrypted', 'attribute' ], true)
       knife.run
     end
 
-    it 'should throw an error for invalid JSON' do
+    it 'throws an error for invalid JSON' do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
       expect(IO).to receive(:read).and_return('Bad-json')
       expect_any_instance_of(Chef::EncryptedAttribute).not_to receive(:create_on_node)
