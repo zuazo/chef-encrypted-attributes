@@ -20,13 +20,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'ffi-yajl', '~> 1.0'
   s.add_dependency 'chef', chef_version
-
-  if RUBY_VERSION < '1.9'
-    s.add_development_dependency 'rake', '< 10.2'
-   # s.add_development_dependency 'mime-types', '< 2.0'
-  else
-    s.add_development_dependency 'rake', '~> 10.0'
+  if RUBY_VERSION < '1.9.3'
+    s.add_dependency 'mixlib-shellout', '< 1.6.1'
   end
+
+  s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'chef-zero', '~> 2.0'
   s.add_development_dependency 'rspec-core', '~> 2.14'
   s.add_development_dependency 'rspec-expectations', '~> 2.14'
