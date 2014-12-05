@@ -23,6 +23,7 @@ require 'chef/encrypted_attribute/remote_clients'
 
 class Chef
   class EncryptedAttribute
+    # Helpers to search nodes remotely and get its public keys
     class RemoteNodes
       extend ::Chef::EncryptedAttribute::SearchHelper
 
@@ -37,22 +38,20 @@ class Chef
         raise e unless e.response.code == '403'
         raise InsufficientPrivileges,
               "You cannot read #{node['name']} client key. Consider including "\
-              "the encrypted_attributes::expose_key recipe in the "\
+              'the encrypted_attributes::expose_key recipe in the '\
               "#{node['name']} node run list."
       end
 
-      def self.search_public_keys(search='*:*', partial_search=true)
+      def self.search_public_keys(search = '*:*', partial_search = true)
         escaped_query = escape_query(search)
-        if cache.has_key?(escaped_query)
-          cache[escaped_query]
-        else
-          cache[escaped_query] = search(:node, search, {
-            'name' => [ 'name' ],
-            'public_key' => [ 'public_key' ]
-          }, 1000, partial_search).map { |node| get_public_key(node) }.compact
-        end
+        return cache[escaped_query] if cache.key?(escaped_query)
+        cache[escaped_query] =
+          search(
+            :node, search,
+            { 'name' => %w(name), 'public_key' => %w(public_key) },
+            1000, partial_search
+          ).map { |node| get_public_key(node) }.compact
       end
-
     end
   end
 end

@@ -20,6 +20,7 @@ require 'chef/mixin/params_validate'
 
 class Chef
   class EncryptedAttribute
+    # Sets and reads encrypted attributes configuration options
     class Config
       include ::Chef::Mixin::ParamsValidate
 
@@ -29,111 +30,92 @@ class Chef
         :client_search,
         :node_search,
         :users,
-        :keys,
+        :keys
       ].freeze
 
-      def initialize(config=nil)
+      def initialize(config = nil)
         update!(config) unless config.nil?
       end
 
-      def version(arg=nil)
-        unless arg.nil? or not arg.kind_of?(String)
-          arg = Integer(arg) rescue arg
+      def version(arg = nil)
+        unless arg.nil? || !arg.is_a?(String)
+          begin
+            arg = Integer(arg)
+          rescue ArgumentError
+            arg
+          end
         end
+        set_or_return(:version, arg, kind_of: [Fixnum, String], default: 1)
+      end
+
+      def partial_search(arg = nil)
         set_or_return(
-          :version,
-          arg,
-          :kind_of => [ Fixnum, String ],
-          :default => 1
+          :partial_search, arg, kind_of: [TrueClass, FalseClass], default: true
         )
       end
 
-      def partial_search(arg=nil)
+      def client_search(arg = nil)
+        arg = [arg] unless arg.nil? || !arg.is_a?(String)
         set_or_return(
-          :partial_search,
-          arg,
-          :kind_of => [ TrueClass, FalseClass ],
-          :default => true
+          :client_search, arg,
+          kind_of: Array, default: [], callbacks: config_search_array_callbacks
         )
       end
 
-      def client_search(arg=nil)
-        unless arg.nil? or not arg.kind_of?(String)
-          arg = [ arg ]
-        end
+      def node_search(arg = nil)
+        arg = [arg] unless arg.nil? || !arg.is_a?(String)
         set_or_return(
-          :client_search,
-          arg,
-          :kind_of => Array,
-          :default => [],
-          :callbacks => config_search_array_callbacks
+          :node_search, arg,
+          kind_of: Array, default: [], callbacks: config_search_array_callbacks
         )
       end
 
-      def node_search(arg=nil)
-        unless arg.nil? or not arg.kind_of?(String)
-          arg = [ arg ]
-        end
+      def users(arg = nil)
         set_or_return(
-          :node_search,
-          arg,
-          :kind_of => Array,
-          :default => [],
-          :callbacks => config_search_array_callbacks
+          :users, arg,
+          kind_of: [String, Array], default: [],
+          callbacks: config_users_arg_callbacks
         )
       end
 
-      def users(arg=nil)
+      def keys(arg = nil)
         set_or_return(
-          :users,
-          arg,
-          :kind_of => [ String, Array ],
-          :default => [],
-          :callbacks => config_users_arg_callbacks
-        )
-      end
-
-      def keys(arg=nil)
-        set_or_return(
-          :keys,
-          arg,
-          :kind_of => Array,
-          :default => [],
-          :callbacks => config_valid_keys_array_callbacks
+          :keys, arg,
+          kind_of: Array, default: [],
+          callbacks: config_valid_keys_array_callbacks
         )
       end
 
       def update!(config)
-        if config.kind_of?(self.class)
+        if config.is_a?(self.class)
           OPTIONS.each do |attr|
             value = dup_object(config.send(attr))
-            self.instance_variable_set("@#{attr.to_s}", value)
+            instance_variable_set("@#{attr}", value)
           end
-        elsif config.kind_of?(Hash)
+        elsif config.is_a?(Hash)
           config.each do |attr, value|
-            attr = attr.to_sym if attr.kind_of?(String)
+            attr = attr.to_sym if attr.is_a?(String)
             if OPTIONS.include?(attr)
               value = dup_object(value)
-              self.send(attr, value)
+              send(attr, value)
             else
-              Chef::Log.warn("#{self.class.to_s}: configuration method not found: \"#{attr.to_s}\".")
+              Chef::Log.warn(
+                "#{self.class}: configuration method not found: "\
+                "#{attr.to_s.inspect}."
+              )
             end
           end
         end
       end
 
       def [](key)
-        key = key.to_sym if key.kind_of?(String)
-        if OPTIONS.include?(key)
-          self.send(key)
-        end
+        key = key.to_sym if key.is_a?(String)
+        send(key) if OPTIONS.include?(key)
       end
 
       def []=(key, value)
-        key = key.to_sym if key.kind_of?(String)
-        if OPTIONS.include?(key)
-          self.send(key, value)
-        end
+        key = key.to_sym if key.is_a?(String)
+        send(key, value) if OPTIONS.include?(key)
       end
 
       protected
@@ -146,7 +128,7 @@ class Chef
 
       def config_valid_search_array?(s_ary)
         s_ary.each do |s|
-          return false unless s.kind_of?(String)
+          return false unless s.is_a?(String)
         end
         true
       end
@@ -160,9 +142,9 @@ class Chef
       end
 
       def config_valid_user_arg?(users)
-        return users == '*' if users.kind_of?(String)
+        return users == '*' if users.is_a?(String)
         users.each do |u|
-          return false unless u.kind_of?(String) and u.match(/^[a-z0-9\-_]+$/)
+          return false unless u.is_a?(String) && u.match(/^[a-z0-9\-_]+$/)
         end
         true
       end
@@ -176,27 +158,25 @@ class Chef
       end
 
       def config_valid_key?(k)
-        rsa_k = case k
-        when OpenSSL::PKey::RSA
-          k
-        when String
-          begin
-            OpenSSL::PKey::RSA.new(k)
-          rescue OpenSSL::PKey::RSAError, TypeError
+        rsa_k =
+          case k
+          when OpenSSL::PKey::RSA then k
+          when String
+            begin
+              OpenSSL::PKey::RSA.new(k)
+            rescue OpenSSL::PKey::RSAError, TypeError
+              nil
+            end
+          else
             nil
           end
-        else
-          nil
-        end
         return false if rsa_k.nil?
         rsa_k.public?
       end
 
       def config_valid_keys_array?(k_ary)
         k_ary.each do |k|
-          unless config_valid_key?(k)
-            return false
-          end
+          return false unless config_valid_key?(k)
         end
         true
       end
@@ -208,7 +188,6 @@ class Chef
           end
         }
       end
-
     end
   end
 end

@@ -22,38 +22,37 @@ require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
+    # Helpers to get remote Chef Users keys
     class RemoteUsers
-
       def self.cache
         @@cache ||= Chef::EncryptedAttribute::CacheLru.new
       end
 
-      def self.get_public_keys(users=[])
+      def self.get_public_keys(users = [])
         if users == '*' # users are [a-z0-9\-_]+, cannot be *
-          if cache.has_key?('*')
-            cache['*']
-          else
-            cache['*'] = get_all_public_keys
-          end
-        elsif users.kind_of?(Array)
+          cache.key?('*') ? cache['*'] : cache['*'] = all_public_keys
+        elsif users.is_a?(Array)
           get_users_public_keys(users)
-        elsif not users.nil?
-          raise ArgumentError, "#{self.class.to_s}##{__method__} users argument must be an array or \"*\"."
+        elsif !users.nil?
+          fail ArgumentError,
+               "#{self.class}##{__method__} users argument must be an array "\
+               'or "*".'
         end
       end
 
-      protected
+      # protected
 
       def self.get_user_public_key(name)
-        return cache[name] if cache.has_key?(name)
+        return cache[name] if cache.key?(name)
         user = Chef::User.load(name)
         cache[name] = user.public_key
       rescue Net::HTTPServerException => e
         case e.response.code
         when '403'
-          raise InsufficientPrivileges, 'Your node needs admin privileges to be able to work with Chef Users.'
-        when '404' # Not Found
-          raise UserNotFound, "Chef User not found: \"#{name}\"."
+          raise InsufficientPrivileges,
+                'Your node needs admin privileges to be able to work with '\
+                'Chef Users.'
+        when '404' then raise UserNotFound, "Chef User not found: \"#{name}\"."
         else
           raise e
         end
@@ -63,11 +62,11 @@ class Chef
         users.map { |n| get_user_public_key(n) }
       end
 
-      def self.get_all_public_keys
-        # Chef::User.list(inflate=true) has a bug
+      def self.all_public_keys
+        # Chef::User.list(inflate=true) has a bug (fixed in 11.14.0)
+        # https://tickets.opscode.com/browse/CHEF-5328
         get_users_public_keys(Chef::User.list.keys)
       end
-
     end
   end
 end

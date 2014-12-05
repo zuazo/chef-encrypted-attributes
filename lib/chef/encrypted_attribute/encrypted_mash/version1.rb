@@ -19,10 +19,11 @@
 require 'chef/encrypted_attribute/encrypted_mash/version0'
 require 'chef/encrypted_attribute/exceptions'
 
-# Version1 format: using RSA with a shared secret and message authentication (HMAC)
 class Chef
   class EncryptedAttribute
     class EncryptedMash
+      # EncryptedMash Version1 format: using RSA with a shared secret and
+      # message authentication (HMAC)
       class Version1 < Chef::EncryptedAttribute::EncryptedMash::Version0
         SYMM_ALGORITHM = 'aes-256-cbc'
         HMAC_ALGORITHM = 'sha256'
@@ -33,14 +34,16 @@ class Chef
           public_keys = parse_public_keys(public_keys)
           # encrypt the data
           encrypted_data = symmetric_encrypt_value(value_json)
-          secrets['data'] = encrypted_data.delete('secret') # should no include the secret in clear
+          # should no include the secret in clear
+          secrets['data'] = encrypted_data.delete('secret')
           self['encrypted_data'] = encrypted_data
           # generate hmac (encrypt-then-mac), excluding the secret
           hmac = generate_hmac(json_encode(self['encrypted_data'].sort))
           secrets['hmac'] = hmac.delete('secret')
           self['hmac'] = hmac
           # encrypt the shared secrets
-          self['encrypted_secret'] = rsa_encrypt_multi_key(json_encode(secrets), public_keys)
+          self['encrypted_secret'] =
+            rsa_encrypt_multi_key(json_encode(secrets), public_keys)
           self
         end
 
@@ -49,12 +52,15 @@ class Chef
           enc_value = self['encrypted_data'].dup
           hmac = self['hmac'].dup
           # decrypt the shared secrets
-          secrets = json_decode(rsa_decrypt_multi_key(self['encrypted_secret'], key))
+          secrets =
+            json_decode(rsa_decrypt_multi_key(self['encrypted_secret'], key))
           enc_value['secret'] = secrets['data']
           hmac['secret'] = secrets['hmac']
           # check hmac (encrypt-then-mac -> mac-then-decrypt)
           unless hmac_matches?(hmac, json_encode(self['encrypted_data'].sort))
-            raise DecryptionFailure, 'Error decrypting encrypted attribute: invalid hmac. Most likely the data is corrupted.'
+            fail DecryptionFailure,
+                 'Error decrypting encrypted attribute: invalid hmac. Most '\
+                 'likely the data is corrupted.'
           end
           # decrypt the data
           value_json = symmetric_decrypt_value(enc_value)
@@ -64,77 +70,83 @@ class Chef
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
           parse_public_keys(keys).reduce(true) do |r, k|
-            r and data_can_be_decrypted_by_key?(self['encrypted_secret'], k)
+            r && data_can_be_decrypted_by_key?(self['encrypted_secret'], k)
           end
         end
 
         def needs_update?(keys)
           keys = parse_public_keys(keys)
-          not can_be_decrypted_by?(keys) && self['encrypted_secret'].keys.count == keys.count
+          !can_be_decrypted_by?(keys) ||
+            self['encrypted_secret'].keys.count != keys.count
         end
 
         protected
 
         def encrypted?
-          super and
-          self['encrypted_data'].has_key?('iv') and
-          self['encrypted_data']['iv'].kind_of?(String) and
-          self['encrypted_data'].has_key?('data') and
-          self['encrypted_data']['data'].kind_of?(String) and
-          self['encrypted_secret'].kind_of?(Hash) and
-          self['hmac'].kind_of?(Hash) and
-          self['hmac'].has_key?('data') and
-          self['hmac']['data'].kind_of?(String)
+          super &&
+            self['encrypted_data'].key?('iv') &&
+            self['encrypted_data']['iv'].is_a?(String) &&
+            self['encrypted_data'].key?('data') &&
+            self['encrypted_data']['data'].is_a?(String) &&
+            self['encrypted_secret'].is_a?(Hash) &&
+            self['hmac'].is_a?(Hash) &&
+            self['hmac'].key?('data') &&
+            self['hmac']['data'].is_a?(String)
         end
 
-        def symmetric_encrypt_value(value, algo=SYMM_ALGORITHM)
-          enc_value = Mash.new({ 'cipher' => algo })
+        def symmetric_encrypt_value(value, algo = SYMM_ALGORITHM)
+          enc_value = Mash.new('cipher' => algo)
           begin
             cipher = OpenSSL::Cipher.new(algo)
             cipher.encrypt
-            enc_value['secret'] = Base64.encode64(cipher.key = cipher.random_key)
+            enc_value['secret'] =
+              Base64.encode64(cipher.key = cipher.random_key)
             enc_value['iv'] = Base64.encode64(cipher.iv = cipher.random_iv)
             enc_data = cipher.update(value) + cipher.final
           rescue OpenSSL::Cipher::CipherError => e
-            raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
+            raise EncryptionFailure, "#{e.class.name}: #{e}"
           end
           enc_value['data'] = Base64.encode64(enc_data)
           enc_value
         end
 
-        def symmetric_decrypt_value(enc_value, algo=SYMM_ALGORITHM)
-          cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
+        def symmetric_decrypt_value(enc_value, algo = SYMM_ALGORITHM)
+          # TODO: maybe it's better to ignore [cipher] ?
+          cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo)
           cipher.decrypt
           # We must set key before iv: https://bugs.ruby-lang.org/issues/8221
           cipher.key = Base64.decode64(enc_value['secret'])
           cipher.iv = Base64.decode64(enc_value['iv'])
           cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
         rescue OpenSSL::Cipher::CipherError => e
-          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
-        def generate_hmac(data, algo=HMAC_ALGORITHM)
-          hmac = Mash.new({ 'cipher' => algo }) # [cipher] is ignored, only as info
+        def generate_hmac(data, algo = HMAC_ALGORITHM)
+          # [cipher] is ignored, only as info
+          hmac = Mash.new('cipher' => algo)
           digest = OpenSSL::Digest.new(algo)
           secret = OpenSSL::Random.random_bytes(digest.block_length)
           hmac['secret'] = Base64.encode64(secret)
-          hmac['data'] = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
+          hmac['data'] =
+            Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           hmac
-        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
+        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
+               RuntimeError => e
           # RuntimeError is raised for unsupported algorithms
-          raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
+          raise MessageAuthenticationFailure, "#{e.class.name}: #{e}"
         end
 
-        def hmac_matches?(orig_hmac, data, algo=HMAC_ALGORITHM)
+        def hmac_matches?(orig_hmac, data, algo = HMAC_ALGORITHM)
           digest = OpenSSL::Digest.new(algo)
           secret = Base64.decode64(orig_hmac['secret'])
           new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           orig_hmac['data'] == new_hmac
-        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError => e
+        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
+               RuntimeError => e
           # RuntimeError is raised for unsupported algorithms
-          raise MessageAuthenticationFailure, "#{e.class.name}: #{e.to_s}"
+          raise MessageAuthenticationFailure, "#{e.class.name}: #{e}"
         end
-
       end
     end
   end

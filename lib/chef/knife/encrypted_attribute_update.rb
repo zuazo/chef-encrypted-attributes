@@ -21,8 +21,8 @@ require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
+    # knife encrypted attribute update command
     class EncryptedAttributeUpdate < EncryptedAttributeShow
-
       include Knife::Core::EncryptedAttributeEditorOptions
 
       banner 'knife encrypted attribute update NODE ATTRIBUTE (options)'
@@ -52,14 +52,16 @@ class Chef
         end
 
         # update encrypted attribute
-        enc_attr = Chef::EncryptedAttribute.new(Chef::Config[:knife][:encrypted_attributes])
+        enc_attr =
+          Chef::EncryptedAttribute.new(
+            Chef::Config[:knife][:encrypted_attributes]
+          )
         if enc_attr.update_on_node(node_name, attr_ary)
           ui.info('Encrypted attribute updated.')
         else
           ui.info('Encrypted attribute does not need updating.')
         end
       end
-
     end
   end
 end

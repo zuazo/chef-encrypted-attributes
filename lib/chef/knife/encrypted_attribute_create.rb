@@ -21,14 +21,16 @@ require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
+    # knife encrypted attribute create command
     class EncryptedAttributeCreate < EncryptedAttributeShow
-
       include Knife::Core::EncryptedAttributeEditorOptions
 
       option :input_format,
-        :short => '-i FORMAT',
-        :long => '--input-format FORMAT',
-        :description => 'Input (EDITOR) format, supported formats are "plain" (default) and "json"'
+             short: '-i FORMAT',
+             long: '--input-format FORMAT',
+             description:
+                'Input (EDITOR) format, supported formats are "plain" '\
+                '(default) and "json"'
 
       banner 'knife encrypted attribute create NODE ATTRIBUTE (options)'
 
@@ -58,10 +60,12 @@ class Chef
 
         # create encrypted attribute
         output = edit_data(nil, config[:input_format])
-        enc_attr = Chef::EncryptedAttribute.new(Chef::Config[:knife][:encrypted_attributes])
+        enc_attr =
+          Chef::EncryptedAttribute.new(
+            Chef::Config[:knife][:encrypted_attributes]
+          )
         enc_attr.create_on_node(node_name, attr_ary, output)
       end
-
     end
   end
 end

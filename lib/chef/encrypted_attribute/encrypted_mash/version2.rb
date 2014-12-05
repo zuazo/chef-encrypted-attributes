@@ -21,16 +21,16 @@ require 'chef/encrypted_attribute/encrypted_mash/version1'
 require 'chef/encrypted_attribute/assertions'
 require 'chef/encrypted_attribute/exceptions'
 
-# Version2 format: using RSA with a shared secret and GCM
 class Chef
   class EncryptedAttribute
     class EncryptedMash
+      # EncryptedMash Version2 format: using RSA with a shared secret and GCM
       class Version2 < Chef::EncryptedAttribute::EncryptedMash::Version1
         include Chef::EncryptedAttribute::Assertions
 
         ALGORITHM = 'aes-256-gcm'
 
-        def initialize(enc_hs=nil)
+        def initialize(enc_hs = nil)
           assert_aead_requirements_met!(ALGORITHM)
           super
         end
@@ -40,7 +40,8 @@ class Chef
           public_keys = parse_public_keys(public_keys)
           # encrypt the data
           encrypted_data = symmetric_encrypt_value(value_json)
-          secret = encrypted_data.delete('secret') # should no include the secret in clear
+          # should no include the secret in clear
+          secret = encrypted_data.delete('secret')
           self['encrypted_data'] = encrypted_data
           # encrypt the shared secret
           self['encrypted_secret'] = rsa_encrypt_multi_key(secret, public_keys)
@@ -51,7 +52,8 @@ class Chef
           key = parse_decryption_key(key)
           enc_value = self['encrypted_data'].dup
           # decrypt the shared secret
-          enc_value['secret'] = rsa_decrypt_multi_key(self['encrypted_secret'], key)
+          enc_value['secret'] =
+            rsa_decrypt_multi_key(self['encrypted_secret'], key)
           # decrypt the data
           value_json = symmetric_decrypt_value(enc_value)
           json_decode(value_json)
@@ -60,18 +62,18 @@ class Chef
         protected
 
         def encrypted?
-          Version0.instance_method(:encrypted?).bind(self).call and
-          self['encrypted_data'].has_key?('iv') and
-          self['encrypted_data']['iv'].kind_of?(String) and
-          self['encrypted_data'].has_key?('auth_tag') and
-          self['encrypted_data']['auth_tag'].kind_of?(String) and
-          self['encrypted_data'].has_key?('data') and
-          self['encrypted_data']['data'].kind_of?(String) and
-          self['encrypted_secret'].kind_of?(Hash)
+          Version0.instance_method(:encrypted?).bind(self).call &&
+            self['encrypted_data'].key?('iv') &&
+            self['encrypted_data']['iv'].is_a?(String) &&
+            self['encrypted_data'].key?('auth_tag') &&
+            self['encrypted_data']['auth_tag'].is_a?(String) &&
+            self['encrypted_data'].key?('data') &&
+            self['encrypted_data']['data'].is_a?(String) &&
+            self['encrypted_secret'].is_a?(Hash)
         end
 
-        def symmetric_encrypt_value(value, algo=ALGORITHM)
-          enc_value = Mash.new({ 'cipher' => algo })
+        def symmetric_encrypt_value(value, algo = ALGORITHM)
+          enc_value = Mash.new('cipher' => algo)
           begin
             cipher = OpenSSL::Cipher.new(algo)
             cipher.encrypt
@@ -80,14 +82,15 @@ class Chef
             enc_data = cipher.update(value) + cipher.final
             enc_value['auth_tag'] = Base64.encode64(cipher.auth_tag)
           rescue OpenSSL::Cipher::CipherError => e
-            raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
+            raise EncryptionFailure, "#{e.class.name}: #{e}"
           end
           enc_value['data'] = Base64.encode64(enc_data)
           enc_value
         end
 
-        def symmetric_decrypt_value(enc_value, algo=ALGORITHM)
-          cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo) # TODO maybe it's better to ignore [cipher] ?
+        def symmetric_decrypt_value(enc_value, algo = ALGORITHM)
+          # TODO: maybe it's better to ignore [cipher] ?
+          cipher = OpenSSL::Cipher.new(enc_value['cipher'] || algo)
           cipher.decrypt
           # We must set key before iv: https://bugs.ruby-lang.org/issues/8221
           cipher.key = enc_value['secret']
@@ -95,9 +98,8 @@ class Chef
           cipher.auth_tag = Base64.decode64(enc_value['auth_tag'])
           cipher.update(Base64.decode64(enc_value['data'])) + cipher.final
         rescue OpenSSL::Cipher::CipherError => e
-          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
-
       end
     end
   end

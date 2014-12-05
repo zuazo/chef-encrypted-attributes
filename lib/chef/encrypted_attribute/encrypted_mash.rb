@@ -21,39 +21,40 @@ require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
+    # Mash structure with embedded Mash structure encrypted. This class is
+    # oriented to be easily integrable with chef in the future using JSONCompat
     class EncryptedMash < Mash
-
-      # This class is oriented to be easily integrable with
-      # chef in the future using JSONCompat
-
       JSON_CLASS =      'x_json_class'.freeze
       CHEF_TYPE =       'chef_type'.freeze
       CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
 
-      VERSION_PREFIX = "#{self.name}::Version"
+      VERSION_PREFIX = "#{name}::Version"
 
-      def initialize(enc_hs=nil)
+      def initialize(enc_hs = nil)
         super
         self[JSON_CLASS] = self.class.name
         self[CHEF_TYPE] = CHEF_TYPE_VALUE
-        update_from!(enc_hs) if enc_hs.kind_of?(Hash)
+        update_from!(enc_hs) if enc_hs.is_a?(Hash)
       end
 
-      %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
+      %w(encrypt decrypt can_be_decrypted_by? needs_update?).each do |meth|
         define_method(meth) do
-          raise NotImplementedError, "#{self.class.to_s}##{__method__} method not implemented."
+          fail NotImplementedError,
+               "#{self.class}##{__method__} method not implemented."
         end
       end
 
       def self.exist?(enc_hs)
-        enc_hs.kind_of?(Hash) and
-        enc_hs.has_key?(JSON_CLASS) and
-        enc_hs[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ and
-        enc_hs.has_key?(CHEF_TYPE) and enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
+        enc_hs.is_a?(Hash) &&
+          enc_hs.key?(JSON_CLASS) &&
+          enc_hs[JSON_CLASS] =~ /^#{Regexp.escape(Module.nesting[1].name)}/ &&
+          enc_hs.key?(CHEF_TYPE) && enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
       end
 
       def self.exists?(*args)
-        Chef::Log.warn("#{self.name}.exists? is deprecated in favor of #{self.name}.exist?.")
+        Chef::Log.warn(
+          "#{name}.exists? is deprecated in favor of #{name}.exist?."
+        )
         exist?(*args)
       end
 
@@ -75,7 +76,9 @@ class Chef
       # Update the EncryptedMash from Hash
       def update_from!(enc_hs)
         unless self.class.exist?(enc_hs)
-          raise UnacceptableEncryptedAttributeFormat, 'Trying to construct invalid encrypted attribute. Maybe it is not encrypted?'
+          fail UnacceptableEncryptedAttributeFormat,
+               'Trying to construct invalid encrypted attribute. Maybe it is '\
+               'not encrypted?'
         end
         enc_hs = enc_hs.dup
         enc_hs.delete(JSON_CLASS)
@@ -87,22 +90,22 @@ class Chef
       def self.json_create(enc_hs)
         klass = string_to_klass(enc_hs[JSON_CLASS])
         if klass.nil?
-          raise UnsupportedEncryptedAttributeFormat, "Unknown chef-encrypted-attribute class \"#{enc_hs[JSON_CLASS]}\""
+          fail UnsupportedEncryptedAttributeFormat,
+               "Unknown chef-encrypted-attribute class #{enc_hs[JSON_CLASS]}"
         end
         klass.send(:new, enc_hs)
       end
 
-      protected
+      # protected
 
       def self.string_to_klass(class_name)
-        unless class_name.kind_of?(String)
-          raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute class name \"#{class_name.inspect}\""
+        unless class_name.is_a?(String)
+          fail UnacceptableEncryptedAttributeFormat,
+               "Bad chef-encrypted-attribute class name #{class_name.inspect}"
         end
         begin
-          if RUBY_VERSION < '1.9'
-            class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const) }
-          else
-            class_name.split('::').inject(Kernel) { |scope, const| scope.const_get(const, scope === Kernel) }
+          class_name.split('::').inject(Kernel) do |scope, const|
+            scope.const_get(const, scope == Kernel)
           end
         rescue NameError => e
           Chef::Log.error(e)
@@ -111,17 +114,19 @@ class Chef
       end
 
       def self.version_klass(version)
-        version = version.to_s unless version.kind_of?(String)
+        version = version.to_s unless version.is_a?(String)
         if version.empty?
-          raise UnacceptableEncryptedAttributeFormat, "Bad chef-encrypted-attribute version \"#{version.inspect}\""
+          fail UnacceptableEncryptedAttributeFormat,
+               "Bad chef-encrypted-attribute version #{version.inspect}"
         end
         klass = string_to_klass("#{VERSION_PREFIX}#{version}")
         if klass.nil?
-          raise UnsupportedEncryptedAttributeFormat, "This version of chef-encrypted-attribute does not support encrypted attribute item format version: \"#{version}\""
+          fail UnsupportedEncryptedAttributeFormat,
+               'This version of chef-encrypted-attribute does not support '\
+               "encrypted attribute item format version: \"#{version}\""
         end
         klass
       end
-
     end
   end
 end

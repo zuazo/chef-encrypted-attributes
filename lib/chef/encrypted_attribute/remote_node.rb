@@ -22,6 +22,7 @@ require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
+    # Remote Node object to read and save its attributes
     class RemoteNode
       include ::Chef::Mixin::ParamsValidate
       include ::Chef::EncryptedAttribute::SearchHelper
@@ -31,29 +32,32 @@ class Chef
       end
 
       def self.cache
-        @@cache ||= Chef::EncryptedAttribute::CacheLru.new(0) # disabled by default
+        # disabled by default
+        @@cache ||= Chef::EncryptedAttribute::CacheLru.new(0)
       end
 
-      def name(arg=nil)
+      def name(arg = nil)
         set_or_return(
           :name,
           arg,
-          :kind_of => String
+          kind_of: String
         )
       end
 
-      def load_attribute(attr_ary, partial_search=true)
-        unless attr_ary.kind_of?(Array)
-          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+      def load_attribute(attr_ary, partial_search = true)
+        unless attr_ary.is_a?(Array)
+          fail ArgumentError,
+               "#{self.class}##{__method__} attr_ary argument must be an "\
+               "array of strings. You passed #{attr_ary.inspect}."
         end
         cache_key = cache_key(name, attr_ary)
-        if self.class.cache.has_key?(cache_key)
+        if self.class.cache.key?(cache_key)
           self.class.cache[cache_key]
         else
           keys = { 'value' => attr_ary }
           res = search(:node, "name:#{@name}", keys, 1, partial_search)
-          self.class.cache[cache_key] = if res.kind_of?(Array) and
-               res[0].kind_of?(Hash) and res[0].has_key?('value')
+          self.class.cache[cache_key] =
+            if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
               res[0]['value']
             else
               nil
@@ -62,15 +66,17 @@ class Chef
       end
 
       def save_attribute(attr_ary, value)
-        unless attr_ary.kind_of?(Array)
-          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+        unless attr_ary.is_a?(Array)
+          fail ArgumentError,
+               "#{self.class}##{__method__} attr_ary argument must be an "\
+               "array of strings. You passed #{attr_ary.inspect}."
         end
         cache_key = cache_key(name, attr_ary)
 
         node = Chef::Node.load(name)
         last = attr_ary.pop
         node_attr = attr_ary.reduce(node.normal) do |a, k|
-          a[k] = Mash.new unless a.has_key?(k)
+          a[k] = Mash.new unless a.key?(k)
           a[k]
         end
         node_attr[last] = value
@@ -80,17 +86,19 @@ class Chef
       end
 
       def delete_attribute(attr_ary)
-        unless attr_ary.kind_of?(Array)
-          raise ArgumentError, "#{self.class.to_s}##{__method__} attr_ary argument must be an array of strings. You passed #{attr_ary.inspect}."
+        unless attr_ary.is_a?(Array)
+          fail ArgumentError,
+               "#{self.class}##{__method__} attr_ary argument must be an "\
+               "array of strings. You passed #{attr_ary.inspect}."
         end
         cache_key = cache_key(name, attr_ary)
 
         node = Chef::Node.load(name)
         last = attr_ary.pop
         node_attr = attr_ary.reduce(node.normal) do |a, k|
-          a.respond_to?(:has_key?) && a.has_key?(k) ? a[k] : nil
+          a.respond_to?(:key?) && a.key?(k) ? a[k] : nil
         end
-        if node_attr.respond_to?(:has_key?) && node_attr.has_key?(last)
+        if node_attr.respond_to?(:key?) && node_attr.key?(last)
           node_attr.delete(last)
           node.save
           self.class.cache.delete(cache_key)
@@ -103,9 +111,8 @@ class Chef
       protected
 
       def cache_key(name, attr_ary)
-        "#{name}:#{attr_ary.inspect}" # TODO ok, this can be improved
+        "#{name}:#{attr_ary.inspect}" # TODO: ok, this can be improved
       end
-
     end
   end
 end

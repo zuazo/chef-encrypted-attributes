@@ -24,6 +24,7 @@ require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
+    # Search remote Chef Clients public search
     class RemoteClients
       extend ::Chef::EncryptedAttribute::SearchHelper
 
@@ -34,27 +35,18 @@ class Chef
       def self.get_public_key(name)
         Chef::ApiClient.load(name).public_key
       rescue Net::HTTPServerException => e
-        case e.response.code
-        when '404' # Not Found
-          raise ClientNotFound, "Chef Client not found: \"#{name}\"."
-        else
-          raise e
-        end
+        raise e unless e.response.code == '404'
+        raise ClientNotFound, "Chef Client not found: #{name.inspect}."
       end
 
-      def self.search_public_keys(search='*:*', partial_search=true)
+      def self.search_public_keys(search = '*:*', partial_search = true)
         escaped_query = escape_query(search)
-        if cache.has_key?(escaped_query)
-          cache[escaped_query]
-        else
-          cache[escaped_query] = search(:client, search, {
-            'public_key' => [ 'public_key' ]
-          }, 1000, partial_search).map do |client|
-            client['public_key']
-          end.compact
-        end
+        return cache[escaped_query] if cache.key?(escaped_query)
+        cache[escaped_query] = search(
+          :client, search,
+          { 'public_key' => %w(public_key) }, 1000, partial_search
+        ).map { |client| client['public_key'] }.compact
       end
-
     end
   end
 end

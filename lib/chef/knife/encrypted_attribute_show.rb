@@ -20,8 +20,8 @@ require 'chef/knife'
 
 class Chef
   class Knife
+    # knife encrypted attribute show command
     class EncryptedAttributeShow < Knife
-
       deps do
         require 'chef/encrypted_attribute'
         require 'chef/json_compat'
@@ -56,18 +56,19 @@ class Chef
         output(enc_attr)
       end
 
-      def attribute_path_to_ary(str, delim='.', escape='\\')
-        # return str.scan(/(?:[^.\\]|\\.)+/).map {|x| x.gsub('\\.', '.') } # cool, but doesn't work for some edge cases
+      def attribute_path_to_ary(str, delim = '.', escape = '\\')
+        # cool, but doesn't work for some edge cases
+        # return str.scan(/(?:[^.\\]|\\.)+/).map {|x| x.gsub('\\.', '.') }
         result = []
         current = ''
         i = 0
-        while ! str[i].nil?
+        until str[i].nil?
           if str[i] == escape
-            if str[i+1] == delim
-              current << str[i+1]
+            if str[i + 1] == delim
+              current << str[i + 1]
             else
               current << str[i]
-              current << str[i+1] unless str[i+1].nil?
+              current << str[i + 1] unless str[i + 1].nil?
             end
             i += 1 # skip the next char
           elsif str[i] == delim
@@ -80,7 +81,6 @@ class Chef
         end
         result << current
       end
-
     end
   end
 end

@@ -22,8 +22,8 @@ require 'chef/encrypted_attribute/remote_node'
 
 class Chef
   class Knife
+    # knife encrypted attribute delete command
     class EncryptedAttributeDelete < EncryptedAttributeShow
-
       deps do
         require 'chef/encrypted_attribute'
         require 'chef/json_compat'
@@ -32,10 +32,11 @@ class Chef
       banner 'knife encrypted attribute delete NODE ATTRIBUTE (options)'
 
       option :force,
-        :short => '-f',
-        :long => '--force',
-        :description => 'Force the attribute deletion even if you cannot read it',
-        :boolean => true
+             short: '-f',
+             long: '--force',
+             description:
+               'Force the attribute deletion even if you cannot read it',
+             boolean: true
 
       def run
         node_name = @name_args[0]
@@ -54,18 +55,16 @@ class Chef
         end
 
         attr_ary = attribute_path_to_ary(attr_path)
-        if Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
-          # TODO move this to lib/EncryptedAttribute
-          unless config[:force] # try to read the attribute
-            Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
-          end
-          remote_node = Chef::EncryptedAttribute::RemoteNode.new(node_name)
-          if remote_node.delete_attribute(attr_ary)
-            ui.info('Encrypted attribute deleted.')
-          end
+        return unless
+          Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
+        # TODO: move this to lib/EncryptedAttribute
+        unless config[:force] # try to read the attribute
+          Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
         end
+        remote_node = Chef::EncryptedAttribute::RemoteNode.new(node_name)
+        return unless remote_node.delete_attribute(attr_ary)
+        ui.info('Encrypted attribute deleted.')
       end
-
     end
   end
 end

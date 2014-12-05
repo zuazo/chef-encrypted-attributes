@@ -18,7 +18,6 @@
 
 class Chef
   class EncryptedAttribute
-
     class RequirementsFailure < StandardError; end
     class UnsupportedEncryptedAttributeFormat < StandardError; end
     class UnacceptableEncryptedAttributeFormat < StandardError; end
@@ -35,6 +34,5 @@ class Chef
     class SearchFailure < StandardError; end
     class SearchFatalError < StandardError; end
     class InvalidSearchKeys < StandardError; end
-
   end
 end

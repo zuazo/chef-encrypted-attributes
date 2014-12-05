@@ -54,7 +54,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     it 'returns cached users with multiples "*"' do
-      expect(@RemoteUsers).to receive(:get_all_public_keys).once.and_return('users1')
+      expect(@RemoteUsers).to receive(:all_public_keys).once.and_return('users1')
       expect(@RemoteUsers.get_public_keys('*')).to eql('users1')
       expect(@RemoteUsers.get_public_keys('*')).to eql('users1') # cached
     end

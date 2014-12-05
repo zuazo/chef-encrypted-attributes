@@ -20,17 +20,19 @@ require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
+    # Include some assertions that throw exceptions if not met
     module Assertions
-
       def assert_aead_requirements_met!(algorithm)
         unless OpenSSL::Cipher.method_defined?(:auth_data=)
-          raise RequirementsFailure, 'The used Encrypted Attributes protocol version requires Ruby >= 1.9'
+          fail RequirementsFailure,
+               'The used Encrypted Attributes protocol version requires Ruby '\
+               '>= 1.9'
         end
-        unless OpenSSL::Cipher.ciphers.include?(algorithm)
-          raise RequirementsFailure, "The used Encrypted Attributes protocol version requires an OpenSSL version with \"#{algorithm}\" algorithm support"
-        end
+        return if OpenSSL::Cipher.ciphers.include?(algorithm)
+        fail RequirementsFailure,
+             'The used Encrypted Attributes protocol version requires an '\
+             "OpenSSL version with \"#{algorithm}\" algorithm support"
       end
-
     end
   end
 end

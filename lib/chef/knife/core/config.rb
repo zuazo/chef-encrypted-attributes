@@ -16,4 +16,6 @@
 # limitations under the License.
 #
 
-Chef::Config[:knife][:encrypted_attributes] = Mash.new unless Chef::Config[:knife][:encrypted_attributes].kind_of?(Hash)
+unless Chef::Config[:knife][:encrypted_attributes].is_a?(Hash)
+  Chef::Config[:knife][:encrypted_attributes] = Mash.new
+end

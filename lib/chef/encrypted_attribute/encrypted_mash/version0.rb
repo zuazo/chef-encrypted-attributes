@@ -20,16 +20,16 @@ require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/encrypted_attribute/exceptions'
 require 'ffi_yajl'
 
-# Version0 format: using RSA without shared secret
 class Chef
   class EncryptedAttribute
     class EncryptedMash
+      # EncryptedMash Version0 format: using RSA without shared secret
       class Version0 < Chef::EncryptedAttribute::EncryptedMash
-
         def encrypt(value, public_keys)
           value_json = json_encode(value)
           public_keys = parse_public_keys(public_keys)
-          self['encrypted_data'] = rsa_encrypt_multi_key(value_json, public_keys)
+          self['encrypted_data'] =
+            rsa_encrypt_multi_key(value_json, public_keys)
           self
         end
 
@@ -43,79 +43,85 @@ class Chef
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
           parse_public_keys(keys).reduce(true) do |r, k|
-            r and data_can_be_decrypted_by_key?(self['encrypted_data'], k)
+            r && data_can_be_decrypted_by_key?(self['encrypted_data'], k)
           end
         end
 
         def needs_update?(keys)
           keys = parse_public_keys(keys)
-          not can_be_decrypted_by?(keys) && self['encrypted_data'].keys.count == keys.count
+          !can_be_decrypted_by?(keys) ||
+            self['encrypted_data'].keys.count != keys.count
         end
 
         protected
 
         def encrypted?
-          has_key?('encrypted_data') and self['encrypted_data'].kind_of?(Hash)
+          key?('encrypted_data') && self['encrypted_data'].is_a?(Hash)
         end
 
         def pem_to_key(k)
-          k.kind_of?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
-        rescue OpenSSL::PKey::RSAError, TypeError => e
+          k.is_a?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
+        rescue OpenSSL::PKey::RSAError, TypeError
           raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
         end
 
         def parse_public_key(key)
           key = pem_to_key(key)
           unless key.public?
-            raise InvalidPublicKey, 'Invalid public key provided.'
+            fail InvalidPublicKey, 'Invalid public key provided.'
           end
           key
         end
 
         def parse_decryption_key(key)
           key = pem_to_key(key)
-          unless key.public? and key.private?
-            raise InvalidPrivateKey, 'The provided key for decryption is invalid, a valid public and private key is required.'
+          unless key.public? && key.private?
+            fail InvalidPrivateKey,
+                 'The provided key for decryption is invalid, a valid public '\
+                 'and private key is required.'
           end
-          unless can_be_decrypted_by?(key) # TODO optimize, node key digest is calculated multiple times
-            raise DecryptionFailure, 'Attribute data cannot be decrypted by the provided key.'
+          # TODO: optimize, node key digest is calculated multiple times
+          unless can_be_decrypted_by?(key)
+            fail DecryptionFailure,
+                 'Attribute data cannot be decrypted by the provided key.'
           end
           key
         end
 
         def parse_public_keys(keys)
-          keys = [ keys ].flatten
-          keys.map do |k|
-            parse_public_key(k)
-          end.uniq { |k| k.public_key.to_s.chomp }
+          keys = [keys].flatten
+          keys_parsed = keys.map { |k| parse_public_key(k) }
+          keys_parsed.uniq { |k| k.public_key.to_s.chomp }
         end
 
         def json_encode(o)
-          # TODO This does not check if the object is correct, should be an Array or a Hash
+          # TODO: This does not check if the object is correct, should be an
+          # Array or a Hash
           FFI_Yajl::Encoder.encode(o)
         end
 
         def json_decode(o)
           FFI_Yajl::Parser.parse(o.to_s)
         rescue FFI_Yajl::ParseError => e
-          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
         # Heavily based on @sl4m code: https://gist.github.com/sl4m/1470360
-        def rsa_ensure_x509(rsa)
-          if RUBY_VERSION < '1.9.3'
-            modulus = rsa.n
-            exponent = rsa.e
+        def rsa_ensure_x509_ruby192(rsa)
+          modulus = rsa.n
+          exponent = rsa.e
 
-            oid = OpenSSL::ASN1::ObjectId.new('rsaEncryption')
-            alg_id = OpenSSL::ASN1::Sequence.new([oid, OpenSSL::ASN1::Null.new(nil)])
-            ary = [OpenSSL::ASN1::Integer.new(modulus), OpenSSL::ASN1::Integer.new(exponent)]
-            pub_key = OpenSSL::ASN1::Sequence.new(ary)
-            enc_pk = OpenSSL::ASN1::BitString.new(pub_key.to_der)
-            subject_pk_info = OpenSSL::ASN1::Sequence.new([alg_id, enc_pk])
-          else
-            rsa
-          end
+          asn1 = OpenSSL::ASN1
+          oid = asn1::ObjectId.new('rsaEncryption')
+          alg_id = asn1::Sequence.new([oid, asn1::Null.new(nil)])
+          ary = [asn1::Integer.new(modulus), asn1::Integer.new(exponent)]
+          pub_key = asn1::Sequence.new(ary)
+          enc_pk = asn1::BitString.new(pub_key.to_der)
+          asn1::Sequence.new([alg_id, enc_pk])
+        end
+
+        def rsa_ensure_x509(rsa)
+          RUBY_VERSION < '1.9.3' ? rsa_ensure_x509_ruby192(rsa) : rsa
         end
 
         def node_key(public_key)
@@ -125,24 +131,21 @@ class Chef
         def rsa_encrypt_value(value, public_key)
           Base64.encode64(public_key.public_encrypt(value))
         rescue OpenSSL::PKey::RSAError => e
-          raise EncryptionFailure, "#{e.class.name}: #{e.to_s}"
+          raise EncryptionFailure, "#{e.class.name}: #{e}"
         end
 
         def rsa_decrypt_value(value, key)
           key.private_decrypt(Base64.decode64(value.to_s))
         rescue OpenSSL::PKey::RSAError => e
-          raise DecryptionFailure, "#{e.class.name}: #{e.to_s}"
+          raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
         def rsa_encrypt_multi_key(value, public_keys)
           Mash.new(Hash[
             public_keys.map do |public_key|
-              [
-                node_key(public_key),
-                rsa_encrypt_value(value, public_key),
-              ]
+              [node_key(public_key), rsa_encrypt_value(value, public_key)]
             end
-          ])
+         ])
         end
 
         def rsa_decrypt_multi_key(enc_value, key)
@@ -151,9 +154,8 @@ class Chef
         end
 
         def data_can_be_decrypted_by_key?(enc_value, key)
-          enc_value.has_key?(node_key(key.public_key))
+          enc_value.key?(node_key(key.public_key))
         end
-
       end
     end
   end
