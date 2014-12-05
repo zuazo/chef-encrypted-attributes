@@ -30,16 +30,26 @@ class Chef
         @@cache ||= Chef::EncryptedAttribute::CacheLru.new
       end
 
+      def self.get_public_key(node)
+        return node['public_key'] unless node['public_key'].nil?
+        RemoteClients.get_public_key(node['name'])
+      rescue Net::HTTPServerException => e
+        raise e unless e.response.code == '403'
+        raise InsufficientPrivileges,
+              "You cannot read #{node['name']} client key. Consider including "\
+              "the encrypted_attributes::expose_key recipe in the "\
+              "#{node['name']} node run list."
+      end
+
       def self.search_public_keys(search='*:*', partial_search=true)
         escaped_query = escape_query(search)
         if cache.has_key?(escaped_query)
           cache[escaped_query]
         else
           cache[escaped_query] = search(:node, search, {
-            'name' => [ 'name' ]
-          }, 1000, partial_search).map do |node|
-            RemoteClients.get_public_key(node['name'])
-          end.compact
+            'name' => [ 'name' ],
+            'public_key' => [ 'public_key' ]
+          }, 1000, partial_search).map { |node| get_public_key(node) }.compact
         end
       end
 

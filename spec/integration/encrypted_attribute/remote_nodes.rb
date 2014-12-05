@@ -68,6 +68,28 @@ describe Chef::EncryptedAttribute::RemoteNodes do
         expect(@RemoteNodes.search_public_keys.sort).to eql(@public_keys.sort)
       end
 
+      context 'with node[public_key] set' do
+        before do
+          Chef::EncryptedAttribute::RemoteNodes.cache.clear
+          @node3 = Chef::Node.new
+          @node3.name('node3')
+          @node3.set['public_key'] = 'pubkey3'
+          @node3.save
+          @node3_client = Chef::ApiClient.new
+          @node3_client.name(@node3.name)
+          @node3_client.public_key(@node3_client.save['public_key'])
+        end
+        after do
+          @node3_client.destroy
+          @node3.destroy
+        end
+
+        it 'uses node[public_key] attribute' do
+          public_keys = @public_keys + [@node3['public_key']]
+          expect(@RemoteNodes.search_public_keys.sort).to eql(public_keys.sort)
+        end
+      end # context with node[public_key] set
+
       it 'should read the correct clients when a search query is passed as arg' do
         query = 'role:webapp'
         expect(@RemoteNodes.search_public_keys(query)).to eql([@node1_client.public_key])

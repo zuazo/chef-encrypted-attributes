@@ -18,7 +18,7 @@ Node attributes are encrypted using chef client and user keys with public key in
 
 * Ruby `>= 1.9`
 * Chef Client `~> 11.4`
-* yajl-ruby `~> 1.1` (included with Chef)
+* yajl-ruby `~> 1.1`
 * If you want to use protocol version 2 to use [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) (disabled by default):
  * Ruby `>= 2`.
  * OpenSSL `>= 1.0.1`.
@@ -90,8 +90,9 @@ end
 Then we can read this attribute from another allowed node (a `"role:webapp"` node):
 
 ```ruby
-chef_gem "chef-encrypted-attributes"
-require "chef-encrypted-attributes"
+include_recipe 'encrypted_attributes'
+# Expose the public key for encryption
+include_recipe 'encrypted_attributes::expose_key'
 
 if Chef::EncryptedAttribute.exist_on_node?("random.example.com", ["myapp", "encrypted_data"])
   data = Chef::EncryptedAttribute.load_from_node("random.example.com", ["myapp", "encrypted_data"])
@@ -104,7 +105,7 @@ end
 
 ### Example Using User Keys Data Bag
 
-Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](README.md#chef-users-limitation) problem.
+Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](README.md#chef-user-keys-access-limitation) problem.
 
 You need to create a Data Bag Item with a content similar to the following:
 
@@ -143,17 +144,23 @@ Chef::Config[:encrypted_attributes][:keys] = chef_users.values
 
 See the [API.md](API.md) file for a more detailed documentation about `Chef::EncryptedAttribute` class and its methods.
 
-## Chef Users Limitation
+## Chef User Keys Access Limitation
 
 Keep in mind that, from a Chef Node, *Chef User* *public keys* are inaccessible. So you have to pass them in raw mode in the recipe if you need any *Chef User* to be able to use the encrypted attributes (this is **required for** example to use the **knife commands** included in this gem, as knife is usually used by *Chef Users*). Summarizing, Chef Node inside a recipe (using its *Chef Client* key) will not be able to retrieve the *Chef Users* *public keys*, so you need to pass them using the `[:keys]` configuration value.
 
 Chef Nodes (Clients) with *admin* privileges do have access to user public keys, but in most cases this is not a recommended practice.
 
-*Chef Client* *public keys* do not have this problem, you can retrieve them from any place without limitation. You can use knife with an *Chef Admin Client* instead of a *Chef Admin User* key, but this is not common.
-
-See the [Example Using User Keys Data Bag](README.md#example-using-user-keys-data-bag) section for a workaround.
+See the [Example Using User Keys Data Bag](README.md#example-using-user-keys-data-bag) section for a workaround. You can use the [`encrypted_attributes::users_data_bag`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::users_data_bag) recipe for this.
 
 **Note:** *Chef Clients* usually are Chef Nodes and *chef-validation*/*chef-webui* keys. *Chef Users* usually are knife users. The main difference between *Chef Users* and *Chef Clients* is that the former are able to log in via *web-ui* (has a password).
+
+## Chef Client Keys Access Limitation
+
+*Chef Client* *public keys* has a [similar problem to the user keys](README.md#chef-user-keys-access-limitation), you cannot retrieve them from a Chef Node.
+
+To fix this limitation you should expose de *Chef Client* *public key* in the `node['public_key']` attribute. You can include the [`encrypted_attributes::expose_key`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::expose_key)` recipe for this. You need to include this recipe in the *Chef Nodes* that require read privileges on the encrypted attributes.
+
+Exposing the public key through attributes should not be considered a security breach, so it's not a problem to include it on all machines.
 
 ## Knife Commands
 
@@ -161,7 +168,7 @@ There are multiple commands to read, create and modify the encrypted attributes.
 
 The `ATTRIBUTE` name must be specified using *dots* notation. For example, for `node['encrypted']['attribute']`, you must specify `"encrypted.attribute"` as knife argument. If the attribute key has a *dot* in its name, you must escape it. For example: `"encrypted.attribute\.with\.dots"`.
 
-Read the [Chef Users Limitation](README.md#chef-users-limitation) caveat before trying to use any knife command.
+Read the [Chef Users Limitation](README.md#chef-user-keys-access-limitation) caveat before trying to use any knife command.
 
 ### Installing the Required Gem
 
