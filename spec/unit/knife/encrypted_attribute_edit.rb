@@ -63,7 +63,7 @@ describe Chef::Knife::EncryptedAttributeEdit do
       knife = Chef::Knife::EncryptedAttributeEdit.new([ 'node1', 'encrypted.attribute', '--input-format', 'json' ])
       expect(IO).to receive(:read).and_return('Bad-json')
       expect_any_instance_of(Chef::EncryptedAttribute).not_to receive(:create_on_node)
-      expect { knife.run }.to raise_error(Yajl::ParseError)
+      expect { knife.run }.to raise_error(FFI_Yajl::ParseError)
     end
 
   end # context #edit_data

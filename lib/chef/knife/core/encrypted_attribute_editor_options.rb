@@ -95,7 +95,7 @@ class Chef
 
               case format
               when 'JSON', 'json'
-                Yajl::Parser.parse(output)
+                FFI_Yajl::Parser.parse(output)
               else
                 output
               end

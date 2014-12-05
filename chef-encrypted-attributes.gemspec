@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
-  s.add_dependency 'yajl-ruby', '~> 1.1'
+  s.add_dependency 'ffi-yajl', '~> 1.0'
   s.add_dependency 'chef', chef_version
 
   if RUBY_VERSION < '1.9'

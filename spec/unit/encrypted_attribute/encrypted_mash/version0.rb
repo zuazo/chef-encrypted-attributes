@@ -200,7 +200,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       body['encrypted_data'] = Hash[body['encrypted_data'].map do |k, v|
         [ k, Base64.encode64(@key1.public_encrypt('bad-json')) ]
       end]
-      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /Yajl::ParseError/)
+      expect { body.decrypt(@key1) }.to raise_error(Chef::EncryptedAttribute::DecryptionFailure, /FFI_Yajl::ParseError/)
     end
 
   end # context #decrypt
