@@ -43,15 +43,25 @@ class Chef
         escape(query_s)
       end
 
+      def valid_search_keys_key?(k)
+        k.is_a?(String) || k.is_a?(Symbol)
+      end
+
+      def valid_search_keys_value?(v)
+        return false unless v.is_a?(Array)
+        v.reduce(true) { |a, e| a && e.is_a?(String) }
+      end
+
       def valid_search_keys?(keys)
         return false unless keys.is_a?(Hash)
         keys.reduce(true) do |r, (k, v)|
-          r && if (k.is_a?(String) || k.is_a?(Symbol)) && v.is_a?(Array)
-                 v.reduce(true) { |a, e| a && e.is_a?(String) }
-               else
-                 false
-               end
+          r && valid_search_keys_key?(k) && valid_search_keys_value?(v)
         end
+      end
+
+      def assert_search_keys(keys)
+        return if valid_search_keys?(keys)
+        fail InvalidSearchKeys, "Invalid search keys: #{keys.inspect}"
       end
 
       def empty_search?(query)
@@ -61,10 +71,39 @@ class Chef
 
       def search(type, query, keys, rows = 1000, partial_search = true)
         return [] if empty_search?(query) # avoid empty searches
-        if partial_search
-          partial_search(type, query, keys, rows)
-        else
-          normal_search(type, query, keys, rows)
+        search_method = partial_search ? :partial_search : :normal_search
+        send(search_method, type, query, keys, rows)
+      rescue Net::HTTPServerException => e
+        unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
+          raise SearchFailure, "Search exception #{e.class}: #{e}"
+        end
+        return []
+      rescue Net::HTTPFatalError => e
+        raise SearchFailure, "Search exception #{e.class}: #{e}"
+      end
+
+      def assert_normal_search_response(resp)
+        return if resp.is_a?(Array)
+        fail SearchFatalError,
+             "Wrong response received from Normal Search: #{resp.inspect}"
+      end
+
+      def parse_normal_search_row_attribute(row, attr_ary)
+        attr_ary.reduce(row) do |r, attr|
+          if r.respond_to?(attr.to_sym)
+            r.send(attr.to_sym)
+          elsif r.respond_to?(:key?)
+            r[attr.to_s] if r.key?(attr.to_s)
+          end
+        end
+      end
+
+      def parse_normal_search_response(resp, keys)
+        resp.map do |row|
+          Hash[keys.map do |key_name, attr_ary|
+            value = parse_normal_search_row_attribute(row, attr_ary)
+            [key_name, value]
+          end]
         end
       end
 
@@ -73,67 +112,21 @@ class Chef
         Chef::Log.info(
           "Normal Search query: #{escaped_query}, keys: #{keys.inspect}"
         )
-        unless valid_search_keys?(keys)
-          fail InvalidSearchKeys, "Invalid search keys: #{keys.inspect}"
-        end
+        assert_search_keys(keys)
 
-        begin
-          resp = self.query.search(type, escaped_query, nil, 0, rows)[0]
-        rescue Net::HTTPServerException => e
-          if e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
-            return []
-          else
-            raise SearchFailure, "Partial Search exception #{e.class}: #{e}"
-          end
-        rescue Net::HTTPFatalError => e
-          raise SearchFailure, "Normal Search exception #{e.class}: #{e}"
-        end
-        unless resp.is_a?(Array)
-          fail SearchFatalError,
-               "Wrong response received from Normal Search: #{resp.inspect}"
-        end
-        # TODO: too complex, refactorize
-        resp.map do |row|
-          Hash[keys.map do |key_name, attr_ary|
-            value = attr_ary.reduce(row) do |r, attr|
-              if r.respond_to?(attr.to_sym)
-                r.send(attr.to_sym)
-              elsif r.respond_to?(:key?)
-                r[attr.to_s] if r.key?(attr.to_s)
-              end
-            end
-            [key_name, value]
-          end]
-        end
+        resp = self.query.search(type, escaped_query, nil, 0, rows)[0]
+        assert_normal_search_response(resp)
+        parse_normal_search_response(resp, keys)
       end
 
-      def partial_search(type, query, keys, rows = 1000)
-        escaped_query =
-          "search/#{escape(type)}?q=#{escape_query(query)}&start=0&rows=#{rows}"
-        Chef::Log.info(
-          "Partial Search query: #{escaped_query}, keys: #{keys.inspect}"
-        )
-        unless valid_search_keys?(keys)
-          fail InvalidSearchKeys, "Invalid search keys: #{keys.inspect}"
-        end
+      def assert_partial_search_response(resp)
+        return if resp.is_a?(Hash) && resp.key?('rows') &&
+                  resp['rows'].is_a?(Array)
+        fail SearchFatalError,
+             "Wrong response received from Partial Search: #{resp.inspect}"
+      end
 
-        rest = Chef::REST.new(Chef::Config[:chef_server_url])
-        begin
-          resp = rest.post_rest(escaped_query, keys)
-        rescue Net::HTTPServerException => e
-          if e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
-            return []
-          else
-            raise SearchFailure, "Partial Search exception #{e.class}: #{e}"
-          end
-        rescue Net::HTTPFatalError => e
-          raise SearchFailure, "Partial Search exception #{e.class}: #{e}"
-        end
-        unless resp.is_a?(Hash) && resp.key?('rows') &&
-               resp['rows'].is_a?(Array)
-          fail SearchFatalError,
-               "Wrong response received from Partial Search: #{resp.inspect}"
-        end
+      def parse_partial_search_response(resp)
         resp['rows'].map do |row|
           if row.is_a?(Hash) && row['data'].is_a?(Hash)
             row['data']
@@ -142,6 +135,20 @@ class Chef
                  "Wrong row format received from Partial Search: #{row.inspect}"
           end
         end.compact
+      end
+
+      def partial_search(type, query, keys, rows = 1000)
+        escaped_query =
+          "search/#{escape(type)}?q=#{escape_query(query)}&start=0&rows=#{rows}"
+        Chef::Log.info(
+          "Partial Search query: #{escaped_query}, keys: #{keys.inspect}"
+        )
+        assert_search_keys(keys)
+
+        rest = Chef::REST.new(Chef::Config[:chef_server_url])
+        resp = rest.post_rest(escaped_query, keys)
+        assert_partial_search_response(resp)
+        parse_partial_search_response(resp)
       end
     end
   end
