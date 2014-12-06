@@ -55,19 +55,11 @@ class Chef
       end
 
       def client_search(arg = nil)
-        arg = [arg] unless arg.nil? || !arg.is_a?(String)
-        set_or_return(
-          :client_search, arg,
-          kind_of: Array, default: [], callbacks: config_search_array_callbacks
-        )
+        set_or_return_search_array(:client_search, arg)
       end
 
       def node_search(arg = nil)
-        arg = [arg] unless arg.nil? || !arg.is_a?(String)
-        set_or_return(
-          :node_search, arg,
-          kind_of: Array, default: [], callbacks: config_search_array_callbacks
-        )
+        set_or_return_search_array(:node_search, arg)
       end
 
       def users(arg = nil)
@@ -88,23 +80,9 @@ class Chef
 
       def update!(config)
         if config.is_a?(self.class)
-          OPTIONS.each do |attr|
-            value = dup_object(config.send(attr))
-            instance_variable_set("@#{attr}", value)
-          end
+          update_from_config!(config)
         elsif config.is_a?(Hash)
-          config.each do |attr, value|
-            attr = attr.to_sym if attr.is_a?(String)
-            if OPTIONS.include?(attr)
-              value = dup_object(value)
-              send(attr, value)
-            else
-              Chef::Log.warn(
-                "#{self.class}: configuration method not found: "\
-                "#{attr.to_s.inspect}."
-              )
-            end
-          end
+          update_from_hash!(config)
         end
       end
 
@@ -124,6 +102,14 @@ class Chef
         o.dup
       rescue TypeError
         o
+      end
+
+      def set_or_return_search_array(name, arg = nil)
+        arg = [arg] unless arg.nil? || !arg.is_a?(String)
+        set_or_return(
+          name, arg,
+          kind_of: Array, default: [], callbacks: config_search_array_callbacks
+        )
       end
 
       def config_valid_search_array?(s_ary)
@@ -187,6 +173,28 @@ class Chef
             config_valid_keys_array?(keys)
           end
         }
+      end
+
+      def update_from_config!(config)
+        OPTIONS.each do |attr|
+          value = dup_object(config.send(attr))
+          instance_variable_set("@#{attr}", value)
+        end
+      end
+
+      def update_from_hash!(config)
+        config.each do |attr, value|
+          attr = attr.to_sym if attr.is_a?(String)
+          if OPTIONS.include?(attr)
+            value = dup_object(value)
+            send(attr, value)
+          else
+            Chef::Log.warn(
+              "#{self.class}: configuration method not found: "\
+              "#{attr.to_s.inspect}."
+            )
+          end
+        end
       end
     end
   end
