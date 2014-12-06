@@ -16,13 +16,13 @@
 # limitations under the License.
 #
 
-require 'chef/knife/encrypted_attribute_show'
+require 'chef/knife/core/encrypted_attribute_base'
 require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
     # knife encrypted attribute edit command
-    class EncryptedAttributeEdit < EncryptedAttributeShow
+    class EncryptedAttributeEdit < EncryptedAttributeBase
       include Knife::Core::EncryptedAttributeEditorOptions
 
       option :input_format,
@@ -34,38 +34,21 @@ class Chef
 
       banner 'knife encrypted attribute edit NODE ATTRIBUTE (options)'
 
+      def assert_valid_args
+        assert_attribute_exists(@node_name, @attr_ary)
+      end
+
       def run
-        node_name = @name_args[0]
-        attr_path = @name_args[1]
-
-        if node_name.nil?
-          show_usage
-          ui.fatal('You must specify a node name')
-          exit 1
-        end
-
-        if attr_path.nil?
-          show_usage
-          ui.fatal('You must specify an encrypted attribute name')
-          exit 1
-        end
-
-        attr_ary = attribute_path_to_ary(attr_path)
-
-        # check if the encrypted attribute already exists
-        unless Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
-          ui.fatal('Encrypted attribute not found')
-          exit 1
-        end
+        parse_args
 
         # edit encrypted attribute
         enc_attr =
           Chef::EncryptedAttribute.new(
             Chef::Config[:knife][:encrypted_attributes]
           )
-        input = enc_attr.load_from_node(node_name, attr_ary)
+        input = enc_attr.load_from_node(@node_name, @attr_ary)
         output = edit_data(input, config[:input_format])
-        enc_attr.create_on_node(node_name, attr_ary, output)
+        enc_attr.create_on_node(@node_name, @attr_ary, output)
       end
     end
   end

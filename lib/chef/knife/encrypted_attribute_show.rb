@@ -16,70 +16,24 @@
 # limitations under the License.
 #
 
-require 'chef/knife'
+require 'chef/knife/core/encrypted_attribute_base'
 
 class Chef
   class Knife
     # knife encrypted attribute show command
-    class EncryptedAttributeShow < Knife
-      deps do
-        require 'chef/encrypted_attribute'
-        require 'chef/json_compat'
-      end
-
+    class EncryptedAttributeShow < EncryptedAttributeBase
       banner 'knife encrypted attribute show NODE ATTRIBUTE (options)'
 
-      def run
-        node_name = @name_args[0]
-        attr_path = @name_args[1]
-
-        if node_name.nil?
-          show_usage
-          ui.fatal('You must specify a node name')
-          exit 1
-        end
-
-        if attr_path.nil?
-          show_usage
-          ui.fatal('You must specify an encrypted attribute name')
-          exit 1
-        end
-
-        attr_ary = attribute_path_to_ary(attr_path)
-
-        unless Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
-          ui.fatal('Encrypted attribute not found')
-          exit 1
-        end
-
-        enc_attr = Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
-        output(enc_attr)
+      def assert_valid_args
+        assert_attribute_exists(@node_name, @attr_ary)
       end
 
-      def attribute_path_to_ary(str, delim = '.', escape = '\\')
-        # cool, but doesn't work for some edge cases
-        # return str.scan(/(?:[^.\\]|\\.)+/).map {|x| x.gsub('\\.', '.') }
-        result = []
-        current = ''
-        i = 0
-        until str[i].nil?
-          if str[i] == escape
-            if str[i + 1] == delim
-              current << str[i + 1]
-            else
-              current << str[i]
-              current << str[i + 1] unless str[i + 1].nil?
-            end
-            i += 1 # skip the next char
-          elsif str[i] == delim
-            result << current
-            current = ''
-          else
-            current << str[i]
-          end
-          i += 1
-        end
-        result << current
+      def run
+        parse_args
+
+        enc_attr =
+          Chef::EncryptedAttribute.load_from_node(@node_name, @attr_ary)
+        output(enc_attr)
       end
     end
   end

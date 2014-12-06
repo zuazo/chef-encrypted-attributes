@@ -16,47 +16,29 @@
 # limitations under the License.
 #
 
-require 'chef/knife/encrypted_attribute_show'
+require 'chef/knife/core/encrypted_attribute_base'
 require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
     # knife encrypted attribute update command
-    class EncryptedAttributeUpdate < EncryptedAttributeShow
+    class EncryptedAttributeUpdate < EncryptedAttributeBase
       include Knife::Core::EncryptedAttributeEditorOptions
 
       banner 'knife encrypted attribute update NODE ATTRIBUTE (options)'
 
+      def assert_valid_args
+        assert_attribute_exists(@node_name, @attr_ary)
+      end
+
       def run
-        node_name = @name_args[0]
-        attr_path = @name_args[1]
-
-        if node_name.nil?
-          show_usage
-          ui.fatal('You must specify a node name')
-          exit 1
-        end
-
-        if attr_path.nil?
-          show_usage
-          ui.fatal('You must specify an encrypted attribute name')
-          exit 1
-        end
-
-        attr_ary = attribute_path_to_ary(attr_path)
-
-        # check if the encrypted attribute already exists
-        unless Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
-          ui.fatal('Encrypted attribute not found')
-          exit 1
-        end
+        parse_args
 
         # update encrypted attribute
-        enc_attr =
-          Chef::EncryptedAttribute.new(
-            Chef::Config[:knife][:encrypted_attributes]
-          )
-        if enc_attr.update_on_node(node_name, attr_ary)
+        enc_attr = Chef::EncryptedAttribute.new(
+                     Chef::Config[:knife][:encrypted_attributes]
+                   )
+        if enc_attr.update_on_node(@node_name, @attr_ary)
           ui.info('Encrypted attribute updated.')
         else
           ui.info('Encrypted attribute does not need updating.')
