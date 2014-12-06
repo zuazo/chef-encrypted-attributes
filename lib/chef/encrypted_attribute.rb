@@ -21,6 +21,7 @@ require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/config'
 require 'chef/mash'
 
+require 'chef/encrypted_attribute/api'
 require 'chef/encrypted_attribute/local_node'
 require 'chef/encrypted_attribute/remote_node'
 require 'chef/encrypted_attribute/remote_nodes'
@@ -35,8 +36,10 @@ unless Chef::Config[:encrypted_attributes].is_a?(Hash)
 end
 
 class Chef
-  # Main EncryptedAttribute API class
+  # Main EncryptedAttribute class, includes instance and class API methods
   class EncryptedAttribute
+    extend Chef::EncryptedAttribute::API
+
     def initialize(c = nil)
       config(c)
     end
@@ -136,127 +139,7 @@ class Chef
     end
 
     def local_key
-      self.class.local_node.key
-    end
-
-    def self.local_node
-      LocalNode.new
-    end
-
-    def self.config(arg)
-      config =
-        EncryptedAttribute::Config.new(Chef::Config[:encrypted_attributes])
-      config.update!(arg)
-      config.keys(config.keys + [local_node.public_key])
-      config
-    end
-
-    # public
-
-    def self.load(hs, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Loading Local Encrypted Attribute from: "\
-        "#{hs.inspect}"
-      )
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.load(hs)
-      Chef::Log.debug("#{self.class.name}: Local Encrypted Attribute loaded.")
-      result
-    end
-
-    def self.load_from_node(name, attr_ary, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Loading Remote Encrypted Attribute from #{name}: "\
-        "#{attr_ary.inspect}"
-      )
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.load_from_node(name, attr_ary)
-      Chef::Log.debug("#{self.class.name}: Remote Encrypted Attribute loaded.")
-      result
-    end
-
-    def self.create(value, c = {})
-      Chef::Log.debug("#{self.class.name}: Creating Encrypted Attribute.")
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.create(value)
-      Chef::Log.debug("#{self.class.name}: Encrypted Attribute created.")
-      result
-    end
-
-    def self.create_on_node(name, attr_ary, value, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Creating Remote Encrypted Attribute on #{name}: "\
-        "#{attr_ary.inspect}"
-      )
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.create_on_node(name, attr_ary, value)
-      Chef::Log.debug("#{self.class.name}: Encrypted Remote Attribute created.")
-      result
-    end
-
-    def self.update(hs, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Updating Encrypted Attribute: #{hs.inspect}"
-      )
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.update(hs)
-      if result
-        Chef::Log.debug("#{self.class.name}: Encrypted Attribute updated.")
-      else
-        Chef::Log.debug("#{self.class.name}: Encrypted Attribute not updated.")
-      end
-      result
-    end
-
-    def self.update_on_node(name, attr_ary, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Updating Remote Encrypted Attribute on #{name}: "\
-        "#{attr_ary.inspect}"
-      )
-      enc_attr = EncryptedAttribute.new(config(c))
-      result = enc_attr.update_on_node(name, attr_ary)
-      Chef::Log.debug(
-        "#{self.class.name}: Encrypted Remote Attribute "\
-        "#{result ? '' : 'not '}updated."
-      )
-      result
-    end
-
-    def self.exist?(hs)
-      Chef::Log.debug(
-        "#{self.class.name}: Checking if Encrypted Attribute exists here: "\
-        "#{hs.inspect}"
-      )
-      result = EncryptedMash.exist?(hs)
-      Chef::Log.debug(
-        "#{self.class.name}: Encrypted Attribute #{result ? '' : 'not '}found."
-      )
-      result
-    end
-
-    def self.exists?(*args)
-      Chef::Log.warn(
-        "#{name}.exists? is deprecated in favor of #{name}.exist?."
-      )
-      exist?(*args)
-    end
-
-    def self.exist_on_node?(name, attr_ary, c = {})
-      Chef::Log.debug(
-        "#{self.class.name}: Checking if Remote Encrypted Attribute exists on"\
-        " #{name}"
-      )
-      remote_node = RemoteNode.new(name)
-      node_attr = remote_node.load_attribute(attr_ary, config(c).partial_search)
-      Chef::EncryptedAttribute.exist?(node_attr)
-    end
-
-    def self.exists_on_node?(*args)
-      Chef::Log.warn(
-        "#{name}.exists_on_node? is deprecated in favor of "\
-        "#{name}.exist_on_node?."
-      )
-      exist_on_node?(*args)
+      LocalNode.new.key
     end
   end
 end
