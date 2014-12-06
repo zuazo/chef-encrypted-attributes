@@ -148,7 +148,7 @@ class Chef
         rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
                RuntimeError => e
           # RuntimeError is raised for unsupported algorithms
-          raise MessageAuthenticationFailure, "#{e.class.name}: #{e}"
+          raise MessageAuthenticationFailure, "#{e.class}: #{e}"
         end
 
         def hmac_matches?(orig_hmac, data, algo = HMAC_ALGORITHM)
@@ -158,8 +158,7 @@ class Chef
           orig_hmac['data'] == new_hmac
         rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
                RuntimeError => e
-          # RuntimeError is raised for unsupported algorithms
-          raise MessageAuthenticationFailure, "#{e.class.name}: #{e}"
+          raise MessageAuthenticationFailure, "#{e.class}: #{e}"
         end
       end
     end
