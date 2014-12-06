@@ -69,9 +69,7 @@ class Chef
 
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
-          parse_public_keys(keys).reduce(true) do |r, k|
-            r && data_can_be_decrypted_by_key?(self['encrypted_secret'], k)
-          end
+          data_can_be_decrypted_by_keys?(self['encrypted_secret'], keys)
         end
 
         def needs_update?(keys)
@@ -82,11 +80,15 @@ class Chef
 
         protected
 
+        def encrypted_data_contain_fields?(fields)
+          data = self['encrypted_data']
+          fields.reduce(true) do |r, (field, kind_of)|
+            r && data.key?(field) && data[field].is_a?(kind_of)
+          end
+        end
+
         def encrypted_data?
-          self['encrypted_data'].key?('iv') &&
-            self['encrypted_data']['iv'].is_a?(String) &&
-            self['encrypted_data'].key?('data') &&
-            self['encrypted_data']['data'].is_a?(String)
+          encrypted_data_contain_fields?(iv: String, data: String)
         end
 
         def encrypted_secret?

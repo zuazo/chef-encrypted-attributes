@@ -62,12 +62,9 @@ class Chef
         protected
 
         def encrypted_data?
-          self['encrypted_data'].key?('iv') &&
-            self['encrypted_data']['iv'].is_a?(String) &&
-            self['encrypted_data'].key?('auth_tag') &&
-            self['encrypted_data']['auth_tag'].is_a?(String) &&
-            self['encrypted_data'].key?('data') &&
-            self['encrypted_data']['data'].is_a?(String)
+          encrypted_data_contain_fields?(
+            iv: String, auth_tag: String, data: String
+          )
         end
 
         def encrypted_secret?

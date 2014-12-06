@@ -40,11 +40,15 @@ class Chef
           # we avoid saving the decrypted value, only return it
         end
 
+        def data_can_be_decrypted_by_keys?(data, keys)
+          parse_public_keys(keys).reduce(true) do |r, k|
+            r && data_can_be_decrypted_by_key?(data, k)
+          end
+        end
+
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
-          parse_public_keys(keys).reduce(true) do |r, k|
-            r && data_can_be_decrypted_by_key?(self['encrypted_data'], k)
-          end
+          data_can_be_decrypted_by_keys?(self['encrypted_data'], keys)
         end
 
         def needs_update?(keys)
