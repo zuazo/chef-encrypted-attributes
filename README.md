@@ -1,6 +1,7 @@
 # Chef-Encrypted-Attributes
 [![Gem Version](http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat)](http://badge.fury.io/rb/chef-encrypted-attributes)
 [![Dependency Status](http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/onddo/chef-encrypted-attributes)
+[![Code Climate](http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/onddo/chef-encrypted-attributes)
 [![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
 [![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
 
