@@ -100,11 +100,10 @@ class Chef
       end
 
       def assert_attribute_array(attr_ary)
-        unless attr_ary.is_a?(Array)
-          fail ArgumentError,
-               "#{self.class}##{__method__} attr_ary argument must be an "\
-               "array of strings. You passed #{attr_ary.inspect}."
-        end
+        return if attr_ary.is_a?(Array)
+        fail ArgumentError,
+             "#{self.class}##{__method__} attr_ary argument must be an array "\
+             "of strings. You passed #{attr_ary.inspect}."
       end
     end
   end
