@@ -44,18 +44,21 @@ class Chef
         )
       end
 
+      def parse_search_result(res)
+        if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
+          res[0]['value']
+        else
+          nil
+        end
+      end
+
       def load_attribute(attr_ary, partial_search = true)
         assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
         return self.class.cache[cache_key] if self.class.cache.key?(cache_key)
         keys = { 'value' => attr_ary }
         res = search(:node, "name:#{@name}", keys, 1, partial_search)
-        self.class.cache[cache_key] =
-          if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
-            res[0]['value']
-          else
-            nil
-          end
+        self.class.cache[cache_key] = parse_search_result(res)
       end
 
       def save_attribute(attr_ary, value)
