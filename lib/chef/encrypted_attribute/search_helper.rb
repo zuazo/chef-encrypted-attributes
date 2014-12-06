@@ -90,8 +90,8 @@ class Chef
 
       def parse_normal_search_row_attribute(row, attr_ary)
         attr_ary.reduce(row) do |r, attr|
-          if r.respond_to?(attr.to_sym)
-            r.send(attr.to_sym)
+          if r.respond_to?(attr)
+            r.send(attr)
           elsif r.respond_to?(:key?)
             r[attr.to_s] if r.key?(attr.to_s)
           end
