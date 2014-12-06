@@ -66,6 +66,14 @@ class Chef
           Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
         end
 
+        def attribute_path_to_ary_read_escape(str, i, delim)
+          if str[i + 1] == delim
+            str[i + 1]
+          else
+            str[i] + (str[i + 1].nil? ? '' : str[i + 1])
+          end
+        end
+
         def attribute_path_to_ary(str, delim = '.', escape = '\\')
           # cool, but doesn't work for some edge cases
           # return str.scan(/(?:[^.\\]|\\.)+/).map {|x| x.gsub('\\.', '.') }
@@ -74,12 +82,7 @@ class Chef
           i = 0
           until str[i].nil?
             if str[i] == escape
-              if str[i + 1] == delim
-                current << str[i + 1]
-              else
-                current << str[i]
-                current << str[i + 1] unless str[i + 1].nil?
-              end
+              current << attribute_path_to_ary_read_escape(str, i, delim)
               i += 1 # skip the next char
             elsif str[i] == delim
               result << current
