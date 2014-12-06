@@ -26,7 +26,6 @@ class Chef
         def self.included(includer)
           includer.class_eval do
             deps do
-              puts "OKOKOK"
               require 'chef/encrypted_attribute'
               require 'chef/json_compat'
             end
