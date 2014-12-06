@@ -82,16 +82,28 @@ class Chef
 
         protected
 
-        def encrypted?
-          super &&
-            self['encrypted_data'].key?('iv') &&
+        def encrypted_data?
+          self['encrypted_data'].key?('iv') &&
             self['encrypted_data']['iv'].is_a?(String) &&
             self['encrypted_data'].key?('data') &&
-            self['encrypted_data']['data'].is_a?(String) &&
-            self['encrypted_secret'].is_a?(Hash) &&
-            self['hmac'].is_a?(Hash) &&
+            self['encrypted_data']['data'].is_a?(String)
+        end
+
+        def encrypted_secret?
+          self['encrypted_secret'].is_a?(Hash)
+        end
+
+        def encrypted_hmat?
+          self['hmac'].is_a?(Hash) &&
             self['hmac'].key?('data') &&
             self['hmac']['data'].is_a?(String)
+        end
+
+        def encrypted?
+          super &&
+            encrypted_data? &&
+            encrypted_secret? &&
+            encrypted_hmat?
         end
 
         def symmetric_encrypt_value(value, algo = SYMM_ALGORITHM)
