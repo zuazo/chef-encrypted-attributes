@@ -61,15 +61,23 @@ class Chef
 
         protected
 
-        def encrypted?
-          Version0.instance_method(:encrypted?).bind(self).call &&
-            self['encrypted_data'].key?('iv') &&
+        def encrypted_data?
+          self['encrypted_data'].key?('iv') &&
             self['encrypted_data']['iv'].is_a?(String) &&
             self['encrypted_data'].key?('auth_tag') &&
             self['encrypted_data']['auth_tag'].is_a?(String) &&
             self['encrypted_data'].key?('data') &&
-            self['encrypted_data']['data'].is_a?(String) &&
-            self['encrypted_secret'].is_a?(Hash)
+            self['encrypted_data']['data'].is_a?(String)
+        end
+
+        def encrypted_secret?
+          self['encrypted_secret'].is_a?(Hash)
+        end
+
+        def encrypted?
+          Version0.instance_method(:encrypted?).bind(self).call &&
+            encrypted_data? &&
+            encrypted_secret?
         end
 
         def symmetric_encrypt_value(value, algo = ALGORITHM)
