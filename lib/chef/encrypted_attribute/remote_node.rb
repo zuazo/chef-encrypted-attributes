@@ -45,32 +45,21 @@ class Chef
       end
 
       def load_attribute(attr_ary, partial_search = true)
-        unless attr_ary.is_a?(Array)
-          fail ArgumentError,
-               "#{self.class}##{__method__} attr_ary argument must be an "\
-               "array of strings. You passed #{attr_ary.inspect}."
-        end
+        assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
-        if self.class.cache.key?(cache_key)
-          self.class.cache[cache_key]
-        else
-          keys = { 'value' => attr_ary }
-          res = search(:node, "name:#{@name}", keys, 1, partial_search)
-          self.class.cache[cache_key] =
-            if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
-              res[0]['value']
-            else
-              nil
-            end
-        end
+        return self.class.cache[cache_key] if self.class.cache.key?(cache_key)
+        keys = { 'value' => attr_ary }
+        res = search(:node, "name:#{@name}", keys, 1, partial_search)
+        self.class.cache[cache_key] =
+          if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
+            res[0]['value']
+          else
+            nil
+          end
       end
 
       def save_attribute(attr_ary, value)
-        unless attr_ary.is_a?(Array)
-          fail ArgumentError,
-               "#{self.class}##{__method__} attr_ary argument must be an "\
-               "array of strings. You passed #{attr_ary.inspect}."
-        end
+        assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
 
         node = Chef::Node.load(name)
@@ -86,11 +75,7 @@ class Chef
       end
 
       def delete_attribute(attr_ary)
-        unless attr_ary.is_a?(Array)
-          fail ArgumentError,
-               "#{self.class}##{__method__} attr_ary argument must be an "\
-               "array of strings. You passed #{attr_ary.inspect}."
-        end
+        assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
 
         node = Chef::Node.load(name)
@@ -112,6 +97,14 @@ class Chef
 
       def cache_key(name, attr_ary)
         "#{name}:#{attr_ary.inspect}" # TODO: ok, this can be improved
+      end
+
+      def assert_attribute_array(attr_ary)
+        unless attr_ary.is_a?(Array)
+          fail ArgumentError,
+               "#{self.class}##{__method__} attr_ary argument must be an "\
+               "array of strings. You passed #{attr_ary.inspect}."
+        end
       end
     end
   end
