@@ -136,6 +136,10 @@ class Chef
           raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
+        # RuntimeError is raised for unsupported algorithms
+        HMAC_EXCEPTIONS =
+          [OpenSSL::Digest::DigestError, OpenSSL::HMACError, RuntimeError]
+
         def generate_hmac(data, algo = HMAC_ALGORITHM)
           # [cipher] is ignored, only as info
           hmac = Mash.new('cipher' => algo)
@@ -145,9 +149,7 @@ class Chef
           hmac['data'] =
             Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           hmac
-        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
-               RuntimeError => e
-          # RuntimeError is raised for unsupported algorithms
+        rescue *HMAC_EXCEPTIONS => e
           raise MessageAuthenticationFailure, "#{e.class}: #{e}"
         end
 
@@ -156,8 +158,7 @@ class Chef
           secret = Base64.decode64(orig_hmac['secret'])
           new_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, secret, data))
           orig_hmac['data'] == new_hmac
-        rescue OpenSSL::Digest::DigestError, OpenSSL::HMACError,
-               RuntimeError => e
+        rescue *HMAC_EXCEPTIONS => e
           raise MessageAuthenticationFailure, "#{e.class}: #{e}"
         end
       end
