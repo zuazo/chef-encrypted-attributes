@@ -17,12 +17,14 @@
 #
 
 require 'chef/knife/core/encrypted_attribute_base'
+require 'chef/knife/core/encrypted_attribute_depends'
 require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
     # knife encrypted attribute edit command
-    class EncryptedAttributeEdit < EncryptedAttributeBase
+    class EncryptedAttributeEdit < Core::EncryptedAttributeBase
+      include Knife::Core::EncryptedAttributeDepends
       include Knife::Core::EncryptedAttributeEditorOptions
 
       option :input_format,

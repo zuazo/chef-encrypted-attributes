@@ -26,11 +26,6 @@ class Chef
         def self.included(includer)
           includer.class_eval do
 
-            deps do
-              require 'chef/encrypted_attribute'
-              require 'chef/json_compat'
-            end
-
             def self.encrypted_attributes_option_set(key, value)
               Chef::Config[:knife][:encrypted_attributes][key] = value
             end

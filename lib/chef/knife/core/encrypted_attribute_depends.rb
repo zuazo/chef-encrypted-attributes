@@ -16,27 +16,21 @@
 # limitations under the License.
 #
 
-require 'chef/knife/core/encrypted_attribute_base'
-require 'chef/knife/core/encrypted_attribute_depends'
+require 'chef/knife'
 
 class Chef
   class Knife
-    # knife encrypted attribute show command
-    class EncryptedAttributeShow < Core::EncryptedAttributeBase
-      include Knife::Core::EncryptedAttributeDepends
-
-      banner 'knife encrypted attribute show NODE ATTRIBUTE (options)'
-
-      def assert_valid_args
-        assert_attribute_exists(@node_name, @attr_ary)
-      end
-
-      def run
-        parse_args
-
-        enc_attr =
-          Chef::EncryptedAttribute.load_from_node(@node_name, @attr_ary)
-        output(enc_attr)
+    module Core
+      # Loads knife encrypted attribute dependencies
+      module EncryptedAttributeDepends
+        def self.included(includer)
+          includer.class_eval do
+            deps do
+              require 'chef/encrypted_attribute'
+              require 'chef/json_compat'
+            end
+          end
+        end
       end
     end
   end

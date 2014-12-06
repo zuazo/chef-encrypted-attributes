@@ -17,12 +17,14 @@
 #
 
 require 'chef/knife/core/encrypted_attribute_base'
+require 'chef/knife/core/encrypted_attribute_depends'
 require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
     # knife encrypted attribute update command
-    class EncryptedAttributeUpdate < EncryptedAttributeBase
+    class EncryptedAttributeUpdate < Core::EncryptedAttributeBase
+      include Knife::Core::EncryptedAttributeDepends
       include Knife::Core::EncryptedAttributeEditorOptions
 
       banner 'knife encrypted attribute update NODE ATTRIBUTE (options)'

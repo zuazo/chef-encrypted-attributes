@@ -17,16 +17,14 @@
 #
 
 require 'chef/knife/core/encrypted_attribute_base'
+require 'chef/knife/core/encrypted_attribute_depends'
 require 'chef/encrypted_attribute/remote_node'
 
 class Chef
   class Knife
     # knife encrypted attribute delete command
-    class EncryptedAttributeDelete < EncryptedAttributeBase
-      deps do
-        require 'chef/encrypted_attribute'
-        require 'chef/json_compat'
-      end
+    class EncryptedAttributeDelete < Core::EncryptedAttributeBase
+      include Knife::Core::EncryptedAttributeDepends
 
       banner 'knife encrypted attribute delete NODE ATTRIBUTE (options)'
 
