@@ -31,14 +31,22 @@ class Chef
               require 'chef/json_compat'
             end
 
-            def self.encrypted_attributes_config
-              Chef::Config[:knife][:encrypted_attributes]
+            def self.encrypted_attributes_option_set(key, value)
+              Chef::Config[:knife][:encrypted_attributes][key] = value
+            end
+
+            def self.encrypted_attributes_option_push(key, value)
+              unless Chef::Config[:knife][:encrypted_attributes][key]
+                     .is_a?(Array)
+                Chef::Config[:knife][:encrypted_attributes][key] = []
+              end
+              Chef::Config[:knife][:encrypted_attributes][key] << value
             end
 
             option :encrypted_attribute_version,
                    long: '--encrypted-attribute-version VERSION',
                    description: 'Encrypted Attribute protocol version to use',
-                   proc: ->(i) { encrypted_attributes_config[:version] = i }
+                   proc: ->(i) { encrypted_attributes_option_set(:version, i) }
 
             option :encrypted_attribute_partial_search,
                    short: '-P',
@@ -47,7 +55,7 @@ class Chef
                    boolean: true,
                    proc:
                     (lambda do |_i|
-                      encrypted_attributes_config[:partial_search] = false
+                      encrypted_attributes_option_set(:partial_search, false)
                     end)
 
             option :encrypted_attribute_client_search,
@@ -57,11 +65,7 @@ class Chef
                      'Client search query. Can be specified multiple times',
                    proc:
                      (lambda do |i|
-                       unless encrypted_attributes_config[:client_search]
-                              .is_a?(Array)
-                         encrypted_attributes_config[:client_search] = []
-                       end
-                       encrypted_attributes_config[:client_search] << i
+                       encrypted_attributes_option_push(:client_search, i)
                      end)
 
             option :encrypted_attribute_node_search,
@@ -70,13 +74,7 @@ class Chef
                    description:
                      'Node search query. Can be specified multiple times',
                    proc:
-                     (lambda do |i|
-                       unless encrypted_attributes_config[:node_search]
-                              .is_a?(Array)
-                         encrypted_attributes_config[:node_search] = []
-                       end
-                       encrypted_attributes_config[:node_search] << i
-                     end)
+                     ->(i) { encrypted_attributes_option_push(:node_search, i) }
 
             option :encrypted_attribute_users,
                    short: '-U USER',
@@ -84,51 +82,57 @@ class Chef
                    description:
                      'User name to allow access to. Can be specified multiple '\
                      'times',
-                   proc:
-                     (lambda do |i|
-                       unless encrypted_attributes_config[:users].is_a?(Array)
-                         encrypted_attributes_config[:users] = []
-                       end
-                       encrypted_attributes_config[:users] << i
-                     end)
+                   proc: ->(i) { encrypted_attributes_option_push(:users, i) }
 
             # TODO: option :keys
 
             # Modified Chef::Knife::UI#edit_data method with plain text format
             # support
-            def edit_data(data = nil, format = 'plain')
-              output =
-                case format
-                when 'JSON', 'json'
-                  if data.nil?
-                    {}
-                  else
-                    Chef::JSONCompat.to_json_pretty(data, quirks_mode: true)
-                  end
-                else
-                  data.nil? ? '' : data
-                end
 
-              unless config[:disable_editing]
-                Tempfile.open(%w(knife-edit- .json)) do |tf|
-                  tf.sync = true
-                  tf.puts output
-                  tf.close
-                  unless system("#{config[:editor]} #{tf.path}")
-                    fail 'Please set EDITOR environment variable'
-                  end
-
-                  output = IO.read(tf.path)
-                  tf.unlink # not needed, but recommended
-                end
-              end
-
+            def edit_data_string_to_obj(data, format)
               case format
               when 'JSON', 'json'
-                FFI_Yajl::Parser.parse(output)
+                if data.nil?
+                  {}
+                else
+                  Chef::JSONCompat.to_json_pretty(data, quirks_mode: true)
+                end
               else
-                output
+                data.nil? ? '' : data
               end
+            end
+
+            def edit_data_obj_to_string(data, format)
+              case format
+              when 'JSON', 'json'
+                FFI_Yajl::Parser.parse(data)
+              else
+                data
+              end
+            end
+
+            def edit_data_run_editor_command(path)
+              return if system("#{config[:editor]} #{path}")
+              fail 'Please set EDITOR environment variable'
+            end
+
+            def edit_data_run_editor(data)
+              return if config[:disable_editing]
+              result = nil
+              Tempfile.open(%w(knife-edit- .json)) do |tf|
+                tf.sync = true
+                tf.puts(data)
+                tf.close
+                edit_data_run_editor_command(tf.path)
+                result = IO.read(tf.path)
+              end
+              result
+            end
+
+            def edit_data(data = nil, format = 'plain')
+              output = edit_data_string_to_obj(data, format)
+              output = edit_data_run_editor(output)
+              edit_data_obj_to_string(output, format)
             end # def edit_data
 
           end # includer.class_eval
