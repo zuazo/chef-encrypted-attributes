@@ -2,13 +2,13 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
-## 0.3.0:
+## 0.3.0 (2014-08-25)
 
 * gemspec: added the missing CONTRIBUTING.md file
 * README: replaced exist_on_node? by exist? in users_data_bag example
 * Added the required `:node_search` option (fixes the `"role:..."` examples).
 
-## 0.2.0:
+## 0.2.0 (2014-08-12)
 
 * Deprecate `#exists?` methods in favor of `#exist?` methods
 * Fixed all RSpec deprecation warnings
@@ -20,7 +20,7 @@ This file is used to list changes made in each version of `chef-encrypted-attrib
 * Added gem signing certificate
 * gemspec: added dev dependency versions with pessimistic operator
 
-## 0.1.1:
+## 0.1.1 (2014-05-23)
 
 * gemspec: replaced open-ended chef dependency by `~> 11.4`
 * Fixed ruby `1.9.2` decryption (uses `PKCS#1` for public key format)
@@ -28,6 +28,6 @@ This file is used to list changes made in each version of `chef-encrypted-attrib
 * INTERNAL doc: added `EncryptedMash` class name to the Version0 structure
 * Added shields.io badges
 
-## 0.1.0:
+## 0.1.0 (2014-05-21)
 
 * Initial release of `chef-encrypted-attributes`
