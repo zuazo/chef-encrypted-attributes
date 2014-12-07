@@ -43,7 +43,8 @@ In the following example we save a simple FTP user password.
 chef_gem "chef-encrypted-attributes"
 require "chef/encrypted_attributes"
 
-Chef::Recipe.send(:include, Opscode::OpenSSL::Password) # include the #secure_password method
+# include the #secure_password method
+Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 if Chef::EncryptedAttribute.exist?(node["myapp"]["ftp_password"])
   # update with the new keys
@@ -77,14 +78,16 @@ Chef::Config[:encrypted_attributes][:client_search] = "admin:true"
 Chef::Config[:encrypted_attributes][:node_search] = "role:webapp"
 
 if Chef::EncryptedAttribute.exist?(node["myapp"]["encrypted_data"])
-  # when can used #load here as above if we need the `encrypted_data` outside this `if`
+  # when can used #load here as above if we need the `encrypted_data` outside
+  # this `if`
 
   # update with the new keys
   Chef::EncryptedAttribute.update(node.set["myapp"]["encrypted_data"])
 else
   # create the data, encrypt and save it
   data_to_encrypt = # ....
-  node.set["myapp"]["encrypted_data"] = Chef::EncryptedAttribute.create(data_to_encrypt)
+  node.set["myapp"]["encrypted_data"] =
+    Chef::EncryptedAttribute.create(data_to_encrypt)
 end
 ```
 
@@ -95,8 +98,12 @@ include_recipe 'encrypted_attributes'
 # Expose the public key for encryption
 include_recipe 'encrypted_attributes::expose_key'
 
-if Chef::EncryptedAttribute.exist_on_node?("random.example.com", ["myapp", "encrypted_data"])
-  data = Chef::EncryptedAttribute.load_from_node("random.example.com", ["myapp", "encrypted_data"])
+if Chef::EncryptedAttribute.exist_on_node?(
+     "random.example.com", ["myapp", "encrypted_data"]
+   )
+  data = Chef::EncryptedAttribute.load_from_node(
+    "random.example.com", ["myapp", "encrypted_data"]
+  )
 
   # use `data` for something here ...
 end
@@ -127,9 +134,12 @@ chef_gem "chef-encrypted-attributes"
 require "chef/encrypted_attributes"
 
 chef_users = Chef::DataBagItem.load("global_data_bag", "chef_users")
-chef_users.delete("id") # remove the data bag "id" to avoid to confuse it with a user
+# remove the data bag "id" to avoid to confuse it with a user:
+chef_users.delete("id")
 
-Chef::Log.debug("Admin users able to read the Encrypted Attributes: #{chef_users.keys.inspect}")
+Chef::Log.debug(
+  "Chef Users able to read the Encrypted Attributes: #{chef_users.keys.inspect}"
+)
 Chef::Config[:encrypted_attributes][:keys] = chef_users.values
 
 # if Chef::EncryptedAttribute.exist?(...)
