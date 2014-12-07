@@ -20,15 +20,16 @@ require 'spec_helper'
 require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::RemoteClients do
+  let(:remote_clients_class) { Chef::EncryptedAttribute::RemoteClients }
   before do
-    Chef::EncryptedAttribute::RemoteClients.cache.clear
+    clear_cache(:clients)
 
-    @RemoteClients = Chef::EncryptedAttribute::RemoteClients
-    allow(@RemoteClients).to receive(:search)
+    allow(remote_clients_class).to receive(:search)
   end
 
   it 'includes EncryptedAttribute::SearchHelper methods' do
-    expect(@RemoteClients).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
+    expect(remote_clients_class)
+      .to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
   describe '#get_public_key' do
@@ -36,23 +37,26 @@ describe Chef::EncryptedAttribute::RemoteClients do
     it 'gets client public key' do
       fake_client = Chef::ApiClient.new
       allow(fake_client).to receive(:public_key).and_return('OK')
-      expect(Chef::ApiClient).to receive(:load).with('node1').and_return(fake_client)
-      expect(@RemoteClients.get_public_key('node1')).to eq('OK')
+      expect(Chef::ApiClient)
+        .to receive(:load).with('node1').and_return(fake_client)
+      expect(remote_clients_class.get_public_key('node1')).to eq('OK')
     end
 
     {
       '404' => Chef::EncryptedAttribute::ClientNotFound,
-      'anything_else' => Net::HTTPServerException,
+      'anything_else' => Net::HTTPServerException
     }.each do |code, exception|
 
-      it "throws an #{exception.to_s} exception if the server returns a #{code} code" do
+      it "throws an #{exception} exception if the server returns a "\
+         "#{code} code" do
         allow(Chef::ApiClient).to receive(:load) do
-          raise Net::HTTPServerException.new('Net::HTTPServerException',
+          fail Net::HTTPServerException.new(
+            'Net::HTTPServerException',
             Net::HTTPResponse.new('1.1', code, 'Net::HTTPResponse')
           )
         end
         expect do
-          @RemoteClients.get_public_key('random_client')
+          remote_clients_class.get_public_key('random_client')
         end.to raise_error(exception)
       end
 
@@ -61,64 +65,61 @@ describe Chef::EncryptedAttribute::RemoteClients do
   end # #get_public_key
 
   describe '#search_public_keys' do
-    before(:all) do
-      Chef::EncryptedAttribute::RemoteClients.cache.max_size(20)
-    end
-    before do
-      @public_keys = [
-        OpenSSL::PKey::RSA.new(128).public_key.to_pem,
-        OpenSSL::PKey::RSA.new(128).public_key.to_pem,
+    let(:public_keys) do
+      [
+        create_ssl_key.public_key.to_pem,
+        create_ssl_key.public_key.to_pem
       ]
-      @clients = @public_keys.map { |x| { 'public_key' => x } }
     end
+    let(:clients) { public_keys.map { |x| { 'public_key' => x } } }
+    before(:all) { cache_size(:clients, 20) }
 
     it 'gets client public_keys using SearchHelper' do
-      allow(@RemoteClients).to receive(:search).and_return(@clients)
-      expect(@RemoteClients.search_public_keys).to eql(@public_keys)
+      allow(remote_clients_class).to receive(:search).and_return(clients)
+      expect(remote_clients_class.search_public_keys).to eql(public_keys)
     end
 
     it 'returns empty array for empty search results' do
-      allow(@RemoteClients).to receive(:search).and_return({})
-      expect(@RemoteClients.search_public_keys).to eql([])
+      allow(remote_clients_class).to receive(:search).and_return({})
+      expect(remote_clients_class.search_public_keys).to eql([])
     end
 
     it 'does a search with the correct arguments' do
       query = 'admin:true'
-      expect(@RemoteClients).to receive(:search).once.with(
+      expect(remote_clients_class).to receive(:search).once.with(
         :client,
         query,
-        { 'public_key' => [ 'public_key' ] },
+        { 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@clients)
-      @RemoteClients.search_public_keys(query)
+      ).and_return(clients)
+      remote_clients_class.search_public_keys(query)
     end
 
     it 'does "*:*" search by default' do
-      expect(@RemoteClients).to receive(:search).with(
+      expect(remote_clients_class).to receive(:search).with(
         :client,
         '*:*',
-        { 'public_key' => [ 'public_key' ] },
+        { 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@clients)
-      @RemoteClients.search_public_keys
+      ).and_return(clients)
+      remote_clients_class.search_public_keys
     end
 
     it 'caches search results for multiple calls' do
       query = 'admin:true'
-      expect(@RemoteClients).to receive(:search).once.with(
+      expect(remote_clients_class).to receive(:search).once.with(
         :client,
         query,
-        { 'public_key' => [ 'public_key' ] },
+        { 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@clients)
+      ).and_return(clients)
 
-      @RemoteClients.search_public_keys(query)
-      @RemoteClients.search_public_keys(query) # cached
+      remote_clients_class.search_public_keys(query)
+      remote_clients_class.search_public_keys(query) # cached
     end
 
   end # describe #search_public_keys
-
 end

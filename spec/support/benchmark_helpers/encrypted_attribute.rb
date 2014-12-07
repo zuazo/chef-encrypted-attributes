@@ -16,16 +16,17 @@
 # limitations under the License.
 #
 
-module BenchmarkHelpers::EncryptedAttribute
-
-  def benchmark_each_version(desc, &block)
-    %w{0 1 2}.each do |version|
-      Chef::Config[:encrypted_attributes][:version] = version
-      benchmark_it "#{desc} (v=#{version})" do
-        instance_eval(&block)
+module BenchmarkHelpers
+  # Benchmark test helpers related with EncryptedAttribute class
+  module EncryptedAttribute
+    def benchmark_each_version(desc, &block)
+      %w(0 1 2).each do |version|
+        Chef::Config[:encrypted_attributes][:version] = version
+        benchmark_it "#{desc} (v=#{version})" do
+          instance_eval(&block)
+        end
+        Chef::Config[:encrypted_attributes].delete(:version)
       end
-      Chef::Config[:encrypted_attributes].delete(:version)
     end
   end
-
 end

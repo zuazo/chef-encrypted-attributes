@@ -17,7 +17,7 @@
 #
 
 require 'simplecov'
-if ENV['TRAVIS'] and RUBY_VERSION >= '2.0'
+if ENV['TRAVIS'] && RUBY_VERSION >= '2.0'
   require 'coveralls'
   SimpleCov.formatter = Coveralls::SimpleCov::Formatter
 end
@@ -32,6 +32,8 @@ require 'rspec/autorun'
 require 'should_not/rspec'
 
 require 'support/platform_helpers'
+require 'support/chef_helpers'
+require 'support/encrypted_attributes_helpers'
 
 RSpec.configure do |config|
   config.order = 'random'
@@ -39,9 +41,14 @@ RSpec.configure do |config|
   config.color = true
   config.tty = true
 
-  config.filter_run_excluding :ruby_gte_19 => true unless ruby_gte_19?
-  config.filter_run_excluding :ruby_gte_20 => true unless ruby_gte_20?
-  config.filter_run_excluding :ruby_gte_20_and_openssl_gte_101 => true unless (ruby_gte_20? && openssl_gte_101?)
-  config.filter_run_excluding :openssl_lt_101 => true unless openssl_lt_101?
-  config.filter_run_excluding :ruby_lt_20 => true unless ruby_lt_20?
+  config.filter_run_excluding ruby_gte_19: true unless ruby_gte_19?
+  config.filter_run_excluding ruby_gte_20: true unless ruby_gte_20?
+  unless ruby_gte_20? && openssl_gte_101?
+    config.filter_run_excluding ruby_gte_20_and_openssl_gte_101: true
+  end
+  config.filter_run_excluding openssl_lt_101: true unless openssl_lt_101?
+  config.filter_run_excluding ruby_lt_20: true unless ruby_lt_20?
+
+  config.include ChefHelpers
+  config.include EncryptedAttributesHelpers
 end

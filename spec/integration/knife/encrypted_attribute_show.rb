@@ -21,44 +21,45 @@ require 'chef/knife/encrypted_attribute_show'
 
 describe Chef::Knife::EncryptedAttributeShow do
   extend ChefZero::RSpec
+  let(:node) do
+    node = Chef::Node.new
+    node.name('node1')
+    node
+  end
 
   when_the_chef_server 'is ready to rock!' do
     before do
-      Chef::EncryptedAttribute::RemoteClients.cache.clear
-      Chef::EncryptedAttribute::RemoteNodes.cache.clear
-      Chef::EncryptedAttribute::RemoteUsers.cache.clear
-      Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
+      clear_all_caches
+      cache_size(:node, 0)
 
       Chef::Knife::EncryptedAttributeShow.load_deps
       @knife = Chef::Knife::EncryptedAttributeShow.new
 
-      @node = Chef::Node.new
-      @node.name('node1')
-      @node.set['encrypted']['attribute'] = Chef::EncryptedAttribute.create('unicorns drill accurately')
-      @node.set['encrypted']['attri.bu\\te'] = Chef::EncryptedAttribute.create('escaped unicorns')
-      @node.save
+      node.set['encrypted']['attribute'] =
+        Chef::EncryptedAttribute.create('unicorns drill accurately')
+      node.set['encrypted']['attri.bu\\te'] =
+        Chef::EncryptedAttribute.create('escaped unicorns')
+      node.save
 
       @stdout = StringIO.new
       allow(@knife.ui).to receive(:stdout).and_return(@stdout)
     end
-    after do
-      @node.destroy
-    end
+    after { node.destroy }
 
     it 'shows the encrypted attribute' do
-      @knife.name_args = %w{node1 encrypted.attribute}
+      @knife.name_args = %w(node1 encrypted.attribute)
       @knife.run
       expect(@stdout.string).to match(/unicorns drill accurately/)
     end
 
     it 'shows the encrypted attribute if needs to be escaped' do
-      @knife.name_args = %w{node1 encrypted.attri\.bu\te}
+      @knife.name_args = %w(node1 encrypted.attri\.bu\te)
       @knife.run
       expect(@stdout.string).to match(/escaped unicorns/)
     end
 
     it 'prints error message when the attribute does not exists' do
-      @knife.name_args = %w{node1 non.existent}
+      @knife.name_args = %w(node1 non.existent)
       expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
       expect { @knife.run }.to raise_error(SystemExit)
     end
@@ -71,7 +72,7 @@ describe Chef::Knife::EncryptedAttributeShow do
     end
 
     it 'prints usage and exit when an attribute is not provided' do
-      @knife.name_args = [ 'node1' ]
+      @knife.name_args = %w(node1)
       expect(@knife).to receive(:show_usage)
       expect(@knife.ui).to receive(:fatal)
       expect { @knife.run }.to raise_error(SystemExit)

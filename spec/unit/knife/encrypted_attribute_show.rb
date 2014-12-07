@@ -20,7 +20,6 @@ require 'spec_helper'
 require 'chef/knife/encrypted_attribute_show'
 
 describe Chef::Knife::EncryptedAttributeShow do
-
   before do
     Chef::Knife::EncryptedAttributeShow.load_deps
     @knife = Chef::Knife::EncryptedAttributeShow.new
@@ -31,15 +30,17 @@ describe Chef::Knife::EncryptedAttributeShow do
   end
 
   it 'loads the encrypted attribute' do
-    expect(Chef::EncryptedAttribute).to receive(:load_from_node).and_return('unicorns drill accurately')
-    @knife.name_args = %w{node1 encrypted.attribute}
+    expect(Chef::EncryptedAttribute)
+      .to receive(:load_from_node).and_return('unicorns drill accurately')
+    @knife.name_args = %w(node1 encrypted.attribute)
     @knife.run
     expect(@stdout.string).to match(/unicorns drill accurately/)
   end
 
   it 'prints error message when the attribute does not exists' do
-    expect(Chef::EncryptedAttribute).to receive(:exist_on_node?).and_return(false)
-    @knife.name_args = [ 'node1', 'non.existent' ]
+    expect(Chef::EncryptedAttribute)
+      .to receive(:exist_on_node?).and_return(false)
+    @knife.name_args = %w(node1 non.existent)
     expect(@knife.ui).to receive(:fatal).with('Encrypted attribute not found')
     expect { @knife.run }.to raise_error(SystemExit)
   end
@@ -52,7 +53,7 @@ describe Chef::Knife::EncryptedAttributeShow do
   end
 
   it 'prints usage and exit when an attribute is not provided' do
-    @knife.name_args = [ 'node1' ]
+    @knife.name_args = ['node1']
     expect(@knife).to receive(:show_usage)
     expect(@knife.ui).to receive(:fatal)
     expect { @knife.run }.to raise_error(SystemExit)
@@ -61,13 +62,15 @@ describe Chef::Knife::EncryptedAttributeShow do
   context '#attribute_path_to_ary' do
 
     {
-      'encrypted.attribute' => [ 'encrypted', 'attribute' ],
-      '.encrypted.attribute.' => [ '', 'encrypted', 'attribute', '' ],
-      'encrypted\\.attribute' => [ 'encrypted.attribute' ],
-      'encrypted\\.attribute\\' => [ 'encrypted.attribute\\' ],
-      'encrypted\\.attr.i\\\\.bute' => [ 'encrypted.attr', 'i\\\\', 'bute' ],
-      'encrypted\\.attr.i\\\\.bu\\\\\.te' => [ 'encrypted.attr', 'i\\\\', 'bu\\\\.te' ],
-      'encrypted\\.attr.i\\\\\\\\.bu\\\\\\\\\.te' => [ 'encrypted.attr', 'i\\\\\\\\', 'bu\\\\\\\\.te' ],
+      'encrypted.attribute' => %w(encrypted attribute),
+      '.encrypted.attribute.' => ['', 'encrypted', 'attribute', ''],
+      'encrypted\\.attribute' => %w(encrypted.attribute),
+      'encrypted\\.attribute\\' => ['encrypted.attribute\\'],
+      'encrypted\\.attr.i\\\\.bute' => ['encrypted.attr', 'i\\\\', 'bute'],
+      'encrypted\\.attr.i\\\\.bu\\\\\.te' =>
+        ['encrypted.attr', 'i\\\\', 'bu\\\\.te'],
+      'encrypted\\.attr.i\\\\\\\\.bu\\\\\\\\\.te' =>
+        ['encrypted.attr', 'i\\\\\\\\', 'bu\\\\\\\\.te']
     }.each do |str, ary|
 
       it "converts #{str.inspect} to #{ary.inspect}" do
@@ -75,7 +78,5 @@ describe Chef::Knife::EncryptedAttributeShow do
       end
 
     end # each do |str, ary|
-
   end # context #attribute_path_to_ary
-
 end

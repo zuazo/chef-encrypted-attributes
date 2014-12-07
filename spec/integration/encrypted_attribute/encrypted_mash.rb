@@ -21,28 +21,19 @@ require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::EncryptedMash do
   extend ChefZero::RSpec
-  before(:all) do
-    Chef::EncryptedAttribute::RemoteClients.cache.clear
-    Chef::EncryptedAttribute::RemoteNodes.cache.clear
-    Chef::EncryptedAttribute::RemoteUsers.cache.clear
-  end
+  before(:all) { clear_all_caches }
 
   when_the_chef_server 'is ready to rock!' do
 
     context '#update' do
-      before do
-        @EncryptedAttribute = Chef::EncryptedAttribute
-        @RemoteClients = Chef::EncryptedAttribute::RemoteClients
-        @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
-      end
 
       it 'calls RemoteClients#search_public_keys only once' do
-        body = @EncryptedAttribute.create(0)
-        expect(@RemoteClients).to receive(:search_public_keys).once.and_return([])
-        @EncryptedAttribute.update(body)
+        body = Chef::EncryptedAttribute.create(0)
+        expect(Chef::EncryptedAttribute::RemoteClients)
+          .to receive(:search_public_keys).once.and_return([])
+        Chef::EncryptedAttribute.update(body)
       end
 
     end # context update
-
   end # when_the_chef_server is ready to rock!
 end

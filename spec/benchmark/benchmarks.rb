@@ -22,15 +22,16 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
-    before(:all) do
-      benchmark_caption
+    let(:node) do
+      node = Chef::Node.new
+      node.name(Chef::Config[:node_name])
+      node
     end
-    before(:each) do
-      @node = Chef::Node.new
-      @node.name(Chef::Config[:node_name])
-
+    before(:all) { benchmark_caption }
+    before do
       # data bag secret
-      Chef::Config[:encrypted_data_bag_secret] = File.join(File.dirname(__FILE__), '../data/encrypted_data_bag_secret')
+      Chef::Config[:encrypted_data_bag_secret] =
+        File.join(File.dirname(__FILE__), '../data/encrypted_data_bag_secret')
       @data_bag_secret = Chef::EncryptedDataBagItem.load_secret
 
       # disable client and node search
@@ -38,29 +39,32 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
       Chef::Config[:encrypted_attributes][:node_search] = []
 
       # Some data to encrypt
-      @clear_hs = Mash.new({
-        :complex => 'object',
-        :more_complexity => [ 1, 'hated string' ],
-        :raving => { 'more random stuff' => [ 3.0, true, false, nil ] },
-      })
+      @clear_hs = Mash.new(
+        complex: 'object',
+        more_complexity: [1, 'hated string'],
+        raving: { 'more random stuff' => [3.0, true, false, nil] }
+      )
       @data_bag_item = {
         'id' => 'data_bag_id', # required for data bags
-        'data' => @clear_hs,
+        'data' => @clear_hs
       }
 
       # Create a data bag example
       data_bag = Chef::DataBag.new
       data_bag.name('encrypted')
       data_bag.save
-      enc_hs = Chef::EncryptedDataBagItem.encrypt_data_bag_item(@data_bag_item, @data_bag_secret)
+      enc_hs =
+        Chef::EncryptedDataBagItem.encrypt_data_bag_item(
+          @data_bag_item, @data_bag_secret
+        )
       @enc_data_bag_item = Chef::DataBagItem.from_hash(enc_hs)
       @enc_data_bag_item.data_bag('encrypted')
       @enc_data_bag_item.save
 
       # Create an encrypted attribute example
       @enc_attr = Chef::EncryptedAttribute.create(@clear_hs)
-      @node.set['encrypted']['attribute'] = @enc_attr
-      @node.save
+      node.set['encrypted']['attribute'] = @enc_attr
+      node.save
     end
 
     benchmark_each_version 'Local EncryptedAttribute read' do
@@ -69,16 +73,20 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
 
     benchmark_it 'Local EncryptedDataBag read' do
       data_bag_secret = Chef::EncryptedDataBagItem.load_secret
-      data_bag_item = Chef::EncryptedDataBagItem.new(@enc_data_bag_item, data_bag_secret)
+      data_bag_item =
+        Chef::EncryptedDataBagItem.new(@enc_data_bag_item, data_bag_secret)
       data_bag_item['data']
     end
 
     benchmark_each_version 'Remote EncryptedAttribute read' do
-      Chef::EncryptedAttribute.load_from_node(@node.name, ['encrypted', 'attribute'])
+      Chef::EncryptedAttribute.load_from_node(
+        node.name, %w(encrypted attribute)
+      )
     end
 
     benchmark_it 'Remote EncryptedDataBag read' do
-      data_bag_item = Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
+      data_bag_item =
+        Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
       data_bag_item['data']
     end
 
@@ -88,24 +96,30 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
 
     benchmark_it 'Local EncryptedDataBag write' do
       data_bag_secret = Chef::EncryptedDataBagItem.load_secret
-      enc_hs = Chef::EncryptedDataBagItem.encrypt_data_bag_item(@data_bag_item, data_bag_secret)
+      enc_hs =
+        Chef::EncryptedDataBagItem.encrypt_data_bag_item(
+          @data_bag_item, data_bag_secret
+        )
       enc_data_bag_item = Chef::DataBagItem.from_hash(enc_hs)
       enc_data_bag_item.data_bag('encrypted')
     end
 
     benchmark_each_version 'Remote EncryptedAttribute write' do
       enc_attr = Chef::EncryptedAttribute.create(@clear_hs)
-      @node.set['encrypted']['attribute'] = enc_attr
-      @node.save
+      node.set['encrypted']['attribute'] = enc_attr
+      node.save
     end
 
     benchmark_it 'Remote EncryptedDataBag write' do
       data_bag_secret = Chef::EncryptedDataBagItem.load_secret
-      enc_hs = Chef::EncryptedDataBagItem.encrypt_data_bag_item(@data_bag_item, data_bag_secret)
+      enc_hs =
+        Chef::EncryptedDataBagItem.encrypt_data_bag_item(
+          @data_bag_item, data_bag_secret
+        )
       enc_data_bag_item = Chef::DataBagItem.from_hash(enc_hs)
       enc_data_bag_item.data_bag('encrypted')
       enc_data_bag_item.save
-      @node.save
+      node.save
     end
 
     benchmark_each_version 'Local EncryptedAttribute read/write' do
@@ -116,28 +130,38 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
 
     benchmark_it 'Local EncryptedDataBag read/write' do
       data_bag_secret = Chef::EncryptedDataBagItem.load_secret
-      enc_hs = Chef::EncryptedDataBagItem.encrypt_data_bag_item(@data_bag_item, data_bag_secret)
+      enc_hs =
+        Chef::EncryptedDataBagItem.encrypt_data_bag_item(
+          @data_bag_item, data_bag_secret
+        )
       enc_data_bag_item = Chef::DataBagItem.from_hash(enc_hs)
       enc_data_bag_item.data_bag('encrypted')
-      enc_data_bag_item = Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
+      enc_data_bag_item =
+        Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
       enc_data_bag_item['data']
     end
 
     benchmark_each_version 'Remote EncryptedAttribute read/write' do
       enc_attr = Chef::EncryptedAttribute.create(@clear_hs)
-      @node.set['encrypted']['attribute'] = enc_attr
-      @node.save
-      Chef::EncryptedAttribute.load_from_node(@node.name, ['encrypted', 'attribute'])
+      node.set['encrypted']['attribute'] = enc_attr
+      node.save
+      Chef::EncryptedAttribute.load_from_node(
+        node.name, %w(encrypted attribute)
+      )
     end
 
     benchmark_it 'Remote EncryptedDataBag read/write' do
       data_bag_secret = Chef::EncryptedDataBagItem.load_secret
-      enc_hs = Chef::EncryptedDataBagItem.encrypt_data_bag_item(@data_bag_item, data_bag_secret)
+      enc_hs =
+        Chef::EncryptedDataBagItem.encrypt_data_bag_item(
+          @data_bag_item, data_bag_secret
+        )
       enc_data_bag_item = Chef::DataBagItem.from_hash(enc_hs)
       enc_data_bag_item.data_bag('encrypted')
       enc_data_bag_item.save
-      @node.save
-      enc_data_bag_item = Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
+      node.save
+      enc_data_bag_item =
+        Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
       enc_data_bag_item['data']
     end
 

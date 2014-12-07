@@ -20,12 +20,10 @@ require 'integration_helper'
 require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::SearchHelper do
+  let(:search_helper_class) { Chef::EncryptedAttribute::SearchHelper }
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
-    before do
-      @SearchHelper = Chef::EncryptedAttribute::SearchHelper
-    end
 
     context '#search' do
       before do
@@ -37,61 +35,72 @@ describe Chef::EncryptedAttribute::SearchHelper do
           node
         end
         # load the default clients
-        @default_clients = Chef::ApiClient.list.keys.each.map do |c|
+        @default_clients = Chef::ApiClient.list.keys.map do |c|
           Chef::ApiClient.load(c)
         end
-        @new_clients = (1..2).step.map do |c|
-          client = Chef::ApiClient.new
-          client.name("client#{c}")
-          client.admin(false)
-          client.public_key(client.save['public_key'])
-          client
-        end
+        @new_clients = (1..2).step.map { |c| chef_create_client("client#{c}") }
       end
       after do
-        @nodes.each { |n| n.destroy }
-        @new_clients.each { |c| c.destroy }
+        @nodes.each(&:destroy)
+        @new_clients.each(&:destroy)
       end
 
-      [ true, false ].each do |partial_search|
+      [true, false].each do |partial_search|
         context "partial_search=#{partial_search}" do
 
           it 'searches node attributes without errors' do
-            expect(@SearchHelper.search(:node, 'name:*', { 'value' => [ 'some', 'deep' ] }, 1000, partial_search)).to eql(
+            expect(search_helper_class.search(
+              :node, 'name:*', { 'value' => %w(some deep) }, 1000,
+              partial_search
+            )).to eql(
               @nodes.map { |n| { 'value' => n['some']['deep'] } }
             )
           end
 
           it 'searches all client public_keys without errors' do
-            expect(@SearchHelper.search(:client, '*:*', { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql(
-              (@default_clients + @new_clients).map { |n| { 'key' => n.public_key } }
+            expect(search_helper_class.search(
+              :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
+            )).to eql(
+              (@default_clients + @new_clients).map do |n|
+                { 'key' => n.public_key }
+              end
             )
           end
 
           it 'searches some client public_keys without errors' do
             search_ary = @new_clients.map { |c| "name:#{c.name}" }
-            expect(@SearchHelper.search(:client, search_ary, { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql(
+            expect(search_helper_class.search(
+              :client, search_ary, { 'key' => %w(public_key) }, 1000,
+              partial_search
+            )).to eql(
               @new_clients.map { |n| { 'key' => n.public_key } }
             )
           end
 
           it 'returns empty results without errors' do
-            expect(@SearchHelper.search(:client, 'empty-result:true', { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql([])
+            expect(search_helper_class.search(
+              :client, 'empty-result:true', { 'key' => %w(public_key) }, 1000,
+              partial_search
+            )).to eql([])
           end
 
           it 'returns empty results without bad types' do
-            expect(@SearchHelper.search(:bad_type, '*:*' , { 'key' => [ 'public_key' ] }, 1000, partial_search)).to eql([])
+            expect(search_helper_class.search(
+              :bad_type, '*:*', { 'key' => %w(public_key) }, 1000,
+              partial_search
+            )).to eql([])
           end
 
           it 'throws an error for invalid keys' do
-            expect { @SearchHelper.search(:node, '*:*', { :invalid => 'query' }, 1000, partial_search) }.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
+            expect do
+              search_helper_class.search(
+                :node, '*:*', { invalid: 'query' }, 1000, partial_search
+              )
+            end.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
           end
 
         end # context partial_search=?
-
       end # each do |partial_search|
-
     end # context #search
-
   end # when_the_chef_server is ready to rock!
 end

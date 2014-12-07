@@ -19,246 +19,256 @@
 require 'spec_helper'
 
 describe Chef::EncryptedAttribute::Config do
-  before do
-    @Config = Chef::EncryptedAttribute::Config
-  end
+  extend EncryptedAttributesHelpers
+
+  let(:config_class) { Chef::EncryptedAttribute::Config }
 
   it 'creates an entire configuration with default values' do
-    expect { @Config.new }.not_to raise_error
+    expect { config_class.new }.not_to raise_error
   end
 
   it 'updates the configuration from the constructor' do
     expect(Chef::Log).not_to receive(:warn)
-    config_hs = { :partial_search => true }
-    expect_any_instance_of(@Config).to receive(:update!).with(config_hs).once
-    config = @Config.new(config_hs)
+    config_hs = { partial_search: true }
+    expect_any_instance_of(config_class)
+      .to receive(:update!).with(config_hs).once
+    config_class.new(config_hs)
   end
 
   it 'warns about unknown configuration values' do
     expect(Chef::Log).to receive(:warn).once
-    @Config.new({
-      :unknown_option => 'foo'
-    })
+    config_class.new(unknown_option: 'foo')
   end
 
   describe "#{Chef::EncryptedAttribute::Config} instance" do
-    before do
-      @config = @Config.new
-    end
+    let(:config) { config_class.new }
 
     {
-      :version => {
-        :default => 1,
-        :ok => [ 1, 'any-string' ],
-        :error => [ true, false, 0.2, Hash.new, Array.new, Object.new ],
+      version: {
+        default: 1,
+        ok: [1, 'any-string'],
+        error: [true, false, 0.2, Hash.new, Array.new, Object.new]
       },
-      :partial_search => {
-        :default => true,
-        :ok => [ true, false ],
-        :error => [ 1, 0.2, 'any-string', Hash.new, Array.new, Object.new ],
+      partial_search: {
+        default: true,
+        ok: [true, false],
+        error: [1, 0.2, 'any-string', Hash.new, Array.new, Object.new]
       },
-      :client_search => {
-        :default => [],
-        :ok => [ [ 'admin:false' ], [ 'admin:true', 'admin:false' ], [] ], # string case is treated below separately
-        :error => [ 1, 0.2, Hash.new, Object.new ],
+      client_search: {
+        default: [],
+        # string case is treated below separately
+        ok: [['admin:false'], %w(admin:true admin:false), []],
+        error: [1, 0.2, Hash.new, Object.new]
       },
-      :node_search => {
-        :default => [],
-        :ok => [ [ 'role:webapp' ], [ 'role:webapp', 'role:ftp' ], [] ], # string case is treated below separately
-        :error => [ 1, 0.2, Hash.new, Object.new ],
+      node_search: {
+        default: [],
+        # string case is treated below separately
+        ok: [['role:webapp'], %w(role:webapp role:ftp), []],
+        error: [1, 0.2, Hash.new, Object.new]
       },
-      :users => {
-        :default => [],
-        :ok => [ '*', [], [ 'admin1' ], [ 'admin1', 'admin2' ] ],
-        :error => [ 1, 0.2, 'any-string', Hash.new, Object.new, [ 2 ], [ 'admin1', Hash.new ], 'invalid.u$er' ],
+      users: {
+        default: [],
+        ok: ['*', [], ['admin1'], %w(admin1 admin2)],
+        error:
+          [
+            1, 0.2, 'any-string', Hash.new, Object.new, [2],
+            ['admin1', Hash.new], 'invalid.u$er'
+          ]
       },
-      :keys => {
-        :default => [],
-        :ok => [
-          [ OpenSSL::PKey::RSA.new(128) ],
-          [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
-          [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
-          [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, OpenSSL::PKey::RSA.new(128) ],
+      keys: {
+        default: [],
+        ok: [
+          [create_ssl_key],
+          [create_ssl_key.public_key.to_pem],
+          [
+            create_ssl_key.public_key.to_pem,
+            create_ssl_key.public_key.to_pem
+          ],
+          [
+            create_ssl_key.public_key.to_pem,
+            create_ssl_key
+          ]
         ],
-        :error => [
+        error: [
           true, false, 1, 0.2, 'any-string', Hash.new,
-          OpenSSL::PKey::RSA.new(128),
-          [ OpenSSL::PKey::RSA.new(128).public_key.to_pem, 4 ],
-          [ 'bad-key' ],
-          # TODO non-public key string arrays
-        ],
-      },
+          create_ssl_key,
+          [create_ssl_key.public_key.to_pem, 4],
+          ['bad-key']
+          # TODO: non-public key string arrays
+        ]
+      }
     }.each do |method, values|
 
       describe "##{method}" do
 
-        it "returns the correct default value (#{values[:default].inspect[0..10]}...)" do
-          expect(@config.send(method)).to eql(values[:default])
+        it 'returns the correct default value '\
+           "(#{values[:default].inspect[0..10]}...)" do
+          expect(config.send(method)).to eql(values[:default])
         end
 
         values[:ok].each do |v_ok|
-          it "accepts #{v_ok.class.to_s} type (#{v_ok.inspect.inspect[0..10]}...)" do
-            expect { @config.send(method, v_ok) }.not_to raise_error
-            expect(@config.send(method)).to eql(v_ok)
+          it "accepts #{v_ok.class} type "\
+             "(#{v_ok.inspect.inspect[0..10]}...)" do
+            expect { config.send(method, v_ok) }.not_to raise_error
+            expect(config.send(method)).to eql(v_ok)
           end
         end
 
         values[:error].each do |v_error|
-          it "does not accept #{v_error.class.to_s} type (#{v_error.inspect[0..10]}...)" do
-            expect { @config.send(method, v_error) }.to raise_error(Chef::Exceptions::ValidationFailed)
+          it "does not accept #{v_error.class} type "\
+             "(#{v_error.inspect[0..10]}...)" do
+            expect { config.send(method, v_error) }
+              .to raise_error(Chef::Exceptions::ValidationFailed)
           end
         end
 
       end # describe method
 
-
     end # methods each
 
     it '#client_search accepts String type tunrning it into an Array' do
-      expect { @config.client_search('admin:false') }.not_to raise_error
-      expect(@config.client_search).to eql([ 'admin:false' ])
+      expect { config.client_search('admin:false') }.not_to raise_error
+      expect(config.client_search).to eql(['admin:false'])
     end
 
     it '#node_search  accepts String type tunrning it into an Array' do
-      expect { @config.node_search('role:webapp') }.not_to raise_error
-      expect(@config.node_search).to eql([ 'role:webapp' ])
+      expect { config.node_search('role:webapp') }.not_to raise_error
+      expect(config.node_search).to eql(['role:webapp'])
     end
 
     describe '#update!' do
       before do
-        @config.version(2)
-        @config.partial_search(true)
-        @config.client_search([ 'admin:true' ])
-        @config.node_search([])
-        @config.users('*')
-        @config.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
+        config.version(2)
+        config.partial_search(true)
+        config.client_search(%w(admin:true))
+        config.node_search([])
+        config.users('*')
+        config.keys([create_ssl_key.public_key.to_pem])
       end
 
-      it 'updates version value from a @Config class' do
-        config2 = @Config.new
+      it 'updates version value from a config_class class' do
+        config2 = config_class.new
         config2.version(5)
-        @config.update!(config2)
-        expect(@config.version).to eql(config2.version)
+        config.update!(config2)
+        expect(config.version).to eql(config2.version)
       end
 
-      it 'updates partial_search values from a @Config class' do
-        config2 = @Config.new
+      it 'updates partial_search values from a config_class class' do
+        config2 = config_class.new
         config2.partial_search(false)
-        @config.update!(config2)
-        expect(@config.partial_search).to eql(config2.partial_search)
+        config.update!(config2)
+        expect(config.partial_search).to eql(config2.partial_search)
       end
 
-      it 'updates client_search values from a @Config class' do
-        config2 = @Config.new
-        config2.client_search([ '*:*' ])
-        @config.update!(config2)
-        expect(@config.client_search).to eql(config2.client_search)
+      it 'updates client_search values from a config_class class' do
+        config2 = config_class.new
+        config2.client_search(%w(*:*))
+        config.update!(config2)
+        expect(config.client_search).to eql(config2.client_search)
       end
 
-      it 'updates node_search values from a @Config class' do
-        config2 = @Config.new
-        config2.node_search([ '*:*' ])
-        @config.update!(config2)
-        expect(@config.node_search).to eql(config2.node_search)
+      it 'updates node_search values from a config_class class' do
+        config2 = config_class.new
+        config2.node_search(%w(*:*))
+        config.update!(config2)
+        expect(config.node_search).to eql(config2.node_search)
       end
 
-      it 'updates users values from a @Config class' do
-        config2 = @Config.new
-        config2.users([ 'admin' ])
-        @config.update!(config2)
-        expect(@config.users).to eql(config2.users)
+      it 'updates users values from a config_class class' do
+        config2 = config_class.new
+        config2.users(%w(admin))
+        config.update!(config2)
+        expect(config.users).to eql(config2.users)
       end
 
-      it 'updates keys values from a @Config class' do
-        config2 = @Config.new
-        config2.keys([ OpenSSL::PKey::RSA.new(128).public_key.to_pem ])
-        @config.update!(config2)
-        expect(@config.keys).to eql(config2.keys)
+      it 'updates keys values from a config_class class' do
+        config2 = config_class.new
+        config2.keys([create_ssl_key.public_key.to_pem])
+        config.update!(config2)
+        expect(config.keys).to eql(config2.keys)
       end
 
       it 'updates version value from a Hash with symbol keys' do
-        config2 = { :version => 5 }
-        @config.update!(config2)
-        expect(@config.version).to eql(config2[:version])
+        config2 = { version: 5 }
+        config.update!(config2)
+        expect(config.version).to eql(config2[:version])
       end
 
       it 'updates partial_search value from a Hash with symbol keys' do
-        config2 = { :partial_search => false }
-        @config.update!(config2)
-        expect(@config.partial_search).to eql(config2[:partial_search])
+        config2 = { partial_search: false }
+        config.update!(config2)
+        expect(config.partial_search).to eql(config2[:partial_search])
       end
 
       it 'updates client_search value from a Hash with symbol keys' do
-        config2 = { :client_search => [ '*:*' ] }
-        @config.update!(config2)
-        expect(@config.client_search).to eql(config2[:client_search])
+        config2 = { client_search: %w(*:*) }
+        config.update!(config2)
+        expect(config.client_search).to eql(config2[:client_search])
       end
 
       it 'updates node_search value from a Hash with symbol keys' do
-        config2 = { :node_search => [ '*:*' ] }
-        @config.update!(config2)
-        expect(@config.node_search).to eql(config2[:node_search])
+        config2 = { node_search: %w(*:*) }
+        config.update!(config2)
+        expect(config.node_search).to eql(config2[:node_search])
       end
 
       it 'updates users value from a Hash with symbol keys' do
-        config2 = { :users => [ 'admin' ] }
-        @config.update!(config2)
-        expect(@config.users).to eql(config2[:users])
+        config2 = { users: %w(admin) }
+        config.update!(config2)
+        expect(config.users).to eql(config2[:users])
       end
 
       it 'updates keys value from a Hash with symbol keys' do
-        config2 = { :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ] }
-        @config.update!(config2)
-        expect(@config.keys).to eql(config2[:keys])
+        config2 = { keys: [create_ssl_key.public_key.to_pem] }
+        config.update!(config2)
+        expect(config.keys).to eql(config2[:keys])
       end
 
       it 'updates multiple values from a Hash with different kind of keys' do
         config2 = {
           'partial_search' => false,
-          :client_search => [],
-          :node_search => [],
-          :keys => [ OpenSSL::PKey::RSA.new(128).public_key.to_pem ],
+          client_search: [],
+          node_search: [],
+          keys: [create_ssl_key.public_key.to_pem]
         }
-        @config.update!(config2)
+        config.update!(config2)
 
-        expect(@config.partial_search).to eql(config2['partial_search'])
-        expect(@config.client_search).to eql(config2[:client_search])
-        expect(@config.node_search).to eql(config2[:node_search])
-        expect(@config.keys).to eql(config2[:keys])
+        expect(config.partial_search).to eql(config2['partial_search'])
+        expect(config.client_search).to eql(config2[:client_search])
+        expect(config.node_search).to eql(config2[:node_search])
+        expect(config.keys).to eql(config2[:keys])
       end
 
     end # describe #update!
 
     context '#[]' do
 
-        it 'reads a configuration variable' do
-          config = @Config.new({ :partial_search => true })
-          expect(config[:partial_search]).to eql(true)
-        end
+      it 'reads a configuration variable' do
+        config1 = config_class.new(partial_search: true)
+        expect(config1[:partial_search]).to eql(true)
+      end
 
-        it 'ignores non existing configuration options' do
-          config = @Config.new
-          expect { config[:random_config_options] }.not_to raise_error
-        end
+      it 'ignores non existing configuration options' do
+        config1 = config_class.new
+        expect { config1[:random_config_options] }.not_to raise_error
+      end
 
     end # context #[]
 
     context '#[]=' do
 
       it 'writes a configuration variable' do
-        config = @Config.new({ :partial_search => false })
-        expect(config[:partial_search]).to eql(false)
-        config[:partial_search] = true
-        expect(config[:partial_search]).to eql(true)
+        config1 = config_class.new(partial_search: false)
+        expect(config1[:partial_search]).to eql(false)
+        config1[:partial_search] = true
+        expect(config1[:partial_search]).to eql(true)
       end
 
       it 'ignores non existing configuration options' do
-        config = @Config.new
-        expect { config[:random_config_options] = 5 }.not_to raise_error
+        config1 = config_class.new
+        expect { config1[:random_config_options] = 5 }.not_to raise_error
       end
 
     end # context #[]=
-
   end # describe Chef::EncryptedAttribute::Config instance
-
 end # describe Chef::EncryptedAttribute::Config

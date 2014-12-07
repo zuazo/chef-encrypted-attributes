@@ -19,65 +19,59 @@
 require 'spec_helper'
 
 describe Chef::EncryptedAttribute::EncryptedMash do
-  before(:all) do
-    Chef::EncryptedAttribute::RemoteClients.cache.clear
-    Chef::EncryptedAttribute::RemoteNodes.cache.clear
-    Chef::EncryptedAttribute::RemoteUsers.cache.clear
-  end
-  before do
-    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
-  end
+  before(:all) { clear_all_caches }
 
   context '#new' do
 
     it 'creates an EncryptedMash object without errors' do
-      expect { @EncryptedMash.new }.not_to raise_error
+      expect { EncryptedMash.new }.not_to raise_error
     end
 
-    it 'is able to create an EncryptedMash from another EncryptedMash instance passed as arg' do
-      body0 = @EncryptedMash.new
-      expect_any_instance_of(@EncryptedMash).to receive(:update_from!).with(body0)
-      expect { @EncryptedMash.new(body0) }.not_to raise_error
+    it 'is able to create an EncryptedMash from another EncryptedMash '\
+       'instance passed as arg' do
+      body0 = EncryptedMash.new
+      expect_any_instance_of(EncryptedMash)
+        .to receive(:update_from!).with(body0)
+      expect { EncryptedMash.new(body0) }.not_to raise_error
     end
 
-    %w{encrypt decrypt can_be_decrypted_by? needs_update?}.each do |meth|
+    %w(encrypt decrypt can_be_decrypted_by? needs_update?).each do |meth|
 
       it "##{meth} method raises a NotImplementedError error" do
-        body = @EncryptedMash.new
+        body = EncryptedMash.new
         expect { body.send(meth) }.to raise_error(NotImplementedError)
       end
 
     end # each do |meth|
-
   end # context #new
 
   context '#self.exist?' do
 
-    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
+    EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     [
-      @EncryptedMash.new,
+      EncryptedMash.new,
       {
-        @EncryptedMash::JSON_CLASS => @EncryptedMash.to_s,
-        @EncryptedMash::CHEF_TYPE => @EncryptedMash::CHEF_TYPE_VALUE,
-      },
+        EncryptedMash::JSON_CLASS => EncryptedMash.to_s,
+        EncryptedMash::CHEF_TYPE => EncryptedMash::CHEF_TYPE_VALUE
+      }
     ].each do |o|
       it "returns true for #{o.inspect}" do
         expect(Chef::Log).to_not receive(:warn)
-        expect(@EncryptedMash.exist?(o)).to be_truthy
+        expect(EncryptedMash.exist?(o)).to be_truthy
       end
     end
 
     [
       5, true, {},
-      { @EncryptedMash::JSON_CLASS => @EncryptedMash.name },
+      { EncryptedMash::JSON_CLASS => EncryptedMash.name },
       {
-        @EncryptedMash::JSON_CLASS => @EncryptedMash.name,
-        @EncryptedMash::CHEF_TYPE => 'bad_type',
-      },
+        EncryptedMash::JSON_CLASS => EncryptedMash.name,
+        EncryptedMash::CHEF_TYPE => 'bad_type'
+      }
     ].each do |o|
       it "returns false for #{o.inspect}" do
         expect(Chef::Log).to_not receive(:warn)
-        expect(@EncryptedMash.exist?(o)).to be_falsey
+        expect(EncryptedMash.exist?(o)).to be_falsey
       end
     end
 
@@ -85,31 +79,33 @@ describe Chef::EncryptedAttribute::EncryptedMash do
 
   context '#self.exists?' do
 
-    @EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
+    EncryptedMash = Chef::EncryptedAttribute::EncryptedMash
     [
-      @EncryptedMash.new,
+      EncryptedMash.new,
       {
-        @EncryptedMash::JSON_CLASS => @EncryptedMash.to_s,
-        @EncryptedMash::CHEF_TYPE => @EncryptedMash::CHEF_TYPE_VALUE,
-      },
+        EncryptedMash::JSON_CLASS => EncryptedMash.to_s,
+        EncryptedMash::CHEF_TYPE => EncryptedMash::CHEF_TYPE_VALUE
+      }
     ].each do |o|
       it "returns true for #{o.inspect}" do
-        expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
-        expect(@EncryptedMash.exists?(o)).to be_truthy
+        expect(Chef::Log)
+          .to receive(:warn).once.with(/is deprecated in favor of/)
+        expect(EncryptedMash.exists?(o)).to be_truthy
       end
     end
 
     [
       5, true, {},
-      { @EncryptedMash::JSON_CLASS => @EncryptedMash.name },
+      { EncryptedMash::JSON_CLASS => EncryptedMash.name },
       {
-        @EncryptedMash::JSON_CLASS => @EncryptedMash.name,
-        @EncryptedMash::CHEF_TYPE => 'bad_type',
-      },
+        EncryptedMash::JSON_CLASS => EncryptedMash.name,
+        EncryptedMash::CHEF_TYPE => 'bad_type'
+      }
     ].each do |o|
       it "returns false for #{o.inspect}" do
-        expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
-        expect(@EncryptedMash.exists?(o)).to be_falsey
+        expect(Chef::Log)
+          .to receive(:warn).once.with(/is deprecated in favor of/)
+        expect(EncryptedMash.exists?(o)).to be_falsey
       end
     end
 
@@ -118,25 +114,33 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#self.create' do
 
     it 'creates a EncryptedMash subclass object' do
-      o = @EncryptedMash.create(0)
-      expect(o).to be_kind_of(@EncryptedMash)
-      expect(o).not_to be_an_instance_of(@EncryptedMash)
+      o = EncryptedMash.create(0)
+      expect(o).to be_kind_of(EncryptedMash)
+      expect(o).not_to be_an_instance_of(EncryptedMash)
     end
 
     it 'throws an Unsupported exception for unknown versions' do
-      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      expect { @EncryptedMash.create(1000) }.to raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      # silence Chef::Log.error by EncryptedMash#string_to_klass
+      allow(Chef::Log).to receive(:error)
+      expect { EncryptedMash.create(1000) }
+        .to raise_error(
+          Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat
+        )
     end
 
-    [ nil, ''].each do |version|
+    [nil, ''].each do |version|
       it "throws an Unacceptable exception for #{version.inspect} versions" do
-        expect { @EncryptedMash.create(version) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+        expect { EncryptedMash.create(version) }
+          .to raise_error(
+            Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat
+          )
       end
     end
 
     it 'uses #const_get in a Ruby 1.9 compatible way' do
-      expect(Kernel).to receive(:const_get).with('Chef', true).once.and_return(Chef)
-      @EncryptedMash.create(0)
+      expect(Kernel)
+        .to receive(:const_get).with('Chef', true).once.and_return(Chef)
+      EncryptedMash.create(0)
     end
 
   end # context #self.create
@@ -144,13 +148,14 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#to_json' do
 
     it 'returns a JSON object' do
-      o = @EncryptedMash.create(0)
+      o = EncryptedMash.create(0)
       expect(o.to_json).to eql(o.to_hash.to_json)
     end
 
     it 'passes arguments to Hash#to_json method' do
-      o = @EncryptedMash.create(0)
-      expect_any_instance_of(@EncryptedMash).to receive(:for_json).and_return(o.to_hash)
+      o = EncryptedMash.create(0)
+      expect_any_instance_of(EncryptedMash)
+        .to receive(:for_json).and_return(o.to_hash)
       expect_any_instance_of(Hash).to receive(:to_json).with(1, 2, 3, 4)
       o.to_json(1, 2, 3, 4)
     end
@@ -160,7 +165,7 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#for_json' do
 
     it 'returns a Hash object' do
-      o = @EncryptedMash.new
+      o = EncryptedMash.new
       expect(o.for_json).to be_instance_of(Hash)
       expect(o.for_json).to eql(o.to_hash)
     end
@@ -170,16 +175,19 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#update_from!' do
 
     it 'updates the encrypted attribute from another encrypted attribute' do
-      orig = @EncryptedMash.new
+      orig = EncryptedMash.new
       orig['key1'] = 'value1'
-      new = @EncryptedMash.new
+      new = EncryptedMash.new
       new.update_from!(orig)
       expect(new['key1']).to eql('value1')
     end
 
     it 'throws an error if a wrong encrypted attribute is passed as arg' do
-      o = @EncryptedMash.new
-      expect { o.update_from!({}) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+      o = EncryptedMash.new
+      expect { o.update_from!({}) }
+        .to raise_error(
+          Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat
+        )
     end
 
   end # context #update_from!
@@ -187,26 +195,34 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   context '#self.json_create' do
 
     it 'creates a new object from a JSON Hash' do
-      orig = @EncryptedMash.new
+      orig = EncryptedMash.new
       orig['key1'] = 'value1'
-      new = @EncryptedMash.json_create(orig)
-      expect(new).to be_kind_of(@EncryptedMash)
+      new = EncryptedMash.json_create(orig)
+      expect(new).to be_kind_of(EncryptedMash)
       expect(new).not_to equal(orig)
       expect(new['key1']).to eql('value1')
     end
 
     it 'throws an error if empty attribute is passed as arg' do
-      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      expect { @EncryptedMash.json_create({}) }.to raise_error(Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat)
+      # silence Chef::Log.error by EncryptedMash#string_to_klass
+      allow(Chef::Log).to receive(:error)
+      expect { EncryptedMash.json_create({}) }
+        .to raise_error(
+          Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat
+        )
     end
 
     it 'throws an error if a wrong encrypted attribute is passed as arg' do
-      allow(Chef::Log).to receive(:error) # silence Chef::Log.error by EncryptedMash#string_to_klass
-      expect { @EncryptedMash.json_create({
-        @EncryptedMash::JSON_CLASS => 'NonExistent::Class',
-      }) }.to raise_error(Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat)
+      # silence Chef::Log.error by EncryptedMash#string_to_klass
+      allow(Chef::Log).to receive(:error)
+      expect do
+        EncryptedMash.json_create(
+          EncryptedMash::JSON_CLASS => 'NonExistent::Class'
+        )
+      end.to raise_error(
+        Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat
+      )
     end
 
   end # context #self.json_create
-
 end # describe Chef::EncryptedAttribute::EncryptedMash

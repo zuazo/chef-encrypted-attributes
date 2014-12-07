@@ -21,38 +21,25 @@ require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::RemoteNodes do
   extend ChefZero::RSpec
-  before(:all) do
-    Chef::EncryptedAttribute::RemoteNodes.cache.clear
-  end
+  let(:remote_nodes_class) { Chef::EncryptedAttribute::RemoteNodes }
+  before(:all) { Chef::EncryptedAttribute::RemoteNodes.cache.clear }
 
   when_the_chef_server 'is ready to rock!' do
     before do
-      @RemoteNodes = Chef::EncryptedAttribute::RemoteNodes
-
       # load the default clients
       @nodes = []
       @public_keys = []
 
-      # create node1 and its client
-      @node1 = Chef::Node.new
-      @node1.name('node1')
-      @node1.run_list << 'role[webapp]'
-      @node1.save
+      @node1, @node1_client = chef_create_node('node1') do |node|
+        node.run_list << 'role[webapp]'
+      end
       @nodes << @node1
-      @node1_client = Chef::ApiClient.new
-      @node1_client.name(@node1.name)
-      @node1_client.public_key(@node1_client.save['public_key'])
       @public_keys << @node1_client.public_key
 
-      # create node2 and its client
-      @node2 = Chef::Node.new
-      @node2.name('node2')
-      @node2.run_list << 'role[ftp]'
-      @node2.save
-      @nodes << @node1
-      @node2_client = Chef::ApiClient.new
-      @node2_client.name(@node2.name)
-      @node2_client.public_key(@node2_client.save['public_key'])
+      @node2, @node2_client = chef_create_node('node2') do |node|
+        node.run_list << 'role[ftp]'
+      end
+      @nodes << @node2
       @public_keys << @node2_client.public_key
     end
     after do
@@ -65,7 +52,8 @@ describe Chef::EncryptedAttribute::RemoteNodes do
     context '#search_public_keys' do
 
       it 'gets all client public_keys by default' do
-        expect(@RemoteNodes.search_public_keys.sort).to eql(@public_keys.sort)
+        expect(remote_nodes_class.search_public_keys.sort)
+          .to eql(@public_keys.sort)
       end
 
       context 'with node[public_key] set' do
@@ -86,21 +74,23 @@ describe Chef::EncryptedAttribute::RemoteNodes do
 
         it 'uses node[public_key] attribute' do
           public_keys = @public_keys + [@node3['public_key']]
-          expect(@RemoteNodes.search_public_keys.sort).to eql(public_keys.sort)
+          expect(remote_nodes_class.search_public_keys.sort)
+            .to eql(public_keys.sort)
         end
+
       end # context with node[public_key] set
 
       it 'reads the correct clients when a search query is passed as arg' do
         query = 'role:webapp'
-        expect(@RemoteNodes.search_public_keys(query)).to eql([@node1_client.public_key])
+        expect(remote_nodes_class.search_public_keys(query))
+          .to eql([@node1_client.public_key])
       end
 
       it 'returns empty array for empty search results' do
         query = 'this_will_return_no_results:true'
-        expect(@RemoteNodes.search_public_keys(query).sort).to eql([])
+        expect(remote_nodes_class.search_public_keys(query).sort).to eql([])
       end
 
     end # context #search_public_keys
-
   end # when_the_chef_server is ready to rock!
 end

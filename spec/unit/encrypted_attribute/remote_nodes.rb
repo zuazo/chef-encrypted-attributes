@@ -20,115 +20,118 @@ require 'spec_helper'
 require 'chef/api_client'
 
 describe Chef::EncryptedAttribute::RemoteNodes do
+  let(:remote_nodes_class) { Chef::EncryptedAttribute::RemoteNodes }
+  let(:remote_clients_class) { Chef::EncryptedAttribute::RemoteClients }
   before do
-    Chef::EncryptedAttribute::RemoteNodes.cache.clear
+    clear_cache(:nodes)
 
-    @RemoteNodes = Chef::EncryptedAttribute::RemoteNodes
-    @RemoteClients = Chef::EncryptedAttribute::RemoteClients
-    allow(@RemoteNodes).to receive(:search)
+    allow(remote_nodes_class).to receive(:search)
   end
 
   it 'includes EncryptedAttribute::SearchHelper methods' do
-    expect(@RemoteNodes).to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
+    expect(remote_nodes_class)
+      .to be_kind_of(Chef::EncryptedAttribute::SearchHelper)
   end
 
   describe '#search_public_keys' do
-    before(:all) do
-      Chef::EncryptedAttribute::RemoteNodes.cache.max_size(20)
-    end
-    before do
-      @keys = {
-        'node1' => OpenSSL::PKey::RSA.new(128).public_key.to_pem,
-        'node2' => OpenSSL::PKey::RSA.new(128).public_key.to_pem,
+    let(:keys) do
+      {
+        'node1' => create_ssl_key.public_key.to_pem,
+        'node2' => create_ssl_key.public_key.to_pem
       }
-      @nodes = @keys.keys.map { |x| { 'name' => x } }
-      @public_keys = @keys.values
-      @keys.each do |node, key|
-        allow(@RemoteClients).to receive(:get_public_key).with(node).and_return(key)
+    end
+    let(:public_keys) { keys.values }
+    let(:nodes) { keys.keys.map { |x| { 'name' => x } } }
+    before(:all) { Chef::EncryptedAttribute::RemoteNodes.cache.max_size(20) }
+    before do
+      keys.each do |node, key|
+        allow(remote_clients_class)
+          .to receive(:get_public_key).with(node).and_return(key)
       end
     end
 
     it 'gets client public_keys using SearchHelper' do
-      allow(@RemoteNodes).to receive(:search).and_return(@nodes)
-      expect(@RemoteNodes.search_public_keys).to eql(@public_keys)
+      allow(remote_nodes_class).to receive(:search).and_return(nodes)
+      expect(remote_nodes_class.search_public_keys).to eql(public_keys)
     end
 
     it 'returns empty array for empty search results' do
-      allow(@RemoteNodes).to receive(:search).and_return({})
-      expect(@RemoteNodes.search_public_keys).to eql([])
+      allow(remote_nodes_class).to receive(:search).and_return({})
+      expect(remote_nodes_class.search_public_keys).to eql([])
     end
 
     it 'does a search with the correct arguments' do
       query = 'role:webapp'
-      expect(@RemoteNodes).to receive(:search).once.with(
+      expect(remote_nodes_class).to receive(:search).once.with(
         :node,
         query,
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@nodes)
-      @RemoteNodes.search_public_keys(query)
+      ).and_return(nodes)
+      remote_nodes_class.search_public_keys(query)
     end
 
     it 'does "*:*" search by default' do
-      expect(@RemoteNodes).to receive(:search).with(
+      expect(remote_nodes_class).to receive(:search).with(
         :node,
         '*:*',
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@nodes)
-      @RemoteNodes.search_public_keys
+      ).and_return(nodes)
+      remote_nodes_class.search_public_keys
     end
 
     it 'caches search results for multiple calls' do
       query = 'role:webapp'
-      expect(@RemoteNodes).to receive(:search).once.with(
+      expect(remote_nodes_class).to receive(:search).once.with(
         :node,
         query,
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@nodes)
+      ).and_return(nodes)
 
-      @RemoteNodes.search_public_keys(query)
-      @RemoteNodes.search_public_keys(query) # cached
+      remote_nodes_class.search_public_keys(query)
+      remote_nodes_class.search_public_keys(query) # cached
     end
 
     it 'returns client public keys' do
       query = '*:*'
-      expect(@RemoteNodes).to receive(:search).once.with(
+      expect(remote_nodes_class).to receive(:search).once.with(
         :node,
         query,
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@nodes)
-      expect(@RemoteNodes.search_public_keys(query)).to eq(@keys.values)
+      ).and_return(nodes)
+      expect(remote_nodes_class.search_public_keys(query)).to eq(keys.values)
     end
 
     it 'returns node[public_key] attribute if exists' do
       query = '*:*'
-      nodes = @keys.keys.map { |x| { 'name' => x, 'public_key' => 'pubkey' } }
-      expect(@RemoteNodes).to receive(:search).once.with(
+      nodes = keys.keys.map { |x| { 'name' => x, 'public_key' => 'pubkey' } }
+      expect(remote_nodes_class).to receive(:search).once.with(
         :node,
         query,
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
       ).and_return(nodes)
-      expect(@RemoteNodes.search_public_keys(query)).to eq(%w(pubkey pubkey))
+      expect(remote_nodes_class.search_public_keys(query))
+        .to eq(%w(pubkey pubkey))
     end
 
     it 'raises an error if forbidden' do
       query = '*:*'
-      expect(@RemoteNodes).to receive(:search).once.with(
+      expect(remote_nodes_class).to receive(:search).once.with(
         :node,
         query,
-        { 'name' => [ 'name' ], 'public_key' => [ 'public_key' ] },
+        { 'name' => %w(name), 'public_key' => %w(public_key) },
         1000,
         true
-      ).and_return(@nodes)
+      ).and_return(nodes)
       expect(Chef::EncryptedAttribute::RemoteClients)
         .to receive(:get_public_key).with(anything).and_raise(
           Net::HTTPServerException.new(
@@ -136,12 +139,11 @@ describe Chef::EncryptedAttribute::RemoteNodes do
             Net::HTTPResponse.new('1.1', '403', 'Forbidden')
           )
         )
-      expect{ @RemoteNodes.search_public_keys(query) }.to raise_error(
+      expect { remote_nodes_class.search_public_keys(query) }.to raise_error(
         Chef::EncryptedAttribute::InsufficientPrivileges,
         /encrypted_attributes::expose_key/
       )
     end
 
   end # describe #search_public_keys
-
 end

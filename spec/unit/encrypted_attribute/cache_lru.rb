@@ -19,19 +19,18 @@
 require 'spec_helper'
 
 describe Chef::EncryptedAttribute::CacheLru do
-  before do
-    @CacheLru = Chef::EncryptedAttribute::CacheLru
-  end
+  let(:cache_lru_class) { Chef::EncryptedAttribute::CacheLru }
 
   describe '#new' do
 
     it 'creates a cache without errors' do
-      expect { @CacheLru.new }.not_to raise_error
+      expect { cache_lru_class.new }.not_to raise_error
     end
 
     it 'creates a cache with max_size as argument ' do
-      expect_any_instance_of(@CacheLru).to receive(:max_size).with(25).once
-      @CacheLru.new(25)
+      expect_any_instance_of(cache_lru_class)
+        .to receive(:max_size).with(25).once
+      cache_lru_class.new(25)
     end
 
   end
@@ -39,21 +38,19 @@ describe Chef::EncryptedAttribute::CacheLru do
   describe '#max_size' do
 
     it 'returns 1024 by default' do
-      cache = @CacheLru.new
+      cache = cache_lru_class.new
       expect(cache.max_size).to eql(1024)
     end
 
     it 'is able to change the maximum size' do
-      cache = @CacheLru.new
+      cache = cache_lru_class.new
       expect(cache.max_size(25)).to eql(25)
       expect(cache.max_size).to eql(25)
     end
 
     it 'reduces the cache size if max_size is decreased' do
-      cache = @CacheLru.new(25)
-      (1..25).step.each do |x|
-        cache[x.to_s] = x
-      end
+      cache = cache_lru_class.new(25)
+      (1..25).step.each { |x| cache[x.to_s] = x }
       expect(cache.size).to eql(25)
       cache.max_size(10)
       expect(cache.size).to eql(10)
@@ -62,52 +59,45 @@ describe Chef::EncryptedAttribute::CacheLru do
   end
 
   describe '#[]' do
-    before do
-      @cache = @CacheLru.new(10)
-      @cache['key1'] = 'value1'
-    end
+    let(:cache) { cache_lru_class.new(10) }
+    before { cache['key1'] = 'value1' }
 
     it 'reads a cache value' do
-      expect(@cache['key1']).to eql('value1')
+      expect(cache['key1']).to eql('value1')
     end
 
     it 'returns nil if the key does not exist' do
-      expect(@cache['key2']).to eql(nil)
+      expect(cache['key2']).to eql(nil)
     end
 
   end
 
   describe '#[]=' do
-    before do
-      @cache = @CacheLru.new(10)
-    end
+    let(:cache) { cache_lru_class.new(10) }
 
     it 'sets a cache value' do
-      @cache['key1'] = 'value1'
-      expect(@cache['key1']).to eql('value1')
+      cache['key1'] = 'value1'
+      expect(cache['key1']).to eql('value1')
     end
 
     it 'does not set more than max_size values' do
-      (1..20).step.each do |x|
-        @cache[x.to_s] = x
-      end
-      expect(@cache.size).to eql(10)
+      (1..20).step.each { |x| cache[x.to_s] = x }
+      expect(cache.size).to eql(10)
     end
 
     it 'frees items using LRU algorithm' do
       # add 1..10
-      (1..10).step.each { |x| @cache[x] = x }
+      (1..10).step.each { |x| cache[x] = x }
       # refresh 4..8
-      (4..8).step.each { |x| read = @cache[x] }
+      (4..8).step.each { |x| cache[x] }
       # add 11..14
-      (11..14).step.each { |x| @cache[x] = x }
+      (11..14).step.each { |x| cache[x] = x }
 
       # expectations
-      (1..3).step.each { |x| expect(@cache.has_key?(x)).to be_falsey }
-      (4..8).step.each { |x| expect(@cache.has_key?(x)).to be_truthy }
-      (10..14).step.each { |x| expect(@cache.has_key?(x)).to be_truthy }
+      (1..3).step.each { |x| expect(cache.key?(x)).to be_falsey }
+      (4..8).step.each { |x| expect(cache.key?(x)).to be_truthy }
+      (10..14).step.each { |x| expect(cache.key?(x)).to be_truthy }
     end
 
   end
-
 end

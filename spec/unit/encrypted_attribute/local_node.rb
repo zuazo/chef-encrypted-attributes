@@ -19,13 +19,14 @@
 require 'spec_helper'
 
 describe Chef::EncryptedAttribute::LocalNode do
+  let(:local_node_class) { Chef::EncryptedAttribute::LocalNode }
+  let(:local_node) { local_node_class.new }
   before do
-    @LocalNode = Chef::EncryptedAttribute::LocalNode
-    @local_node = @LocalNode.new
     @prev_node_name = Chef::Config[:node_name]
     Chef::Config[:node_name] = 'server1'
     @prev_client_key = Chef::Config[:client_key]
-    Chef::Config[:client_key] = "#{File.dirname(__FILE__)}/../../data/client.pem"
+    Chef::Config[:client_key] =
+      "#{File.dirname(__FILE__)}/../../data/client.pem"
   end
   after(:all) do
     Chef::Config[:node_name] = @prev_node_name
@@ -33,29 +34,30 @@ describe Chef::EncryptedAttribute::LocalNode do
   end
 
   it 'creates a local node without errors' do
-    expect { @LocalNode.new }.not_to raise_error
+    expect { local_node_class.new }.not_to raise_error
   end
 
   it '#name returns the local node name' do
-    expect(@local_node.name).to eql(Chef::Config[:node_name])
+    expect(local_node.name).to eql(Chef::Config[:node_name])
   end
 
   it '#key returns a PKey::RSA instance' do
-    expect(@local_node.key).to be_an_instance_of(OpenSSL::PKey::RSA)
+    expect(local_node.key).to be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
   it '#key returns the local node key' do
-    key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read())
-    expect(@local_node.key.to_s).to eql(key.to_s)
+    key = create_ssl_key(open(Chef::Config[:client_key]).read)
+    expect(local_node.key.to_s).to eql(key.to_s)
   end
 
   it '#public_key returns a RSA instance' do
-    expect(@local_node.public_key).to be_an_instance_of(OpenSSL::PKey::RSA)
+    expect(local_node.public_key).to be_an_instance_of(OpenSSL::PKey::RSA)
   end
 
   it '#public_key returns the local node public_key' do
-    public_key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read()).public_key
-    expect(@local_node.public_key.to_s).to eql(public_key.to_s)
+    public_key =
+      create_ssl_key(open(Chef::Config[:client_key]).read).public_key
+    expect(local_node.public_key.to_s).to eql(public_key.to_s)
   end
 
 end

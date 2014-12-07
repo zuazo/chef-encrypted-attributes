@@ -16,21 +16,33 @@
 # limitations under the License.
 #
 
-require 'benchmark'
+require 'chef/api_client'
 
-# Benchmark tests helpers
-module BenchmarkHelpers
-  def benchmark_caption
-    Benchmark.bm(50) {} # print CAPTION
+# Helpers to work with Encrypted Attributes
+module EncryptedAttributesHelpers
+  def class_from_string(str)
+    str.split('::').reduce(Kernel) do |scope, const_name|
+      scope.const_get(const_name, scope == Kernel)
+    end
   end
 
-  def benchmark_it(desc, &block)
-    Benchmark.benchmark('', 50) do |x|
-      it desc do
-        x.report(desc) do
-          100.times { instance_eval(&block) }
-        end
-      end
+  def cache_size(type, size)
+    class_from_string("Chef::EncryptedAttribute::Remote#{type.capitalize}")
+      .cache.max_size(size)
+  end
+
+  def clear_cache(type)
+    class_from_string("Chef::EncryptedAttribute::Remote#{type.capitalize}")
+      .cache.clear
+  end
+
+  def clear_all_caches
+    %w(clients node nodes users).each do |type|
+      clear_cache(type)
     end
+  end
+
+  def create_ssl_key(arg = 2048)
+    OpenSSL::PKey::RSA.new(arg)
   end
 end

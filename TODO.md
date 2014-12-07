@@ -1,6 +1,7 @@
 TODO
 ====
 
+* Fix all RuboCop offenses.
 * knife encrypted attribute create/edit from file.
 * Save config inside encrypted data: `:client_search`, `:node_search` and `:keys` (including user keys).
 * Chef internal node attribute integration monkey-patch. It may require some `EncryptedMash` class rewrite or adding some methods.
@@ -15,6 +16,5 @@ TODO
 * Tests: Add unit tests for `EncryptedAttribute`.
 * Tests: Add unit tests for all knife commands.
 * Tests: Tests `raise_error` always include regex.
-* Tests: Review and clean some tests.
 * Add `chef-vault` to benchmarks.
 * Signed attributes?

@@ -18,13 +18,13 @@
 
 require 'rspec/core/formatters/base_text_formatter'
 
+# Silenced RSpec formater used for benchmarks
 class SilentFormatter < RSpec::Core::Formatters::BaseTextFormatter
-
   def initialize(output)
     super(output)
   end
 
-  def example_passed(example)
+  def example_passed(_example)
     # super(example)
   end
 
@@ -32,7 +32,7 @@ class SilentFormatter < RSpec::Core::Formatters::BaseTextFormatter
     super(example)
   end
 
-  def example_started(example)
+  def example_started(_example)
   end
 
   def example_failed(example)
@@ -47,5 +47,4 @@ class SilentFormatter < RSpec::Core::Formatters::BaseTextFormatter
   def dump_summary(*args)
     super(*args)
   end
-
 end
