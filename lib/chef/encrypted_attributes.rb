@@ -16,4 +16,4 @@
 # limitations under the License.
 #
 
-require 'chef/encrypted_attributes'
+require 'chef/encrypted_attribute'
