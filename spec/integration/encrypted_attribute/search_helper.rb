@@ -69,7 +69,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
             expect(search_helper_class.search(
               :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
-            ).map {|x| x['key']}.sort)
+            ).map { |x| x['key'] }.sort)
               .to eql(all_clients.map(&:public_key).sort)
           end
 
