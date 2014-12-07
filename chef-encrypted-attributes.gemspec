@@ -6,7 +6,12 @@
 
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'chef/encrypted_attribute/version'
-chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : '~> 11.4'
+chef_version =
+  if ENV.key?('CHEF_VERSION')
+    ENV['CHEF_VERSION']
+  else
+    ['>= 11.4', '< 13']
+  end
 
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'

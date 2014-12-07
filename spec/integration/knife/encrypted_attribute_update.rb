@@ -23,6 +23,9 @@ describe Chef::Knife::EncryptedAttributeUpdate do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
+    let(:stdout) { StringIO.new }
+    let(:stderr) { StringIO.new }
+    let(:log) { Chef::VERSION < '12' ? stdout : stderr }
     before do
       Chef::Config[:knife][:encrypted_attributes] = Mash.new
       clear_all_caches
@@ -45,9 +48,10 @@ describe Chef::Knife::EncryptedAttributeUpdate do
         client_search: 'admin:true', node_search: 'role:webapp'
       )
 
-      @stdout = StringIO.new
       allow_any_instance_of(Chef::Knife::UI).to receive(:stdout)
-        .and_return(@stdout)
+        .and_return(stdout)
+      allow_any_instance_of(Chef::Knife::UI).to receive(:stderr)
+        .and_return(stderr)
     end
     after do
       @admin.destroy
@@ -93,14 +97,14 @@ describe Chef::Knife::EncryptedAttributeUpdate do
         --node-search role:webapp
       ))
       knife.run
-      @stdout.rewind
+      log.rewind
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
         node1 encrypted.attribute
         --client-search admin:true
         --node-search role:webapp
       ))
       knife.run
-      expect(@stdout.string)
+      expect(log.string)
         .to match(/Encrypted attribute does not need updating\./)
     end
 
@@ -111,14 +115,14 @@ describe Chef::Knife::EncryptedAttributeUpdate do
         --node-search role:webapp
       ))
       knife.run
-      @stdout.rewind
+      log.rewind
       knife = Chef::Knife::EncryptedAttributeUpdate.new(%w(
         node1 encrypted.attribute
         --client-search admin:false
         --node-search role:webapp
       ))
       knife.run
-      expect(@stdout.string).to match(/Encrypted attribute updated\./)
+      expect(log.string).to match(/Encrypted attribute updated\./)
     end
 
     it 'prints error message when the attribute does not exists' do
