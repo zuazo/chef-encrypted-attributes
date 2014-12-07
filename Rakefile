@@ -1,5 +1,8 @@
-#!/usr/bin/env rake
-# encoding: utf-8
+# encoding: UTF-8
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# More info at https://github.com/jimweirich/rake/blob/master/doc/rakefile.rdoc
 
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
@@ -25,22 +28,22 @@ Bundler::GemHelper.install_tasks
 require 'rake/testtask'
 
 {
-  :test => '{unit,integration}',
-  :unit => 'unit',
-  :integration => 'integration',
-  :benchmark => 'benchmark',
+  test: '{unit,integration}',
+  unit: 'unit',
+  integration: 'integration',
+  benchmark: 'benchmark'
 }.each do |test, dir|
-  Rake::TestTask.new(test) do |test|
-    test.libs << 'lib' << 'spec'
-    test.pattern = "spec/#{dir}/**/*.rb"
-    test.verbose = true
+  Rake::TestTask.new(test) do |t|
+    t.libs << 'lib' << 'spec'
+    t.pattern = "spec/#{dir}/**/*.rb"
+    t.verbose = true
   end
 end
 
 if RUBY_VERSION < '1.9.3'
   # integration tests are broken in 1.9.2 due to a chef-zero bug
   # https://github.com/opscode/chef-zero/issues/65
-  task :default => :unit
+  task default: :unit
 else
-  task :default => :test
+  task default: :test
 end
