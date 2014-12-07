@@ -18,7 +18,7 @@
 
 require 'rspec/autorun'
 require 'chef_zero/rspec'
-require 'chef/encrypted_attributes'
+require 'chef-encrypted-attributes'
 
 require 'support/silent_formatter'
 RSpec.configure do |config|

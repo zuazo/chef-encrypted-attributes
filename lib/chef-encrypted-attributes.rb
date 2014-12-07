@@ -16,9 +16,4 @@
 # limitations under the License.
 #
 
-warn(
-  '[DEPRECATION] The required "chef-encrypted-attributes" file has been moved '\
-  'to "chef/encrypted_attributes" and will be removed in a future release. '\
-  'Please switch to "chef/encrypted_attributes" as soon as possible.'
-)
 require 'chef/encrypted_attributes'

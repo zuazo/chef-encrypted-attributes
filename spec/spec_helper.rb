@@ -25,7 +25,7 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'chef/encrypted_attributes'
+require 'chef-encrypted-attributes'
 require 'chef/exceptions'
 
 require 'rspec/autorun'
