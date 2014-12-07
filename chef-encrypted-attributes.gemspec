@@ -34,9 +34,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'chef-zero', '~> 2.0'
-  s.add_development_dependency 'rspec-core', '~> 2.14'
-  s.add_development_dependency 'rspec-expectations', '~> 2.14'
-  s.add_development_dependency 'rspec-mocks', '~> 2.14'
+  s.add_development_dependency 'rspec-core', '~> 3.1'
+  s.add_development_dependency 'rspec-expectations', '~> 3.1'
+  s.add_development_dependency 'rspec-mocks', '~> 3.1'
   s.add_development_dependency 'coveralls', '~> 0.7'
   s.add_development_dependency 'simplecov', '~> 0.9'
   s.add_development_dependency 'should_not', '~> 1.1'

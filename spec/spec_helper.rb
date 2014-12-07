@@ -36,6 +36,11 @@ require 'support/chef_helpers'
 require 'support/encrypted_attributes_helpers'
 
 RSpec.configure do |config|
+  # Prohibit using the should syntax
+  config.expect_with :rspec do |spec|
+    spec.syntax = :expect
+  end
+
   config.order = 'random'
 
   config.color = true

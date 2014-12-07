@@ -46,7 +46,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version2,
     end
 
     it 'throws an error if ruby does not support GCM' do
-      OpenSSL::Cipher.should_receive(:method_defined?).with(:auth_data=)
+      allow(OpenSSL::Cipher).to receive(:method_defined?).with(:auth_data=)
         .and_return(false)
       expect { encrypted_mash_version2_class.new }
         .to raise_error(
@@ -55,7 +55,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version2,
     end
 
     it 'throws an error if OpenSSL does not support GCM' do
-      OpenSSL::Cipher.should_receive(:ciphers).and_return([])
+      allow(OpenSSL::Cipher).to receive(:ciphers).and_return([])
       expect { encrypted_mash_version2_class.new }
         .to raise_error(
           Chef::EncryptedAttribute::RequirementsFailure, /requires an OpenSSL/
