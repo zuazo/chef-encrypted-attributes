@@ -16,17 +16,10 @@
 # limitations under the License.
 #
 
-require 'rspec/autorun'
-require 'chef_zero/rspec'
-require 'chef/encrypted_attributes'
+require 'spec_helper'
 
-require 'support/silent_formatter'
-RSpec.configure do |config|
-  config.reset
-  config.formatter = 'SilentFormatter'
+describe 'chef-encrypted-attributes' do
+  it 'can be required' do
+    require 'chef-encrypted-attributes'
+  end
 end
-
-require 'support/benchmark_helpers'
-include BenchmarkHelpers
-require 'support/benchmark_helpers/encrypted_attribute'
-include BenchmarkHelpers::EncryptedAttribute

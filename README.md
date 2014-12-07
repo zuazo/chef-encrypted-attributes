@@ -32,7 +32,7 @@ You need to install and include the `chef-encrypted-attributes` gem before using
 
 ```ruby
 chef_gem "chef-encrypted-attributes"
-require "chef-encrypted-attributes"
+require "chef/encrypted_attributes"
 ```
 
 ### Typical Example
@@ -41,7 +41,7 @@ In the following example we save a simple FTP user password.
 
 ```ruby
 chef_gem "chef-encrypted-attributes"
-require "chef-encrypted-attributes"
+require "chef/encrypted_attributes"
 
 # include the #secure_password method
 Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
@@ -69,7 +69,7 @@ In this example we only need to save some data from the local node and read it f
 
 ```ruby
 chef_gem "chef-encrypted-attributes"
-require "chef-encrypted-attributes"
+require "chef/encrypted_attributes"
 
 # Allow all admin clients to read the attributes encrypted by me
 Chef::Config[:encrypted_attributes][:client_search] = "admin:true"
@@ -131,7 +131,7 @@ Then, from a recipe, you can read this user keys and allow them to read the attr
 
 ```ruby
 chef_gem "chef-encrypted-attributes"
-require "chef-encrypted-attributes"
+require "chef/encrypted_attributes"
 
 chef_users = Chef::DataBagItem.load("global_data_bag", "chef_users")
 # remove the data bag "id" to avoid to confuse it with a user:
