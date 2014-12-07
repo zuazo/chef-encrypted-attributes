@@ -163,4 +163,4 @@ The `public_key_hash1` key value is the *SHA1* of the public key used for encryp
 
 Its content is the encrypted shared secret in *raw*. The encryption is done using the *RSA* algorithm (PKI).
 
-After decryption, you find the the shared secret in *raw* (in *Version1* this is a *JSON* in *base64*).
+After decryption, you find the shared secret in *raw* (in *Version1* this is a *JSON* in *base64*).
