@@ -21,13 +21,13 @@ require 'chef/knife/encrypted_attribute_show'
 
 describe Chef::Knife::EncryptedAttributeShow do
   extend ChefZero::RSpec
-  let(:node) do
-    node = Chef::Node.new
-    node.name('node1')
-    node
-  end
 
   when_the_chef_server 'is ready to rock!' do
+    let(:node) do
+      node = Chef::Node.new
+      node.name('node1')
+      node
+    end
     before do
       clear_all_caches
       cache_size(:node, 0)

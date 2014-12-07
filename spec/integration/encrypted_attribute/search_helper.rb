@@ -27,26 +27,29 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
     context '#search' do
       before do
-        @nodes = (1..4).step.map do |n|
-          node = Chef::Node.new
-          node.name("node#{n}")
-          node.set['some'][:deep] = "attr#{n}"
-          node.save
-          node
-        end
-        # load the default clients
         @default_clients = Chef::ApiClient.list.keys.map do |c|
           Chef::ApiClient.load(c)
+        end
+
+        @nodes = []
+        @node_clients = []
+        (1..4).step.map do |n|
+          node, node_client = chef_create_node("node#{n}") do |node|
+            node.set['some'][:deep] = "attr#{n}"
+          end
+          @nodes << node
+          @node_clients << node_client
         end
         @new_clients = (1..2).step.map { |c| chef_create_client("client#{c}") }
       end
       after do
         @nodes.each(&:destroy)
+        @node_clients.each(&:destroy)
         @new_clients.each(&:destroy)
       end
 
       [true, false].each do |partial_search|
-        context "partial_search=#{partial_search}" do
+        context "with partial_search=#{partial_search}" do
 
           it 'searches node attributes without errors' do
             expect(search_helper_class.search(
@@ -58,13 +61,16 @@ describe Chef::EncryptedAttribute::SearchHelper do
           end
 
           it 'searches all client public_keys without errors' do
+            # load the default clients
+            all_clients = @default_clients + @node_clients + @new_clients
             expect(search_helper_class.search(
               :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
-            )).to eql(
-              (@default_clients + @new_clients).map do |n|
-                { 'key' => n.public_key }
-              end
-            )
+            ).count).to eql(all_clients.count)
+
+            expect(search_helper_class.search(
+              :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
+            ).map {|x| x['key']}.sort)
+              .to eql(all_clients.map(&:public_key).sort)
           end
 
           it 'searches some client public_keys without errors' do
