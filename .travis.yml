@@ -8,3 +8,9 @@ env:
   - CHEF_VERSION="= 11.4.0"
   - CHEF_VERSION="~> 11.0"
   - CHEF_VERSION="~> 12.0"
+matrix:
+  exclude:
+    - rvm: 1.9.2
+      env: CHEF_VERSION="~> 12.0"
+    - rvm: 1.9.3
+      env: CHEF_VERSION="~> 12.0"
