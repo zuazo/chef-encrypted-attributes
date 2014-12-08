@@ -17,7 +17,6 @@
 #
 
 class Chef
-  # Encrypted Attribute main class
   class EncryptedAttribute
     # Gem Version
     VERSION = '0.4.0.dev'

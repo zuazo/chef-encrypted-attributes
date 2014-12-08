@@ -36,14 +36,37 @@ unless Chef::Config[:encrypted_attributes].is_a?(Hash)
 end
 
 class Chef
-  # Main EncryptedAttribute class, includes instance and class API methods
+  # Main EncryptedAttribute class. Includes instance and class API methods.
+  #
+  # The *instance methods* are normally used **by other libraries or gems**. For
+  # example, the knife extensions included in this gem uses these methods.
+  #
+  # The *class methods* are normally used **by Chef Run recipes**. They are
+  # documented in the {Chef::EncryptedAttribute::API} class.
   class EncryptedAttribute
+
+    # Include the *class methods* for the recipe API.
     extend Chef::EncryptedAttribute::API
 
+    # Chef::EncryptedAttribute constructor.
+    #
+    # @param c [Config, Hash] configuration to use.
     def initialize(c = nil)
       config(c)
     end
 
+    # Sets or gets the encrypted attribute configuration.
+    #
+    # Reads the default configuration from
+    # `Chef::Config[:encrypted_attributes]`.
+    #
+    # When setting using a {Chef::EncryptedAttribute::Config} class, all the
+    # configuration options will be replaced.
+    #
+    # When setting using a _Hash_, only the provided keys will be replaced.
+    #
+    # @param arg [Config, Hash] the configuarion to set.
+    # @return [Config] the read or set configuration object.
     def config(arg = nil)
       @config ||= EncryptedAttribute::Config.new(
         Chef::Config[:encrypted_attributes]
@@ -52,20 +75,42 @@ class Chef
       @config
     end
 
-    # Decrypts an encrypted attribute from a (encrypted) Hash
+    # Decrypts an encrypted attribute from a local node attribute.
+    #
+    # @param enc_hs [Mash] the encrypted hash as read from the node attributes.
+    # @param key [OpenSSL::PKey::RSA, String] private key to use in the
+    #   decryption process, uses the local node key by default.
+    # @return [Hash, Array, String, ...] decrypted attribute value.
     def load(enc_hs, key = nil)
       enc_attr = EncryptedMash.json_create(enc_hs)
       decrypted = enc_attr.decrypt(key || local_key)
       decrypted['content'] # TODO: check this Hash
     end
 
-    # Decrypts a encrypted attribute from a remote node
+    # Decrypts a encrypted attribute from a remote node.
+    #
+    # @param name [String] node name.
+    # @param attr_ary [Array<String>] node attribute path as Array.
+    # @param key [OpenSSL::PKey::RSA, String] private key to use in the
+    #   decryption process, uses the local key by default.
+    # @return [Hash, Array, String, ...] decrypted attribute value.
     def load_from_node(name, attr_ary, key = nil)
       remote_node = RemoteNode.new(name)
       load(remote_node.load_attribute(attr_ary, config.partial_search), key)
     end
 
-    # Creates an encrypted attribute from a Hash
+    # Creates an encrypted attribute from a Hash.
+    #
+    # Only the **keys passed as parameter and the configured keys** will be able
+    # to decrypt the attribute, so beware of including your local key if you
+    # need to decrypt it in the future.
+    #
+    # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt in
+    #   clear.
+    # @param keys [OpenSSL::PKey::RSA, String] public keys that will be able to
+    #   decrypt the attribute.
+    # @return [Chef::EncryptedAttribute::EncryptedMash] encrypted attribute
+    #   value. This is usually what is saved in the node attributes.
     def create(value, keys = nil)
       decrypted = { 'content' => value }
 
@@ -73,6 +118,15 @@ class Chef
       enc_attr.encrypt(decrypted, target_keys(keys))
     end
 
+    # Creates an encrypted attribute on a remote node.
+    #
+    # The remote node will always be able to deciper it.
+    #
+    # @param name [String] node name.
+    # @param attr_ary [Array<String>] node attribute path as Array.
+    # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt.
+    # @return [Chef::EncryptedAttribute::EncryptedMash] encrypted attribute
+    #   value.
     def create_on_node(name, attr_ary, value)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
@@ -85,7 +139,25 @@ class Chef
       remote_node.save_attribute(attr_ary, enc_attr)
     end
 
-    # Updates the keys for which the attribute is encrypted
+    # Updates the keys for which a local attribute is encrypted.
+    #
+    # In case new keys are added or some keys are removed, the attribute will
+    # be re-created again.
+    #
+    # Only the **keys passed as parameter and the configured keys** will be able
+    # to decrypt the attribute, so beware of including your local key if you
+    # need to decrypt it in the future.
+    #
+    # Uses the local key to decrypt the attribute, so the local key should be
+    # able to read the attribute. At least before updating.
+    #
+    # @param enc_hs [Mash] encrypted attribute. This parameter value will be
+    #   modified on updates.
+    # @param keys [Array<OpenSSL::PKey::RSA, String> public keys that should be
+    #   able to read the attribute.
+    # @return [Boolean] Returns `true` if the encrypted attribute (the *Mash*
+    #   parameter) has been updated.
+    # @see #config
     def update(enc_hs, keys = nil)
       old_enc_attr = EncryptedMash.json_create(enc_hs)
       if old_enc_attr.needs_update?(target_keys(keys))
@@ -98,6 +170,23 @@ class Chef
       end
     end
 
+    # Updates the keys for which a remote attribute is encrypted.
+    #
+    # In case new keys are added or some keys are removed, the attribute will
+    # be re-created again.
+    #
+    # Only the **remote node and the configured keys** will be able to decrypt
+    # the attribute, so beware of including your local key if you need to
+    # decrypt it in the future.
+    #
+    # Uses the local key to decrypt the attribute, so the local key should be
+    # able to read the attribute. At least before updating.
+    #
+    # @param name [String] node name.
+    # @param attr_ary [Array<String>] node attribute path as Array.
+    # @return [Boolean] Returns `true` if the remote encrypted attribute has
+    #   been updated.
+    # @see #config
     def update_on_node(name, attr_ary)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
@@ -117,20 +206,47 @@ class Chef
 
     protected
 
+    # Gets remote client public keys using the *client search* query included in
+    # the configuration.
+    #
+    # @return [Array<String>] list of client public keys.
+    # @see config
     def remote_client_keys
       RemoteClients.search_public_keys(
         config.client_search, config.partial_search
       )
     end
 
+    # Gets remote node public keys using the *node search* query included in the
+    # configuration.
+    #
+    # @return [Array<String>] list of node public keys.
+    # @see config
     def remote_node_keys
       RemoteNodes.search_public_keys(config.node_search, config.partial_search)
     end
 
+    # Gets remote user keys using the configured user list.
+    #
+    # @return [Array<String>] list of user public keys.
+    # @see config
     def remote_user_keys
       RemoteUsers.get_public_keys(config.users)
     end
 
+    # Gets the public keys that should be able to read the attribute based on
+    # the configuration.
+    #
+    # This includes keys passed as parameter, configured keys,
+    # #remote_client_keys, #remote_node_keys and remote_user_keys.
+    #
+    # @param keys [Array<String>] list of public keys to include in addition to
+    #   the configured.
+    # @return [Array<String>] list of user public keys.
+    # @see config
+    # @see remote_client_keys
+    # @see remote_node_keys
+    # @see remote_user_keys
     def target_keys(keys = nil)
       target_keys =
         config.keys + remote_client_keys + remote_node_keys + remote_user_keys
@@ -138,6 +254,9 @@ class Chef
       target_keys
     end
 
+    # Gets the local private key.
+    #
+    # @return [OpenSSL::PKey::RSA.new] local private (and public) key object.
     def local_key
       LocalNode.new.key
     end
