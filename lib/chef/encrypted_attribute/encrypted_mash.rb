@@ -21,15 +21,35 @@ require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
-    # Mash structure with embedded Mash structure encrypted. This class is
-    # oriented to be easily integrable with chef in the future using JSONCompat
+    # Mash structure with embedded Mash structure encrypted.
+    #
+    # This class is used to construct the different EncryptedAttribute versions.
+    # Each version, implements the encryption in a different way or using
+    # different algorithms.
+    #
+    # This class is oriented to be easily integrable with chef in the future
+    # using JSONCompat.
+    #
+    # @see #self.create
     class EncryptedMash < Mash
+      # Mash key name to use for JSON class name. Chef uses the `'json_class'`
+      # key internally for objects, we use a renamed key.
       JSON_CLASS =      'x_json_class'.freeze
+
+      # Mash key name to use for Chef object type.
       CHEF_TYPE =       'chef_type'.freeze
+
+      # Chef object type value.
       CHEF_TYPE_VALUE = 'encrypted_attribute'.freeze
 
+      # Name prefix for all  EncryptedAttribute version classes.
+      # Used internally by the #self.version_class method.
+      # @private
       VERSION_PREFIX = "#{name}::Version"
 
+      # Encrypted Mash constructor.
+      #
+      # @param enc_hs [Mash] encrypted Mash to clone.
       def initialize(enc_hs = nil)
         super
         self[JSON_CLASS] = self.class.name
@@ -44,6 +64,10 @@ class Chef
         end
       end
 
+      # Checks whether an encrypted Mash exists.
+      #
+      # @param enc_hs [Mash] Mash to check.
+      # @return [Boolean] returns `true` if an encrypted Mash exists.
       def self.exist?(enc_hs)
         enc_hs.is_a?(Hash) &&
           enc_hs.key?(JSON_CLASS) &&
@@ -51,6 +75,11 @@ class Chef
           enc_hs.key?(CHEF_TYPE) && enc_hs[CHEF_TYPE] == CHEF_TYPE_VALUE
       end
 
+      # Checks whether an encrypted Mash exists.
+      #
+      # @param args [Mash] {exist?} arguments.
+      # @return [Boolean] returns `true` if an encrypted Mash exists.
+      # @deprecated Use {exist?} instead.
       def self.exists?(*args)
         Chef::Log.warn(
           "#{name}.exists? is deprecated in favor of #{name}.exist?."
@@ -58,22 +87,33 @@ class Chef
         exist?(*args)
       end
 
+      # Factory method to construct an encrypted Mash.
+      #
+      # @param version [String, Fixnum] EncryptedMash version to use.
       def self.create(version)
         klass = version_klass(version)
         klass.send(:new)
       end
 
-      # Serialize this object as a Hash
+      # Serialize this object as a Hash.
+      #
+      # @param a [Hash] Ruby _#to_json_ call arguments.
+      # @return [String] JSON representation of the object.
       def to_json(*a)
         for_json.to_json(*a)
       end
 
-      # Returns a Hash for JSON
+      # Returns the object as a Ruby Hash.
+      #
+      # @return [Hash] ruby Hash represtation of the object.
       def for_json
         to_hash
       end
 
-      # Update the EncryptedMash from Hash
+      # Replace the EncryptedMash content from a Mash.
+      #
+      # @param enc_hs [Mash] Mash to clone.
+      # @return [Mash] `self`.
       def update_from!(enc_hs)
         unless self.class.exist?(enc_hs)
           fail UnacceptableEncryptedAttributeFormat,
@@ -86,7 +126,13 @@ class Chef
         update(enc_hs)
       end
 
-      # Create an EncryptedMash::Version from JSON Hash
+      # Create an *EncryptedMash::Version* object from a JSON Hash.
+      #
+      # Reads the EncryptedMash version to create from the {JSON_CLASS} key.
+      #
+      # @param enc_hs [Mash] Encrypted Mash as a Mash. As it is read from node
+      #   attributes.
+      # @return [EncryptedMash] *EncryptedMash::Version* object.
       def self.json_create(enc_hs)
         klass = string_to_klass(enc_hs[JSON_CLASS])
         if klass.nil?
@@ -96,8 +142,11 @@ class Chef
         klass.send(:new, enc_hs)
       end
 
-      # protected
-
+      # Gets the class reference from its string representation.
+      #
+      # @param class_name [String] the class name as string.
+      # @return [Class] the class reference.
+      # @api private
       def self.string_to_klass(class_name)
         unless class_name.is_a?(String)
           fail UnacceptableEncryptedAttributeFormat,
@@ -113,6 +162,14 @@ class Chef
         end
       end
 
+      # Get the class reference for a EncryptedMash version.
+      #
+      # The implementation of `"Chef::EncryptedAttribute::Version#{version}"`
+      # must exists and be included (`require`) beforehand.
+      #
+      # @param version [String, Fixnum] the EncryptedMash version.
+      # @return [Class] the EncryptedMash version class reference.
+      # @api private
       def self.version_klass(version)
         version = version.to_s unless version.is_a?(String)
         if version.empty?

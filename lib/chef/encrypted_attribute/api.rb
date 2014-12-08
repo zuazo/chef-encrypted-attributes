@@ -263,7 +263,9 @@ class Chef
 
       # Checks whether an encrypted attribute exists in a remote node.
       #
-      # @param args #exist? arguments.
+      # @param args {#exist?} arguments.
+      # @return [Boolean] `true` if an encrypted attribute is found, `false` if
+      #   not.
       # @deprecated Use {#exist?} instead.
       def exists?(*args)
         warn("#{name}.exists? is deprecated in favor of #{name}.exist?.")
@@ -289,7 +291,9 @@ class Chef
 
       # Checks whether an encrypted attribute exists in a remote node.
       #
-      # @param args #exist_on_node? arguments.
+      # @param args {#exist_on_node?} arguments.
+      # @return [Boolean] `true` if an encrypted attribute is found, `false` if
+      #   not.
       # @deprecated Use {#exist_on_node?} instead.
       def exists_on_node?(*args)
         warn(
