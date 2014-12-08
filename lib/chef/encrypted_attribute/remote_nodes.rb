@@ -23,14 +23,35 @@ require 'chef/encrypted_attribute/remote_clients'
 
 class Chef
   class EncryptedAttribute
-    # Helpers to search nodes remotely and get its public keys
+    # Helpers to search nodes remotely and get it's public keys.
     class RemoteNodes
       extend ::Chef::EncryptedAttribute::SearchHelper
 
+      # Remote nodes search results cache.
+      #
+      # You can disable it setting it's size to zero:
+      #
+      # ```ruby
+      # Chef::EncryptedAttribute::RemoteNodes.cache.max_size(0)
+      # ```
+      #
+      # @return [CacheLru] Remote nodes LRU cache.
       def self.cache
         @@cache ||= Chef::EncryptedAttribute::CacheLru.new
       end
 
+      # Gets remote node public key.
+      #
+      # It first tries to read the key from the `node['public_key']` attribute.
+      #
+      # If the `"public_key"` attribute does not exist, it tries to read the
+      # node client key directly using the Chef API (this require **admin**
+      # privileges).
+      #
+      # @param node [Chef::Node] Chef node object.
+      # @return [String] Chef client public key as string.
+      # @raise InsufficientPrivileges if you lack enoght privileges.
+      # @raise Net::HTTPServerException for HTTP errors.
       def self.get_public_key(node)
         return node['public_key'] unless node['public_key'].nil?
         RemoteClients.get_public_key(node['name'])
@@ -42,6 +63,19 @@ class Chef
               "#{node['name']} node run list."
       end
 
+      # Search for node client public keys.
+      #
+      # It first tries to read the key from the `node['public_key']` attribute.
+      #
+      # If the `"public_key"` attribute does not exist, it tries to read the
+      # node client key directly using the Chef API (this require **admin**
+      # privileges).
+      #
+      # @param search [Array<String>, String] search queries to perform, the
+      #   query result will be *OR*ed.
+      # @return [Array<String>] list of public keys.
+      # @raise InsufficientPrivileges if you lack enoght privileges.
+      # @raise Net::HTTPServerException for HTTP errors.
       def self.search_public_keys(search = '*:*', partial_search = true)
         escaped_query = escape_query(search)
         return cache[escaped_query] if cache.key?(escaped_query)

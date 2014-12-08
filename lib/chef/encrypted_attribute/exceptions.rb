@@ -18,21 +18,38 @@
 
 class Chef
   class EncryptedAttribute
+    # Exception raised when some requirements to use the encrypted attributes
+    # are not met.
     class RequirementsFailure < StandardError; end
+    # Exception raised when the encrypted attribute format is unknown.
     class UnsupportedEncryptedAttributeFormat < StandardError; end
+    # Exception raised when the encrypted attribute format is wrong.
     class UnacceptableEncryptedAttributeFormat < StandardError; end
+    # Exception raised when there are decryption errors.
     class DecryptionFailure < StandardError; end
+    # Exception raised when there are encryption errors.
     class EncryptionFailure < StandardError; end
+    # Exception raised when there errors generating the HMAC.
     class MessageAuthenticationFailure < StandardError; end
+    # Exception raised when the public key is wrong.
     class InvalidPublicKey < StandardError; end
+    # Exception raised when the private key is wrong.
     class InvalidPrivateKey < StandardError; end
 
+    # Exception raised when you don't have enough privileges in the Chef Server
+    # to do what you intend. Usually happens when you try to read Client or Node
+    # keys wihtout being admin.
     class InsufficientPrivileges < StandardError; end
+    # Exception raised when the user does not exist.
     class UserNotFound < StandardError; end
+    # Exception raised when the client does not exist.
     class ClientNotFound < StandardError; end
 
+    # Exception raised for search errors.
     class SearchFailure < StandardError; end
+    # Exception raised for search fatal errors.
     class SearchFatalError < StandardError; end
+    # Exception raised when search keys are wrong.
     class InvalidSearchKeys < StandardError; end
   end
 end

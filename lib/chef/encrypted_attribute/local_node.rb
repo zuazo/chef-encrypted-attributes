@@ -18,17 +18,28 @@
 
 class Chef
   class EncryptedAttribute
-    # Get name and keys from local Chef Node
+    # Get name and keys from local Chef Node.
     class LocalNode
-      # currently not used
+      # Get the local node name.
+      #
+      # @return [String] local node name.
+      # @note currently not used
       def name
         Chef::Config[:node_name]
       end
 
+      # Get the local node key.
+      #
+      # The key has the private key and the public key embedded.
+      #
+      # @return [OpenSSL::PKey::RSA] the local node private and the public key.
       def key
         OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read)
       end
 
+      # Get the local node public key.
+      #
+      # @return [OpenSSL::PKey::RSA] the local node public key.
       def public_key
         key.public_key
       end
