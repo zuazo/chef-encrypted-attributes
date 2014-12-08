@@ -20,8 +20,15 @@ require 'chef/encrypted_attribute/exceptions'
 
 class Chef
   class EncryptedAttribute
-    # Include some assertions that throw exceptions if not met
+    # Include some assertions that throw exceptions if not met.
     module Assertions
+      # Check some assertions related with OpenSSL AEAD support, required to
+      # to use [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode).
+      #
+      # @param algorithm [String] the name of the algorithm to use.
+      # @return void
+      # @raise [RequirementsFailure] if any of the requirements to use AEAD is
+      #   not met.
       def assert_aead_requirements_met!(algorithm)
         unless OpenSSL::Cipher.method_defined?(:auth_data=)
           fail RequirementsFailure,

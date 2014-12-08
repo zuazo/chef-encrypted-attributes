@@ -44,7 +44,7 @@ class Chef
 
       # Name prefix for all  EncryptedAttribute version classes.
       # Used internally by the #self.version_class method.
-      # @private
+      # @api private
       VERSION_PREFIX = "#{name}::Version"
 
       # Encrypted Mash constructor.
