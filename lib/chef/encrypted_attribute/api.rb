@@ -211,9 +211,9 @@ class Chef
       # @return [Boolean] `true` if the encrypted attribute has been updated,
       #   `false` if not.
       def update(enc_hs, c = {})
-        debug("Updating Encrypted Attribute: #{hs.inspect}")
+        debug("Updating Encrypted Attribute: #{enc_hs.inspect}")
         enc_attr = EncryptedAttribute.new(config(c))
-        result = enc_attr.update(hs)
+        result = enc_attr.update(enc_hs)
         if result
           debug('Encrypted Attribute updated.')
         else
