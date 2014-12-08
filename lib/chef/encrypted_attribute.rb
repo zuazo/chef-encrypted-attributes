@@ -109,8 +109,8 @@ class Chef
     #   clear.
     # @param keys [OpenSSL::PKey::RSA, String] public keys that will be able to
     #   decrypt the attribute.
-    # @return [Chef::EncryptedAttribute::EncryptedMash] encrypted attribute
-    #   value. This is usually what is saved in the node attributes.
+    # @return [EncryptedMash] encrypted attribute value. This is usually what is
+    #   saved in the node attributes.
     def create(value, keys = nil)
       decrypted = { 'content' => value }
 
@@ -120,13 +120,14 @@ class Chef
 
     # Creates an encrypted attribute on a remote node.
     #
-    # The remote node will always be able to deciper it.
+    # The remote node will always be able to decrypt it. The local node will
+    # not be able to decrypt it by default, you must remember to include the key
+    # in the configuration.
     #
     # @param name [String] node name.
     # @param attr_ary [Array<String>] node attribute path as Array.
     # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt.
-    # @return [Chef::EncryptedAttribute::EncryptedMash] encrypted attribute
-    #   value.
+    # @return [EncryptedMash] encrypted attribute value.
     def create_on_node(name, attr_ary, value)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
