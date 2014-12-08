@@ -18,18 +18,36 @@
 
 require 'chef/mixin/params_validate'
 
-# Based on https://github.com/SamSaffron/lru_redux
 class Chef
   class EncryptedAttribute
-    # Implementes a LRU cache object
+    # Implementes a LRU (Least Recently Used) cache object.
+    #
+    # The LRU cache algorithm discards the least recently used items first.
+    #
+    # This class extends from *Hash* class and adds methods to behave as a
+    # cache.
+    #
+    # @note Based on [SamSaffron](https://github.com/SamSaffron) work:
+    #   https://github.com/SamSaffron/lru_redux
     class CacheLru < Hash
       include ::Chef::Mixin::ParamsValidate
 
+      # Constructs a new Cache LRU object.
+      #
+      # @param size [Fixnum] Cache maximum size in object count.
       def initialize(size = nil)
         super
         max_size(size)
       end
 
+      # Reads or sets the cache maximum size.
+      #
+      # Removes some values if needed (when the size is reduced).
+      #
+      # The cache size is `1024` by default.
+      #
+      # @param arg [Fixnum] cache maximum size to set.
+      # @return [Fixnum] cache maximum size.
       def max_size(arg = nil)
         set_or_return(
           :max_size,
@@ -41,6 +59,10 @@ class Chef
         @max_size
       end
 
+      # Reads a cache key.
+      #
+      # @param key [String, Symbol] cache key to read.
+      # @return [Mixed] cache key value.
       def [](key)
         if key?(key)
           val = super(key)
@@ -50,6 +72,14 @@ class Chef
         end
       end
 
+      # Sets a cache key.
+      #
+      # Some keys will be removed if the cache size grows too much. The keys to
+      # be removed will be chosen using the LRU algorithm.
+      #
+      # @param key [String, Symbol] cache key to set.
+      # @param val [Mixed] cache key value.
+      # @return [Mixed] cache key value. 
       def []=(key, val)
         if max_size > 0 # unnecessary "if", small optimization?
           delete(key)
@@ -61,6 +91,11 @@ class Chef
 
       protected
 
+      # Removes the tail elements until the size is correct.
+      #
+      # This method is needed to implement the LRU algorithm.
+      #
+      # @return void
       def pop_tail
         delete(first[0]) while size > max_size
       end
