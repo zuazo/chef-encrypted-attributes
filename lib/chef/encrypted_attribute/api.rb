@@ -328,9 +328,10 @@ class Chef
       #
       # An exception is thrown if there is any error in the updating process.
       #
-      # @param enc_hs This must be a node encrypted attribute, this attribute
-      #   will be updated, so it is mandatory to specify the type (usually
-      #   `normal`). For example: `node.normal['myapp']['ftp_password']`.
+      # @param enc_hs [Mash] This must be a node encrypted attribute, this
+      #   attribute will be updated, so it is mandatory to specify the type
+      #   (usually `normal`). For example:
+      #   `node.normal['myapp']['ftp_password']`.
       # @param c [Config, Hash] a configuration hash. Surely you want this
       #   `#update` method to use the same `config` that the `#create` call.
       # @return [Boolean] `true` if the encrypted attribute has been updated,
@@ -388,7 +389,7 @@ class Chef
 
       # Checks whether an encrypted attribute exists in a remote node.
       #
-      # @param args {#exist?} arguments.
+      # @param [Mixed] args {#exist?} arguments.
       # @return [Boolean] `true` if an encrypted attribute is found, `false` if
       #   not.
       # @deprecated Use {#exist?} instead.
@@ -416,7 +417,7 @@ class Chef
 
       # Checks whether an encrypted attribute exists in a remote node.
       #
-      # @param args {#exist_on_node?} arguments.
+      # @param [Mixed] args {#exist_on_node?} arguments.
       # @return [Boolean] `true` if an encrypted attribute is found, `false` if
       #   not.
       # @deprecated Use {#exist_on_node?} instead.

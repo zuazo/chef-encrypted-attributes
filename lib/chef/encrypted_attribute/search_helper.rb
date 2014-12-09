@@ -27,7 +27,7 @@ class Chef
 
       # Gets a Chef Search Query object.
       #
-      # @return {Chef::Search::Query} search query object instance.
+      # @return [Chef::Search::Query] search query object instance.
       # @api private
       def query
         Chef::Search::Query.new
