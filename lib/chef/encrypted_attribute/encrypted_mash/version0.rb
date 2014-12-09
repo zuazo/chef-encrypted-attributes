@@ -194,7 +194,7 @@ class Chef
           raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
-        # Encode Ruby `< 1.9.3` RSA key using X.509 format.
+        # Encodes Ruby `< 1.9.3` RSA key using X.509 format.
         #
         # In Ruby `< 1.9.3` RSA keys are in [PKCS#1]
         # (http://en.wikipedia.org/wiki/PKCS_1) format.
@@ -220,7 +220,7 @@ class Chef
           asn1::Sequence.new([alg_id, enc_pk])
         end
 
-        # Return any RSA key in X.509 format.
+        # Returns any RSA key in X.509 format.
         #
         # Fixes RSA key format in Ruby `< 1.9.3`.
         #
@@ -295,7 +295,7 @@ class Chef
           rsa_decrypt_value(enc_value, key)
         end
 
-        # Check if data can be decrypted by the provided key. Where data is
+        # Checks if data can be decrypted by the provided key. Where data is
         # encrypted for multiple keys.
         #
         # This method is not immune to any kind of data corruption. Only checks

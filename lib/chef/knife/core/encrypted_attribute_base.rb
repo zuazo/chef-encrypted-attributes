@@ -73,7 +73,7 @@ class Chef
           die('Encrypted attribute already exists')
         end
 
-        # Parse knife arguments.
+        # Parses knife arguments.
         #
         # Exits with error if the arguments are wrong.
         #

@@ -63,7 +63,7 @@ class Chef
               "#{node['name']} node run list."
       end
 
-      # Search for node client public keys.
+      # Searches for node client public keys.
       #
       # It first tries to read the key from the `node['public_key']` attribute.
       #

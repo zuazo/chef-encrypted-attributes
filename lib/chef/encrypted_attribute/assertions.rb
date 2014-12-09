@@ -22,7 +22,7 @@ class Chef
   class EncryptedAttribute
     # Include some assertions that throw exceptions if not met.
     module Assertions
-      # Check some assertions related with OpenSSL AEAD support, required to
+      # Checks some assertions related with OpenSSL AEAD support, required to
       # to use [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode).
       #
       # @param algorithm [String] the name of the algorithm to use.

@@ -54,7 +54,7 @@ class Chef
         raise ClientNotFound, "Chef Client not found: #{name.inspect}."
       end
 
-      # Search for chef client public keys.
+      # Searches for chef client public keys.
       #
       # @param search [Array<String>, String] search queries to perform, the
       #   query result will be *OR*-ed.

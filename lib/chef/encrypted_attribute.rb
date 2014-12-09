@@ -36,7 +36,6 @@ unless Chef::Config[:encrypted_attributes].is_a?(Hash)
 end
 
 class Chef
-
   # Main EncryptedAttribute class.
   #
   # This class contains both static and instance level public methods.

@@ -106,7 +106,7 @@ class Chef
         klass.send(:new)
       end
 
-      # Serialize this object as a Hash.
+      # Serializes this object as a Hash.
       #
       # @param a [Hash] Ruby _#to_json_ call arguments.
       # @return [String] JSON representation of the object.
@@ -121,7 +121,7 @@ class Chef
         to_hash
       end
 
-      # Replace the EncryptedMash content from a Mash.
+      # Replaces the EncryptedMash content from a Mash.
       #
       # @param enc_hs [Mash] Mash to clone.
       # @return [Mash] `self`.
@@ -137,7 +137,7 @@ class Chef
         update(enc_hs)
       end
 
-      # Create an *EncryptedMash::Version* object from a JSON Hash.
+      # Creates an *EncryptedMash::Version* object from a JSON Hash.
       #
       # Reads the EncryptedMash version to create from the {JSON_CLASS} key.
       #
@@ -173,7 +173,7 @@ class Chef
         end
       end
 
-      # Get the class reference for a EncryptedMash version.
+      # Gets the class reference for a EncryptedMash version.
       #
       # The implementation of `"Chef::EncryptedAttribute::Version#{version}"`
       # must exists and be included (`require`) beforehand.

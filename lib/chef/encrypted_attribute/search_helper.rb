@@ -58,7 +58,7 @@ class Chef
         escape(query_s)
       end
 
-      # Check if a Hash key from a search keys structure format is correct.
+      # Checks if a Hash key from a search keys structure format is correct.
       #
       # @param k [Mixed] hash key to check.
       # @return [Boolean] `true` if key is a `String` or a `Symbol`.
@@ -67,7 +67,7 @@ class Chef
         k.is_a?(String) || k.is_a?(Symbol)
       end
 
-      # Check if a Hash value from a search keys structure format is correct.
+      # Checks if a Hash value from a search keys structure format is correct.
       #
       # @param v [Mixed] hash value to check.
       # @return [Boolean] `true` if value is a `Array<String>`.
@@ -77,7 +77,7 @@ class Chef
         v.reduce(true) { |a, e| a && e.is_a?(String) }
       end
 
-      # Check if a search keys structure format is correct.
+      # Checks if a search keys structure format is correct.
       #
       # This is an example of a correct search structure:
       #

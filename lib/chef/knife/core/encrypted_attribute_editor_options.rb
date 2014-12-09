@@ -152,6 +152,8 @@ class Chef
           result
         end
 
+        # Edits data using an editor.
+        #
         # Modified `Chef::Knife::UI#edit_data` method with plain text format
         # support
         #
