@@ -4,6 +4,7 @@
 [![Code Climate](http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/onddo/chef-encrypted-attributes)
 [![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
 [![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
+[![Inline docs](http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/onddo/chef-encrypted-attributes)
 
 [Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
 
