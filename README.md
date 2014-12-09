@@ -31,8 +31,8 @@ Node attributes are encrypted using chef client and user keys with public key in
 You need to install and include the `chef-encrypted-attributes` gem before using encrypted attributes inside a cookbook.
 
 ```ruby
-chef_gem "chef-encrypted-attributes"
-require "chef/encrypted_attributes"
+chef_gem 'chef-encrypted-attributes'
+require 'chef/encrypted_attributes'
 ```
 
 ### Typical Example
@@ -40,22 +40,22 @@ require "chef/encrypted_attributes"
 In the following example we save a simple FTP user password.
 
 ```ruby
-chef_gem "chef-encrypted-attributes"
-require "chef/encrypted_attributes"
+chef_gem 'chef-encrypted-attributes'
+require 'chef/encrypted_attributes'
 
 # include the #secure_password method
 Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-if Chef::EncryptedAttribute.exist?(node["myapp"]["ftp_password"])
+if Chef::EncryptedAttribute.exist?(node['myapp']['ftp_password'])
   # update with the new keys
-  Chef::EncryptedAttribute.update(node.set["myapp"]["ftp_password"])
+  Chef::EncryptedAttribute.update(node.set['myapp']['ftp_password'])
 
   # read the password
-  ftp_pass = Chef::EncryptedAttribute.load(node["myapp"]["ftp_password"])
+  ftp_pass = Chef::EncryptedAttribute.load(node['myapp']['ftp_password'])
 else
   # create the password and save it
   ftp_pass = secure_password
-  node.set["myapp"]["ftp_password"] = Chef::EncryptedAttribute.create(ftp_pass)
+  node.set['myapp']['ftp_password'] = Chef::EncryptedAttribute.create(ftp_pass)
 end
 
 # use `ftp_pass` for something here ...
@@ -68,30 +68,30 @@ end
 In this example we only need to save some data from the local node and read it from another:
 
 ```ruby
-chef_gem "chef-encrypted-attributes"
-require "chef/encrypted_attributes"
+chef_gem 'chef-encrypted-attributes'
+require 'chef/encrypted_attributes'
 
 # Allow all admin clients to read the attributes encrypted by me
-Chef::Config[:encrypted_attributes][:client_search] = "admin:true"
+Chef::Config[:encrypted_attributes][:client_search] = 'admin:true'
 
 # Allow all webapp nodes to read the attributes encrypted by me
-Chef::Config[:encrypted_attributes][:node_search] = "role:webapp"
+Chef::Config[:encrypted_attributes][:node_search] = 'role:webapp'
 
-if Chef::EncryptedAttribute.exist?(node["myapp"]["encrypted_data"])
+if Chef::EncryptedAttribute.exist?(node['myapp']['encrypted_data'])
   # when can used #load here as above if we need the `encrypted_data` outside
   # this `if`
 
   # update with the new keys
-  Chef::EncryptedAttribute.update(node.set["myapp"]["encrypted_data"])
+  Chef::EncryptedAttribute.update(node.set['myapp']['encrypted_data'])
 else
   # create the data, encrypt and save it
   data_to_encrypt = # ....
-  node.set["myapp"]["encrypted_data"] =
+  node.set['myapp']['encrypted_data'] =
     Chef::EncryptedAttribute.create(data_to_encrypt)
 end
 ```
 
-Then we can read this attribute from another allowed node (a `"role:webapp"` node):
+Then we can read this attribute from another allowed node (a `'role:webapp'` node):
 
 ```ruby
 include_recipe 'encrypted_attributes'
@@ -99,10 +99,10 @@ include_recipe 'encrypted_attributes'
 include_recipe 'encrypted_attributes::expose_key'
 
 if Chef::EncryptedAttribute.exist_on_node?(
-     "random.example.com", ["myapp", "encrypted_data"]
+     'random.example.com', %w(myapp encrypted_data)
    )
   data = Chef::EncryptedAttribute.load_from_node(
-    "random.example.com", ["myapp", "encrypted_data"]
+    'random.example.com', %w(myapp encrypted_data)
   )
 
   # use `data` for something here ...
@@ -130,12 +130,12 @@ This data bag will contain the user public keys retrieved with `knife user show 
 Then, from a recipe, you can read this user keys and allow them to read the attributes.
 
 ```ruby
-chef_gem "chef-encrypted-attributes"
-require "chef/encrypted_attributes"
+chef_gem 'chef-encrypted-attributes'
+require 'chef/encrypted_attributes'
 
-chef_users = Chef::DataBagItem.load("global_data_bag", "chef_users")
+chef_users = Chef::DataBagItem.load('global_data_bag', 'chef_users')
 # remove the data bag "id" to avoid to confuse it with a user:
-chef_users.delete("id")
+chef_users.delete('id')
 
 Chef::Log.debug(
   "Chef Users able to read the Encrypted Attributes: #{chef_users.keys.inspect}"
