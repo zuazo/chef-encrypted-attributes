@@ -99,7 +99,7 @@ class Chef
     # Decrypts an encrypted attribute from a local node attribute.
     #
     # @param enc_hs [Mash] the encrypted hash as read from the node attributes.
-    # @param key [OpenSSL::PKey::RSA, String] private key to use in the
+    # @param key [String, OpenSSL::PKey::RSA] private key to use in the
     #   decryption process, uses the local node key by default.
     # @return [Hash, Array, String, ...] decrypted attribute value.
     def load(enc_hs, key = nil)
@@ -112,7 +112,7 @@ class Chef
     #
     # @param name [String] node name.
     # @param attr_ary [Array<String>] node attribute path as Array.
-    # @param key [OpenSSL::PKey::RSA, String] private key to use in the
+    # @param key [String, OpenSSL::PKey::RSA] private key to use in the
     #   decryption process, uses the local key by default.
     # @return [Hash, Array, String, ...] decrypted attribute value.
     def load_from_node(name, attr_ary, key = nil)
@@ -128,7 +128,7 @@ class Chef
     #
     # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt in
     #   clear.
-    # @param keys [OpenSSL::PKey::RSA, String] public keys that will be able to
+    # @param keys [String, OpenSSL::PKey::RSA] public keys that will be able to
     #   decrypt the attribute.
     # @return [EncryptedMash] encrypted attribute value. This is usually what is
     #   saved in the node attributes.
@@ -175,7 +175,7 @@ class Chef
     #
     # @param enc_hs [Mash] encrypted attribute. This parameter value will be
     #   modified on updates.
-    # @param keys [Array<OpenSSL::PKey::RSA, String> public keys that should be
+    # @param keys [Array<String, OpenSSL::PKey::RSA> public keys that should be
     #   able to read the attribute.
     # @return [Boolean] Returns `true` if the encrypted attribute (the *Mash*
     #   parameter) has been updated.
