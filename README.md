@@ -7,7 +7,7 @@
 
 [Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
 
-We recommend using the [encrypted_attributes cookbook](http://community.opscode.com/cookbooks/encrypted_attributes) for easy installation.
+We recommend using the [`encrypted_attributes`](http://cookbooks.opscode.com/cookbooks/encrypted_attributes) cookbook for easy installation.
 
 ## Description
 
@@ -61,7 +61,7 @@ end
 # use `ftp_pass` for something here ...
 ```
 
-**Note:** This example requires the [openssl](http://community.opscode.com/cookbooks/openssl) cookbook.
+**Note:** This example requires the [`openssl`](http://cookbooks.opscode.com/cookbooks/openssl) cookbook.
 
 ### Minimal Write Only Example
 
@@ -113,7 +113,7 @@ end
 
 ### Example Using User Keys Data Bag
 
-Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](README.md#chef-user-keys-access-limitation) problem.
+Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the [Chef Users Limitation](#chef-user-keys-access-limitation) problem.
 
 You need to create a Data Bag Item with a content similar to the following:
 
@@ -153,7 +153,7 @@ Chef::Config[:encrypted_attributes][:keys] = chef_users.values
 
 ## Chef::EncryptedAttribute API
 
-See the [API.md](API.md) file for a more detailed documentation about `Chef::EncryptedAttribute` class and its methods.
+See the [API documentation](http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/API.html) for a more detailed information about `Chef::EncryptedAttribute` class and its methods.
 
 ## Chef User Keys Access Limitation
 
@@ -161,173 +161,25 @@ Keep in mind that, from a Chef Node, *Chef User* *public keys* are inaccessible.
 
 Chef Nodes (Clients) with *admin* privileges do have access to user public keys, but in most cases this is not a recommended practice.
 
-See the [Example Using User Keys Data Bag](README.md#example-using-user-keys-data-bag) section for a workaround. You can use the [`encrypted_attributes::users_data_bag`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::users_data_bag) recipe for this.
+See the [Example Using User Keys Data Bag](#example-using-user-keys-data-bag) section for a workaround. You can use the [`encrypted_attributes::users_data_bag`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::users_data_bag) recipe for this.
 
 **Note:** *Chef Clients* usually are Chef Nodes and *chef-validation*/*chef-webui* keys. *Chef Users* usually are knife users. The main difference between *Chef Users* and *Chef Clients* is that the former are able to log in via *web-ui* (has a password).
 
 ## Chef Client Keys Access Limitation
 
-*Chef Client* *public keys* has a [similar problem to the user keys](README.md#chef-user-keys-access-limitation), you cannot retrieve them from a Chef Node.
+*Chef Client* *public keys* has a [similar problem to the user keys](#chef-user-keys-access-limitation), you cannot retrieve them from a Chef Node.
 
-To fix this limitation you should expose de *Chef Client* *public key* in the `node['public_key']` attribute. You can include the [`encrypted_attributes::expose_key`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::expose_key)` recipe for this. You need to include this recipe in the *Chef Nodes* that require read privileges on the encrypted attributes.
+To fix this limitation you should expose de *Chef Client* *public key* in the `node['public_key']` attribute. You can include the [`encrypted_attributes::expose_key`](https://supermarket.chef.io/cookbooks/encrypted_attributes#encrypted_attributes::expose_key) recipe for this. You need to include this recipe in the *Chef Nodes* that require read privileges on the encrypted attributes.
 
 Exposing the public key through attributes should not be considered a security breach, so it's not a problem to include it on all machines.
 
 ## Knife Commands
 
-There are multiple commands to read, create and modify the encrypted attributes. All the commands will grant access privileges to the affected node by default (encrypted attributes are written in Node Attributes). But you will not be allowed to access them by default, so remember to give your own knife user privileges before creating or saving the attribute.
-
-The `ATTRIBUTE` name must be specified using *dots* notation. For example, for `node['encrypted']['attribute']`, you must specify `"encrypted.attribute"` as knife argument. If the attribute key has a *dot* in its name, you must escape it. For example: `"encrypted.attribute\.with\.dots"`.
-
-Read the [Chef Users Limitation](README.md#chef-user-keys-access-limitation) caveat before trying to use any knife command.
-
-### Installing the Required Gem
-
-You need to install the `chef-encrypted-attributes` gem before using this knife commands.
-
-    $ gem install chef-encrypted-attributes
-
-### knife.rb
-
-Some configuration values can be set in your local `knife.rb` configuration file inside the `knife[:encrypted_attributes]` configuraiton space. For example:
-
-```ruby
-knife[:encrypted_attributes][:users] = '*' # allow access to all knife users
-```
-
-See the [API Configuration](API.md#configuration) section for more configuration values.
-
-### knife encrypted attribute show
-
-Shows the decrypted attribute content.
-
-    $ knife encrypted attribute show NODE ATTRIBUTE (options)
-
-For example:
-
-    $ knife encrypted attribute show ftp.example.com myapp.ftp_password
-
-### knife encrypted attribute create
-
-Creates an encrypted attribute in a node. The attribute cannot already exist.
-
-    $ knife encrypted attribute create NODE ATTRIBUTE (options)
-
-If the input is in JSON format (`-i`), you can create a JSON in *quirk* mode like `false`, `5` or `"some string"`. You don't need to create an Array or a Hash as the JSON standard forces.
-
-For example:
-
-    $ export EDITOR=vi
-    $ knife encrypted attribute create ftp.example.com myapp.ftp_password \
-        -U bob -U alice
-
-### knife encrypted attribute update
-
-Updates who can read the attribute (for `:client_search` and `:node_search` changes).
-
-    $ knife encrypted attribute update NODE ATTRIBUTE (options)
-
-**You must be careful to pass the same privilege arguments that you used in its creation** (this will surely be fixed in a future).
-
-For example:
-
-    $ knife encrypted attribute update ftp.example.com myapp.ftp_password \
-        --client-search admin:true \
-        --node-search role:webapp \
-        -U bob -U alice
-
-### knife encrypted attribute edit
-
-Edits an existing encrypted attribute. The attribute must exist.
-
-    $ knife encrypted attribute edit NODE ATTRIBUTE (options)
-
-If the input is in JSON format (`-i`), you can create a JSON in *quirk* mode like `false`, `5` or `"some string"`. You don't need to create an Array or a Hash as the JSON standard forces.
-
-**You must be careful to pass the same privilege arguments that you used in its creation** (this will surely be fixed in a future).
-
-For example:
-
-    $ export EDITOR=vi
-    $ knife encrypted attribute edit ftp.example.com myapp.ftp_password \
-        --client-search admin:true \
-        --node-search role:webapp \
-        -U bob -U alice
-
-### knife encrypted attribute delete
-
-Deletes an existing attribute. If you have no privileges to read it, you must use the `--force` flag.
-
-    $ knife encrypted attribute delete NODE ATTRIBUTE (options)
-
-For example:
-
-    $ knife encrypted attribute delete ftp.example.com myapp.ftp_password --force
-
-### Knife Options
-
-<table>
-  <tr>
-    <th>Short</th>
-    <th>Long</th>
-    <th>Description</th>
-    <th>Valid Values</th>
-    <th>Sub-Commands</th>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td>--encrypted-attribute-version</td>
-    <td>Encrypted Attribute protocol version to use</td>
-    <td>"0", "1" <em>(default)</em>, "2"</td>
-    <td>create, edit, update</td>
-  </tr>
-  <tr>
-    <td>-P</td>
-    <td>--disable-partial-search</td>
-    <td>Disable partial search</td>
-    <td>&nbsp;</td>
-    <td>create, edit, update</td>
-  </tr>
-  <tr>
-    <td>-C</td>
-    <td>--client-search</td>
-    <td>Client search query. Can be specified multiple times</td>
-    <td>&nbsp;</td>
-    <td>create, edit, update</td>
-  </tr>
-  <tr>
-    <td>-N</td>
-    <td>--node-search</td>
-    <td>Node search query. Can be specified multiple times</td>
-    <td>&nbsp;</td>
-    <td>create, edit, update</td>
-  </tr>
-  <tr>
-    <td>-U</td>
-    <td>--user</td>
-    <td>User name to allow access to. Can be specified multiple times</td>
-    <td>&nbsp;</td>
-    <td>create, edit, update</td>
-  </tr>
-  <tr>
-    <td>-i</td>
-    <td>--input-format</td>
-    <td>Input (<em>EDITOR</em>) format</td>
-    <td>"plain" <em>(default)</em>, "json"</td>
-    <td>create, edit</td>
-  </tr>
-  <tr>
-    <td>-f</td>
-    <td>--force</td>
-    <td>Force the attribute deletion even if you cannot read it</td>
-    <td>&nbsp;</td>
-    <td>delete</td>
-  </tr>
-</table>
+See the [KNIFE.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/KNIFE.md) file.
 
 ## Internal Documentation
 
-See the [INTERNAL.md](INTERNAL.md) file for a more low level documentation.
+See the [INTERNAL.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/INTERNAL.md) file for a more low level documentation.
 
 ## Using Signed Gems
 
@@ -348,7 +200,7 @@ We recommend to remove our certificate after the gem has been successfully verif
 
 ## Security Notes
 
-All the cryptographic systems and algorithms used by `chef-encrypted-attributes` are carefully described in the [internal documentation](INTERNAL.md) for public review. The code was originally based on *Encrypted Data Bags* and [chef-vault](https://github.com/Nordstrom/chef-vault) implementations, then improved.
+All the cryptographic systems and algorithms used by `chef-encrypted-attributes` are carefully described in the [internal documentation](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/INTERNAL.md) for public review. The code was originally based on *Encrypted Data Bags* and [chef-vault](https://github.com/Nordstrom/chef-vault) implementations, then improved.
 
 Still, this gem should be considered experimental until audited by professional cryptographers.
 
@@ -364,17 +216,17 @@ The key fingerprint is (or should be):
 
 ## Testing
 
-See [TESTING.md](TESTING.md).
+See [TESTING.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/TESTING.md).
 
 ## Contributing
 
 Please do not hesitate to [open an issue](https://github.com/onddo/chef-encrypted-attributes/issues/new) with any questions or problems.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/CONTRIBUTING.md).
 
 ## TODO
 
-See [TODO.md](TODO.md).
+See [TODO.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TODO.md).
 
 ## License and Author
 

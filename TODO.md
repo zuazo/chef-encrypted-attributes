@@ -1,6 +1,8 @@
 TODO
 ====
 
+* [ ] Documentation: avoid using relative paths in links.
+
 * [ ] Fix all RuboCop offenses.
 * [ ] Document the Ruby code.
 * [ ] knife encrypted attribute create/edit from file.

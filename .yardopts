@@ -1,7 +1,9 @@
 --markup markdown
 -
-API.md
 CHANGELOG.md
 CONTRIBUTING.md
 INTERNAL.md
+KNIFE.md
+README.md
 TESTING.md
+TODO.md

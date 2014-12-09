@@ -118,7 +118,6 @@ class Chef
           query.is_a?(Array) && query.count == 0
       end
 
-
       # Does a search in the Chef Server.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]

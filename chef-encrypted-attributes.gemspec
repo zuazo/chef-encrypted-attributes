@@ -27,9 +27,8 @@ Gem::Specification.new do |s|
   s.homepage = 'http://onddo.github.io/chef-encrypted-attributes'
   s.require_path = 'lib'
   s.files = %w(
-    Rakefile LICENSE README.md API.md INTERNAL.md TESTING.md TODO.md
-    CHANGELOG.md CONTRIBUTING.md
-  ) + Dir.glob('lib/**/*')
+    Rakefile LICENSE
+  ) + Dir.glob('*.md') + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 

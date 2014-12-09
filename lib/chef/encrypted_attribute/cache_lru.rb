@@ -79,7 +79,7 @@ class Chef
       #
       # @param key [String, Symbol] cache key to set.
       # @param val [Mixed] cache key value.
-      # @return [Mixed] cache key value. 
+      # @return [Mixed] cache key value.
       def []=(key, val)
         if max_size > 0 # unnecessary "if", small optimization?
           delete(key)

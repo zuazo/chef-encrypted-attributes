@@ -38,13 +38,15 @@ end
 class Chef
   # Main EncryptedAttribute class. Includes instance and class API methods.
   #
+  # The *class methods* (or static methods) are normally used **from Chef
+  # cookbooks**. They are documented in the {Chef::EncryptedAttribute::API}
+  # class.
+  #
   # The *instance methods* are normally used **by other libraries or gems**. For
   # example, the knife extensions included in this gem uses these methods.
   #
-  # The *class methods* are normally used **by Chef Run recipes**. They are
-  # documented in the {Chef::EncryptedAttribute::API} class.
+  # @see EncryptedAttribute::API
   class EncryptedAttribute
-
     # Include the *class methods* for the recipe API.
     extend Chef::EncryptedAttribute::API
 
