@@ -125,6 +125,8 @@ class Chef
       #
       # @param enc_hs [Mash] Mash to clone.
       # @return [Mash] `self`.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
       def update_from!(enc_hs)
         unless self.class.exist?(enc_hs)
           fail UnacceptableEncryptedAttributeFormat,
@@ -144,6 +146,8 @@ class Chef
       # @param enc_hs [Mash] Encrypted Mash as a Mash. As it is read from node
       #   attributes.
       # @return [EncryptedMash] *EncryptedMash::Version* object.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
       def self.json_create(enc_hs)
         klass = string_to_klass(enc_hs[JSON_CLASS])
         if klass.nil?
@@ -158,6 +162,8 @@ class Chef
       # @param class_name [String] the class name as string.
       # @return [Class] the class reference.
       # @api private
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   class name is wrong.
       def self.string_to_klass(class_name)
         unless class_name.is_a?(String)
           fail UnacceptableEncryptedAttributeFormat,
@@ -181,6 +187,10 @@ class Chef
       # @param version [String, Fixnum] the EncryptedMash version.
       # @return [Class] the EncryptedMash version class reference.
       # @api private
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   version is wrong.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
       def self.version_klass(version)
         version = version.to_s unless version.is_a?(String)
         if version.empty?

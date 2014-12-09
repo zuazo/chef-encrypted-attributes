@@ -46,6 +46,7 @@ class Chef
       # @param users [Array<String>, '*'] user list. Use `'*'` to get all users
       #   public keys.
       # @return [Array<String>] public key list.
+      # @raise [ArgumentError] if user list is wrong.
       def self.get_public_keys(users = [])
         if users == '*' # users are [a-z0-9\-_]+, cannot be *
           cache.key?('*') ? cache['*'] : cache['*'] = all_public_keys
@@ -64,6 +65,8 @@ class Chef
       #
       # @param name [String] user name.
       # @return [String] user public key as string.
+      # @raise [InsufficientPrivileges] if a 403 error is received from the Chef
+      #   server.
       # @api private
       def self.get_user_public_key(name)
         return cache[name] if cache.key?(name)

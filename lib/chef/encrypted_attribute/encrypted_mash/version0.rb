@@ -188,6 +188,7 @@ class Chef
         #
         # @param o [String] JSON string to decode.
         # @return [Mixed] Ruby representation of the JSON string.
+        # @raise [DecryptionFailure] if JSON string format is wrong.
         def json_decode(o)
           FFI_Yajl::Parser.parse(o.to_s)
         rescue FFI_Yajl::ParseError => e
@@ -246,6 +247,7 @@ class Chef
         # @param value [String] data to encrypt.
         # @param public_key [OpenSSL::PKey::RSA] public key used for encryption.
         # @return [String] data encrypted in its Base64 representation.
+        # @raise [EncryptionFailure] if there are encryption errors.
         def rsa_encrypt_value(value, public_key)
           Base64.encode64(public_key.public_encrypt(value))
         rescue OpenSSL::PKey::RSAError => e
@@ -258,6 +260,7 @@ class Chef
         #   representation.
         # @param key [OpenSSL::PKey::RSA] private key used for decryption.
         # @return [String] value decrypted.
+        # @raise [DecryptionFailure] if there are decryption errors.
         def rsa_decrypt_value(value, key)
           key.private_decrypt(Base64.decode64(value.to_s))
         rescue OpenSSL::PKey::RSAError => e
