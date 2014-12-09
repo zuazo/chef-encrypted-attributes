@@ -27,8 +27,18 @@ class Chef
     # This class extends from *Hash* class and adds methods to behave as a
     # cache.
     #
+    # You can use the `clear` class method to clean a cache:
+    #
+    # ```ruby
+    # Chef::EncryptedAttribute::RemoteClients.cache.clear
+    # Chef::EncryptedAttribute::RemoteNodes.cache.clear
+    # Chef::EncryptedAttribute::RemoteUsers.cache.clear
+    # Chef::EncryptedAttribute::RemoteNode.cache.clear
+    # ```
+    #
     # @note Based on [SamSaffron](https://github.com/SamSaffron) work:
     #   https://github.com/SamSaffron/lru_redux
+    # @see API
     class CacheLru < Hash
       include ::Chef::Mixin::ParamsValidate
 

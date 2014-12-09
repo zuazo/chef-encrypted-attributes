@@ -213,7 +213,7 @@ class Chef
     # the configuration.
     #
     # @return [Array<String>] list of client public keys.
-    # @see config
+    # @see #config
     def remote_client_keys
       RemoteClients.search_public_keys(
         config.client_search, config.partial_search
@@ -224,7 +224,7 @@ class Chef
     # configuration.
     #
     # @return [Array<String>] list of node public keys.
-    # @see config
+    # @see #config
     def remote_node_keys
       RemoteNodes.search_public_keys(config.node_search, config.partial_search)
     end
@@ -232,7 +232,7 @@ class Chef
     # Gets remote user keys using the configured user list.
     #
     # @return [Array<String>] list of user public keys.
-    # @see config
+    # @see #config
     def remote_user_keys
       RemoteUsers.get_public_keys(config.users)
     end
@@ -246,10 +246,10 @@ class Chef
     # @param keys [Array<String>] list of public keys to include in addition to
     #   the configured.
     # @return [Array<String>] list of user public keys.
-    # @see config
-    # @see remote_client_keys
-    # @see remote_node_keys
-    # @see remote_user_keys
+    # @see #config
+    # @see #remote_client_keys
+    # @see #remote_node_keys
+    # @see #remote_user_keys
     def target_keys(keys = nil)
       target_keys =
         config.keys + remote_client_keys + remote_node_keys + remote_user_keys

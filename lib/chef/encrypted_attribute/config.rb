@@ -65,7 +65,7 @@ class Chef
       # @param arg [Boolean] whether to enable partial search.
       # @return [Boolean] partial search usage.
       # @see
-      #   [Chef Search documentation](http://docs.getchef.com/chef_search.html)
+      #   http://docs.getchef.com/chef_search.html Chef Search documentation
       def partial_search(arg = nil)
         set_or_return(
           :partial_search, arg, kind_of: [TrueClass, FalseClass], default: true
@@ -80,7 +80,7 @@ class Chef
       # @param arg [String, Array<String>] list of client queries to perform.
       # @return [Array<String>] list of client queries.
       # @see
-      #   [Chef Search documentation](http://docs.getchef.com/chef_search.html)
+      #   http://docs.getchef.com/chef_search.html Chef Search documentation
       def client_search(arg = nil)
         set_or_return_search_array(:client_search, arg)
       end

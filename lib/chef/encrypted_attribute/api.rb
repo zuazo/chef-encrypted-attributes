@@ -138,6 +138,7 @@ class Chef
     #
     # ```ruby
     # Chef::EncryptedAttribute::RemoteClients.cache.clear
+    # Chef::EncryptedAttribute::RemoteNodes.cache.clear
     # Chef::EncryptedAttribute::RemoteUsers.cache.clear
     # Chef::EncryptedAttribute::RemoteNode.cache.clear
     # ```
@@ -148,6 +149,7 @@ class Chef
     #
     # ```ruby
     # Chef::EncryptedAttribute::RemoteClients.cache.max_size(0)
+    # Chef::EncryptedAttribute::RemoteNodes.cache.max_size(0)
     # Chef::EncryptedAttribute::RemoteUsers.cache.max_size(0)
     # Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
     # ```
