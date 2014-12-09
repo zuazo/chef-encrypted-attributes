@@ -177,9 +177,16 @@ Exposing the public key through attributes should not be considered a security b
 
 See the [KNIFE.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/KNIFE.md) file.
 
-## Internal Documentation
+## Internal Low Level Documentation
 
-See the [INTERNAL.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/INTERNAL.md) file for a more low level documentation.
+The cryptographic systems used are documented in the following classes:
+
+* [EncryptedMash](http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/EncryptedMash)
+ * [EncryptedMash::Version0](http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/EncryptedMash/Version0)
+ * [EncryptedMash::Version1](http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/EncryptedMash/Version1)
+ * [EncryptedMash::Version2](http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/EncryptedMash/Version2)
+
+See the [official gem documentation](http://www.rubydoc.info/gems/chef-encrypted-attributes/) for more information.
 
 ## Using Signed Gems
 
@@ -200,7 +207,7 @@ We recommend to remove our certificate after the gem has been successfully verif
 
 ## Security Notes
 
-All the cryptographic systems and algorithms used by `chef-encrypted-attributes` are carefully described in the [internal documentation](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/INTERNAL.md) for public review. The code was originally based on *Encrypted Data Bags* and [chef-vault](https://github.com/Nordstrom/chef-vault) implementations, then improved.
+All the cryptographic systems and algorithms used by `chef-encrypted-attributes` are carefully described in the [internal documentation](#internal-low-level-documentation) for public review. The code was originally based on *Encrypted Data Bags* and [chef-vault](https://github.com/Nordstrom/chef-vault) implementations, then improved.
 
 Still, this gem should be considered experimental until audited by professional cryptographers.
 
