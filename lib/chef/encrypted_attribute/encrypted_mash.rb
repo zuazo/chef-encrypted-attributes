@@ -30,7 +30,7 @@ class Chef
     # This class is oriented to be easily integrable with chef in the future
     # using JSONCompat.
     #
-    # @see #self.create
+    # @see .create
     class EncryptedMash < Mash
       # Mash key name to use for JSON class name. Chef uses the `'json_class'`
       # key internally for objects, we use a renamed key.

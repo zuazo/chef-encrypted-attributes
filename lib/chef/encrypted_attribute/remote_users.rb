@@ -22,12 +22,30 @@ require 'chef/encrypted_attribute/cache_lru'
 
 class Chef
   class EncryptedAttribute
-    # Helpers to get remote Chef Users keys
+    # Helpers to get remote Chef Users keys.
+    #
+    # @note This class methods require **admin** privileges.
     class RemoteUsers
+      # Remote users public keys cache.
+      #
+      # You can disable it setting it's size to zero:
+      #
+      # ```ruby
+      # Chef::EncryptedAttribute::RemoteUsers.cache.max_size(0)
+      # ```
+      #
+      # @return [CacheLru] Remote users LRU cache.
       def self.cache
         @@cache ||= Chef::EncryptedAttribute::CacheLru.new
       end
 
+      # Gets some Chef users public keys.
+      #
+      # @note This method requires **admin** privileges.
+      #
+      # @param users [Array<String>, '*'] user list. Use `'*'` to get all users
+      #   public keys.
+      # @return [Array<String>] public key list.
       def self.get_public_keys(users = [])
         if users == '*' # users are [a-z0-9\-_]+, cannot be *
           cache.key?('*') ? cache['*'] : cache['*'] = all_public_keys
@@ -40,8 +58,13 @@ class Chef
         end
       end
 
-      # protected
-
+      # Reads a Chef user public key.
+      #
+      # @note This method requires **admin** privileges.
+      #
+      # @param name [String] user name.
+      # @return [String] user public key as string.
+      # @api private
       def self.get_user_public_key(name)
         return cache[name] if cache.key?(name)
         user = Chef::User.load(name)
@@ -58,10 +81,23 @@ class Chef
         end
       end
 
+      # Gets some Chef users public keys.
+      #
+      # @note This method requires **admin** privileges.
+      #
+      # @param users [Array<String>] user list.
+      # @return [Array<String>] public key list.
+      # @api private
       def self.get_users_public_keys(users)
         users.map { |n| get_user_public_key(n) }
       end
 
+      # Gets all Chef users public keys.
+      #
+      # @note This method requires **admin** privileges.
+      #
+      # @return [Array<String>] public key list.
+      # @api private
       def self.all_public_keys
         # Chef::User.list(inflate=true) has a bug (fixed in 11.14.0)
         # https://tickets.opscode.com/browse/CHEF-5328

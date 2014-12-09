@@ -57,7 +57,7 @@ class Chef
       # Search for chef client public keys.
       #
       # @param search [Array<String>, String] search queries to perform, the
-      #   query result will be *OR*ed.
+      #   query result will be *OR*-ed.
       # @return [Array<String>] list of public keys.
       def self.search_public_keys(search = '*:*', partial_search = true)
         escaped_query = escape_query(search)

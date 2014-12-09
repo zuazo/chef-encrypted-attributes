@@ -72,7 +72,7 @@ class Chef
       # privileges).
       #
       # @param search [Array<String>, String] search queries to perform, the
-      #   query result will be *OR*ed.
+      #   query result will be *OR*-ed.
       # @return [Array<String>] list of public keys.
       # @raise InsufficientPrivileges if you lack enoght privileges.
       # @raise Net::HTTPServerException for HTTP errors.
