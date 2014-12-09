@@ -30,12 +30,18 @@ class Chef
   class EncryptedAttribute
     # Main EncryptedAttribute class methods API module.
     #
-    # All these methods are available as static methods of the
+    # All these methods are available as static methods in the
     # {Chef::EncryptedAttribute} class.
     #
     # These methods are intended to be used from Chef
     # [Recipes](http://docs.getchef.com/recipes.html) or
     # [Resources](https://docs.getchef.com/resource.html).
+    #
+    # The attributes created by these methods are encrypted **only for the local
+    # node** by default.
+    #
+    # The static `*_on_node` methods can be used, although they have not been
+    # designed for this purpose (have not been tested).
     #
     # This module uses the {Chef::EncryptedAttribute} instance methods
     # internally.

@@ -36,14 +36,34 @@ unless Chef::Config[:encrypted_attributes].is_a?(Hash)
 end
 
 class Chef
-  # Main EncryptedAttribute class. Includes instance and class API methods.
+
+  # Main EncryptedAttribute class.
+  #
+  # This class contains both static and instance level public methods.
+  # Internally, all work with {EncryptedMash} object instances.
+  #
+  # # Class Methods
   #
   # The *class methods* (or static methods) are normally used **from Chef
-  # cookbooks**. They are documented in the {Chef::EncryptedAttribute::API}
-  # class.
+  # cookbooks**.
+  #
+  # The attributes create with the class methods are encrypted **only for the
+  # local node** by default.
+  #
+  # The static `*_on_node` methods can be used, although they have not been
+  # designed for this purpose (have not been tested).
+  #
+  # They are # documented in the {Chef::EncryptedAttribute::API} class.
+  #
+  # # Instance Methods
   #
   # The *instance methods* are normally used **by other libraries or gems**. For
   # example, the knife extensions included in this gem uses these methods.
+  #
+  # The instance methods will grant encrypted attribute access **only to the
+  # remote node** by default.
+  #
+  # Usually only the `*_from_node/*_on_node` instance methods will be used.
   #
   # @see EncryptedAttribute::API
   class EncryptedAttribute

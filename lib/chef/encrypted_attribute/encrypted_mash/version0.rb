@@ -23,8 +23,42 @@ require 'ffi_yajl'
 class Chef
   class EncryptedAttribute
     class EncryptedMash
-      # EncryptedMash Version0 format: using RSA without shared secret
+      # EncryptedMash Version0 format: using RSA without shared secret.
+      #
+      # This is the first version, considered old. Uses public key cryptography
+      # (PKI) to encrypt the data. There is no shared secret or HMAC for data
+      # integrity checking.
+      #
+      # # `EncryptedMash::Version0` Structure
+      #
+      # If you try to read this encrypted attribute structure, you can see a
+      # `Chef::Mash` attribute with the following content:
+      #
+      # ```
+      # EncryptedMash
+      # └── encrypted_data
+      #     ├── pub_key_hash1: The data encrypted using PKI for the public key 1
+      #     │     (base64)
+      #     ├── pub_key_hash2: The data encrypted using PKI for the public key 2
+      #     │     (base64)
+      #     └── ...
+      # ```
+      #
+      # The `public_key_hash1` key value is the *SHA1* of the public key used
+      # for encryption.
+      #
+      # Its content is the data encoded in *JSON*, then encrypted with the
+      # public key, and finally encoded in *base64*. The encryption is done
+      # using the *RSA* algorithm (PKI).
+      #
+      # @see EncryptedMash
       class Version0 < Chef::EncryptedAttribute::EncryptedMash
+        # Encrypts data inside the current {EncryptedMash} object.
+        #
+        # @param value [Mixed] value to encrypt, will be converted to JSON.
+        # @param public_keys [Array<String, OpenSSL::PKey::RSA>] publics keys
+        #   that will be able to decrypt the {EncryptedMash}.
+        # @return [EncryptedMash] the value encrypted.
         def encrypt(value, public_keys)
           value_json = json_encode(value)
           public_keys = parse_public_keys(public_keys)
@@ -33,6 +67,11 @@ class Chef
           self
         end
 
+        # Decrypts the current {EncryptedMash} object.
+        #
+        # @param key [String, OpenSSL::PKey::RSA] RSA private key used to
+        #   decrypt.
+        # @return [Mixed] the value decrypted.
         def decrypt(key)
           key = parse_decryption_key(key)
           value_json = rsa_decrypt_multi_key(self['encrypted_data'], key)
@@ -40,17 +79,28 @@ class Chef
           # we avoid saving the decrypted value, only return it
         end
 
-        def data_can_be_decrypted_by_keys?(data, keys)
-          parse_public_keys(keys).reduce(true) do |r, k|
-            r && data_can_be_decrypted_by_key?(data, k)
-          end
-        end
-
+        # Checks if the current {EncryptedMash} can be decrypted by all of the
+        # provided keys.
+        #
+        # @param keys [Array<OpenSSL::PKey::RSA>] list of public keys.
+        # @return [Boolean] `true` if all keys can decrypt the data.
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
           data_can_be_decrypted_by_keys?(self['encrypted_data'], keys)
         end
 
+        # Checks if the current {EncryptedMash} needs to be re-encrypted.
+        #
+        # This usually happends when new keys are provided or some keys are
+        # removed from the previous encryption process.
+        #
+        # In other words, this method checks all key can decrypt the data and
+        # only those keys.
+        #
+        # @param keys [Array<String, OpenSSL::PKey::RSA>] list of RSA public
+        #   keys.
+        # @return [Boolean] `true` if all keys can decrypt the data and only
+        #   those keys can decrypt the data.
         def needs_update?(keys)
           keys = parse_public_keys(keys)
           !can_be_decrypted_by?(keys) ||
@@ -59,16 +109,29 @@ class Chef
 
         protected
 
+        # Checks if encrypted data exists in the current Mash.
+        #
+        # @return [Boolean] `true` if there is encrypted data.
         def encrypted?
           key?('encrypted_data') && self['encrypted_data'].is_a?(Hash)
         end
 
+        # Converts the RSA key to an `OpenSSL::PKey::RSA` object.
+        #
+        # @param k [String, OpenSSL::PKey::RSA] RSA key to convert.
+        # @return [OpenSSL::PKey::RSA] RSA key.
+        # @raise InvalidPrivateKey if the RSA key format is wrong.
         def pem_to_key(k)
           k.is_a?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
         rescue OpenSSL::PKey::RSAError, TypeError
           raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
         end
 
+        # Parses a RSA public key used for encryption.
+        #
+        # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
+        # @return [OpenSSL::PKey::RSA] RSA public key.
+        # @raise InvalidPublicKey if it is not a valid RSA public key.
         def parse_public_key(key)
           key = pem_to_key(key)
           unless key.public?
@@ -77,6 +140,15 @@ class Chef
           key
         end
 
+        # Parses a RSA key used for decryption. Must contain both the public
+        # and the private key. It also checks that the current {EncryptedMash}
+        # object can be decrypted by the provided key.
+        #
+        # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
+        # @return [OpenSSL::PKey::RSA] RSA key.
+        # @raise InvalidPrivateKey if the RSA key format is wrong.
+        # @raise DecryptionFailure if the data cannot be decrypted by the
+        #   provided key.
         def parse_decryption_key(key)
           key = pem_to_key(key)
           unless key.public? && key.private?
@@ -92,25 +164,49 @@ class Chef
           key
         end
 
+        # Parses a list of RSA public keys, used for encryption.
+        #
+        # @param keys [Array<String, OpenSSL::PKey::RSA>] list of keys.
+        # @return [Array<OpenSSL::PKey::RSA>] list of keys parsed.
         def parse_public_keys(keys)
           keys = [keys].flatten
           keys_parsed = keys.map { |k| parse_public_key(k) }
           keys_parsed.uniq { |k| k.public_key.to_s.chomp }
         end
 
+        # Converts an object to its JSON representation.
+        #
+        # @param o [Mixed] object to convert.
+        # @return [String] JSON object as string.
         def json_encode(o)
           # TODO: This does not check if the object is correct, should be an
           # Array or a Hash
           FFI_Yajl::Encoder.encode(o)
         end
 
+        # Decodes a JSON string.
+        #
+        # @param o [String] JSON string to decode.
+        # @return [Mixed] Ruby representation of the JSON string.
         def json_decode(o)
           FFI_Yajl::Parser.parse(o.to_s)
         rescue FFI_Yajl::ParseError => e
           raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
-        # Heavily based on @sl4m code: https://gist.github.com/sl4m/1470360
+        # Encode Ruby `< 1.9.3` RSA key using X.509 format.
+        #
+        # In Ruby `< 1.9.3` RSA keys are in [PKCS#1]
+        # (http://en.wikipedia.org/wiki/PKCS_1) format.
+        #
+        # In Ruby `>= 1.9.3` RSA keys are in [X.509]
+        # (http://en.wikipedia.org/wiki/X.509) format (private keys in [PKCS#8]
+        # (http://en.wikipedia.org/wiki/PKCS_8)).
+        #
+        # @param rsa [OpenSSL::PKey::RSA] RSA key.
+        # @return [OpenSSL::ASN1::Sequence] RSA key in X.509 format.
+        # @note Heavily based on @sl4m code:
+        #   https://gist.github.com/sl4m/1470360
         def rsa_ensure_x509_ruby192(rsa)
           modulus = rsa.n
           exponent = rsa.e
@@ -124,26 +220,61 @@ class Chef
           asn1::Sequence.new([alg_id, enc_pk])
         end
 
+        # Return any RSA key in X.509 format.
+        #
+        # Fixes RSA key format in Ruby `< 1.9.3`.
+        #
+        # @param rsa [OpenSSL::PKey::RSA] RSA key.
+        # @return [OpenSSL::ASN1::Sequence] RSA key in X.509 format.
+        # @see #rsa_ensure_x509_ruby192
         def rsa_ensure_x509(rsa)
           RUBY_VERSION < '1.9.3' ? rsa_ensure_x509_ruby192(rsa) : rsa
         end
 
+        # Gets the hash key to use for saving the encrypted data for a node.
+        #
+        # It uses a SHA1 hexadecimal digest of the public key as key.
+        #
+        # @param public_key [OpenSSL::PKey::RSA] RSA public key.
+        # @return [String] hash key for the public key.
         def node_key(public_key)
           Digest::SHA1.hexdigest(rsa_ensure_x509(public_key).to_der)
         end
 
+        # Encrypts a value using a RSA public key.
+        #
+        # @param value [String] data to encrypt.
+        # @param public_key [OpenSSL::PKey::RSA] public key used for encryption.
+        # @return [String] data encrypted in its Base64 representation.
         def rsa_encrypt_value(value, public_key)
           Base64.encode64(public_key.public_encrypt(value))
         rescue OpenSSL::PKey::RSAError => e
           raise EncryptionFailure, "#{e.class.name}: #{e}"
         end
 
+        # Decrypts a value using a RSA private key.
+        #
+        # @param value [String] encrypted data to decrypt in its Base64
+        #   representation.
+        # @param key [OpenSSL::PKey::RSA] private key used for decryption.
+        # @return [String] value decrypted.
         def rsa_decrypt_value(value, key)
           key.private_decrypt(Base64.decode64(value.to_s))
         rescue OpenSSL::PKey::RSAError => e
           raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
+        # Returns data encrypted for multiple keys using RSA.
+        #
+        # Returns a `Mash` with the following structure:
+        # * Hash keys: hexadecimal SHA1 of the public key.
+        # * Hash values: RSA encrypted data and then converted to Base64.
+        #
+        # @param value [String] data to encrypt.
+        # @param public_keys [Array<OpenSSL::PKey::RSA>] public keys list.
+        # @return [Mash] data encrypted.
+        # @see #node_key
+        # @see #rsa_encrypt_value
         def rsa_encrypt_multi_key(value, public_keys)
           Mash.new(Hash[
             public_keys.map do |public_key|
@@ -152,13 +283,42 @@ class Chef
          ])
         end
 
+        # Decrypts RSA value from a data structure encrypted for multiple keys.
+        #
+        # @param enc_value [Mash] encrypted data structure.
+        # @param key [OpenSSL::PKey::RSA] RSA key to use (public and private key
+        #   is required).
+        # @return [String] data decrypted.
+        # @see #rsa_encrypt_multi_key
         def rsa_decrypt_multi_key(enc_value, key)
           enc_value = enc_value[node_key(key.public_key)]
           rsa_decrypt_value(enc_value, key)
         end
 
+        # Check if data can be decrypted by the provided key. Where data is
+        # encrypted for multiple keys.
+        #
+        # This method is not immune to any kind of data corruption. Only checks
+        # that the data seems to be decipherable by the key. No MAC checking.
+        #
+        # @param enc_value [Mash] encrypted data structure.
+        # @param key [OpenSSL::PKey::RSA] RSA key.
+        # @return [Boolean] `true` if the data can be decrypted.
+        # @see #rsa_encrypt_multi_key
         def data_can_be_decrypted_by_key?(enc_value, key)
           enc_value.key?(node_key(key.public_key))
+        end
+
+        # Checks if the data can be decrypted by all of the provided keys.
+        #
+        # @param data [Mash] encrypted data to check. This usually refers to
+        #   `self['encrypted_data']`.
+        # @param keys [Array<OpenSSL::PKey::RSA>] list of public keys.
+        # @return [Boolean] `true` if all keys can decrypt the data.
+        def data_can_be_decrypted_by_keys?(data, keys)
+          parse_public_keys(keys).reduce(true) do |r, k|
+            r && data_can_be_decrypted_by_key?(data, k)
+          end
         end
       end
     end

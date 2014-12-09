@@ -23,14 +23,25 @@ class Chef
   class EncryptedAttribute
     # Mash structure with embedded Mash structure encrypted.
     #
+    # This is the most basic encrypted object, which inherits from `Chef::Mash`.
+    #
     # This class is used to construct the different EncryptedAttribute versions.
-    # Each version, implements the encryption in a different way or using
+    # Each version implements the encryption in a different way or using
     # different algorithms.
     #
+    # Currently three {EncryptedMash} versions exists. But you can create your
+    # own versions and name it with the
+    # `Chef::EncryptedAttribute::EncryptedMash::Version` prefix.
+    #
+    # Uses {EncryptedMash::Version1} by default.
+    #
     # This class is oriented to be easily integrable with chef in the future
-    # using JSONCompat.
+    # using `JSONCompat`.
     #
     # @see .create
+    # @see EncryptedMash::Version0
+    # @see EncryptedMash::Version1
+    # @see EncryptedMash::Version2
     class EncryptedMash < Mash
       # Mash key name to use for JSON class name. Chef uses the `'json_class'`
       # key internally for objects, we use a renamed key.
