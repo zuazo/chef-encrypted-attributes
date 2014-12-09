@@ -140,7 +140,7 @@ class Chef
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @return [String] cache key.
       def cache_key(name, attr_ary)
-        "#{name}:#{attr_ary.inspect}" # TODO: ok, this can be improved
+        "#{name}:#{attr_ary.inspect}" # TODO: OK, this can be improved
       end
 
       # Asserts that the attribute path is in the correct format.

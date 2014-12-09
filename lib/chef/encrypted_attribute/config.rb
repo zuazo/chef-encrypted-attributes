@@ -133,7 +133,7 @@ class Chef
       #
       # When setting using a _Hash_, only the provided keys will be replaced.
       #
-      # @param config [Config, Hash] the configuarion to set.
+      # @param config [Config, Hash] the configuration to set.
       # @return [Config] `self`.
       def update!(config)
         if config.is_a?(self.class)

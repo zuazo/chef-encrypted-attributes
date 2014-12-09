@@ -204,7 +204,7 @@ class Chef
       # The local node public key will always be added to the provided
       # configuration keys.
       #
-      # @param arg [Config, Hash] the configuarion to set.
+      # @param arg [Config, Hash] the configuration to set.
       # @return [Config] the read or set configuration object.
       # @api private
       def config(arg)

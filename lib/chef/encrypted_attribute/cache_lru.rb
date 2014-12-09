@@ -20,7 +20,7 @@ require 'chef/mixin/params_validate'
 
 class Chef
   class EncryptedAttribute
-    # Implementes a LRU (Least Recently Used) cache object.
+    # Implements an LRU (Least Recently Used) cache object.
     #
     # The LRU cache algorithm discards the least recently used items first.
     #

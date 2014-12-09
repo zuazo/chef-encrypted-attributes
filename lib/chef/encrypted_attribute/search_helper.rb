@@ -27,7 +27,7 @@ class Chef
 
       # Gets a Chef Search Query object.
       #
-      # @return {Chef::Search::Query} seqrch query object instance.
+      # @return {Chef::Search::Query} search query object instance.
       # @api private
       def query
         Chef::Search::Query.new
@@ -128,7 +128,7 @@ class Chef
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
       # @param rows [Fixnum, String] maximum number of rows to return.
-      # @param partial_search [Boolean] whethet to use partial search.
+      # @param partial_search [Boolean] whether to use partial search.
       # @raise [SearchFailure] if there is a search error.
       def search(type, query, keys, rows = 1000, partial_search = true)
         return [] if empty_search?(query) # avoid empty searches

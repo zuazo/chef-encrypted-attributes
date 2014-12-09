@@ -86,7 +86,7 @@ class Chef
     #
     # When setting using a _Hash_, only the provided keys will be replaced.
     #
-    # @param arg [Config, Hash] the configuarion to set.
+    # @param arg [Config, Hash] the configuration to set.
     # @return [Config] the read or set configuration object.
     def config(arg = nil)
       @config ||= EncryptedAttribute::Config.new(

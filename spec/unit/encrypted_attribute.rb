@@ -53,7 +53,7 @@ describe Chef::EncryptedAttribute do
       encrypted_attribute_class.create(%w(a), custom_config)
     end
 
-    it 'calls EncryptedAttribute#create and return its result' do
+    it 'calls EncryptedAttribute#create and returns its result' do
       expect_any_instance_of(encrypted_attribute_class)
         .to receive(:create).with(%w(a)).and_return('create')
       expect(encrypted_attribute_class.create(%w(a))).to eql('create')
@@ -85,7 +85,7 @@ describe Chef::EncryptedAttribute do
       )
     end
 
-    it 'calls EncryptedAttribute#create_on_node and return its result' do
+    it 'calls EncryptedAttribute#create_on_node and returns its result' do
       expect_any_instance_of(encrypted_attribute_class)
         .to receive(:create_on_node).with('node1', %w(a), 'value')
         .and_return('create_on_node')
@@ -118,7 +118,7 @@ describe Chef::EncryptedAttribute do
         encrypted_attribute_class.send(meth, %w(a), custom_config)
       end
 
-      it "calls EncryptedAttribute##{meth} and return its result" do
+      it "calls EncryptedAttribute##{meth} and returns its result" do
         expect_any_instance_of(encrypted_attribute_class)
           .to receive(meth.to_sym) .with(%w(a)).and_return(meth)
         expect(encrypted_attribute_class.send(meth, %w(a))).to eql(meth)
@@ -150,7 +150,7 @@ describe Chef::EncryptedAttribute do
       encrypted_attribute_class.load_from_node('node1', %w(a), custom_config)
     end
 
-    it 'calls EncryptedAttribute#load_from_node and return its result' do
+    it 'calls EncryptedAttribute#load_from_node and returns its result' do
       expect_any_instance_of(encrypted_attribute_class)
         .to receive(:load_from_node).with('node1', %w(a))
         .and_return('load_from_node')
@@ -182,7 +182,7 @@ describe Chef::EncryptedAttribute do
       encrypted_attribute_class.update_on_node('node1', %w(a), custom_config)
     end
 
-    it 'calls EncryptedAttribute#update_on_node and return its result' do
+    it 'calls EncryptedAttribute#update_on_node and returns its result' do
       expect_any_instance_of(encrypted_attribute_class)
         .to receive(:update_on_node).with('node1', %w(a))
         .and_return('update_on_node')
@@ -201,7 +201,7 @@ describe Chef::EncryptedAttribute do
       encrypted_attribute_class.exist?(%w(a))
     end
 
-    it 'calls EncryptedMash#exist? and return its result' do
+    it 'calls EncryptedMash#exist? and returns its result' do
       expect(Chef::Log).to_not receive(:warn)
       expect(encrypted_mash_class)
         .to receive(:exist?).with(%w(a)).and_return(true)
@@ -224,7 +224,7 @@ describe Chef::EncryptedAttribute do
       encrypted_attribute_class.exists?(%w(a))
     end
 
-    it 'calls EncryptedMash#exist? and return its result' do
+    it 'calls EncryptedMash#exist? and returns its result' do
       expect(Chef::Log)
         .to receive(:warn).twice.with(/is deprecated in favor of/)
       expect(encrypted_mash_class)
@@ -238,7 +238,7 @@ describe Chef::EncryptedAttribute do
 
   context '#self.exist_on_node?' do
 
-    it 'loads the remote attribute and call #exist?' do
+    it 'loads the remote attribute and calls #exist?' do
       expect(Chef::Log).to_not receive(:warn)
       expect_any_instance_of(config_class)
         .to receive(:partial_search).and_return('partial_search')
@@ -255,7 +255,7 @@ describe Chef::EncryptedAttribute do
 
   context '#self.exists_on_node?' do
 
-    it 'loads the remote attribute and call #exist?' do
+    it 'loads the remote attribute and calls #exist?' do
       expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
       expect_any_instance_of(config_class)
         .to receive(:partial_search).and_return('partial_search')

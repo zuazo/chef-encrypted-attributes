@@ -74,7 +74,7 @@ class Chef
       # @param search [Array<String>, String] search queries to perform, the
       #   query result will be *OR*-ed.
       # @return [Array<String>] list of public keys.
-      # @raise InsufficientPrivileges if you lack enoght privileges.
+      # @raise InsufficientPrivileges if you lack enough privileges.
       # @raise Net::HTTPServerException for HTTP errors.
       def self.search_public_keys(search = '*:*', partial_search = true)
         escaped_query = escape_query(search)

@@ -38,7 +38,7 @@ class Chef
 
     # Exception raised when you don't have enough privileges in the Chef Server
     # to do what you intend. Usually happens when you try to read Client or Node
-    # keys wihtout being admin.
+    # keys without being admin.
     class InsufficientPrivileges < StandardError; end
     # Exception raised when the user does not exist.
     class UserNotFound < StandardError; end

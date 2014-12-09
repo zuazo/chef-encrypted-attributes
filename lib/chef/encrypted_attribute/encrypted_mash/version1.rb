@@ -219,7 +219,7 @@ class Chef
           self['encrypted_secret'].is_a?(Hash)
         end
 
-        # Checks if the hmas structure is correct.
+        # Checks if the HMAC structure is correct.
         #
         # Checks the `self['hmac']` structure.
         #
