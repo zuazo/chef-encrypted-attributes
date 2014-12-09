@@ -22,7 +22,11 @@ require 'chef/encrypted_attribute/remote_node'
 
 class Chef
   class Knife
-    # knife encrypted attribute delete command
+    # knife encrypted attribute delete command.
+    #
+    # ```
+    # $ knife encrypted attribute delete NODE ATTRIBUTE (options)
+    # ```
     class EncryptedAttributeDelete < Core::EncryptedAttributeBase
       include Knife::Core::EncryptedAttributeDepends
 
@@ -35,6 +39,7 @@ class Chef
                'Force the attribute deletion even if you cannot read it',
              boolean: true
 
+      # Runs knife command.
       def run
         parse_args
 

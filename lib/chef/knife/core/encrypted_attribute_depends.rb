@@ -21,8 +21,13 @@ require 'chef/knife'
 class Chef
   class Knife
     module Core
-      # Loads knife encrypted attribute dependencies
+      # Loads knife encrypted attribute dependencies.
       module EncryptedAttributeDepends
+        # Reopens EncryptedAttributeDepends class to define knife dependencies.
+        #
+        # Includes the required gems to work with encrypted attributes.
+        #
+        # @param includer [Class] includer class.
         def self.included(includer)
           includer.class_eval do
             deps do

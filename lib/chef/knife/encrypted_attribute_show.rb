@@ -21,16 +21,22 @@ require 'chef/knife/core/encrypted_attribute_depends'
 
 class Chef
   class Knife
-    # knife encrypted attribute show command
+    # knife encrypted attribute show command.
+    #
+    # ```
+    # $ knife encrypted attribute show NODE ATTRIBUTE (options)
+    # ```
     class EncryptedAttributeShow < Core::EncryptedAttributeBase
       include Knife::Core::EncryptedAttributeDepends
 
       banner 'knife encrypted attribute show NODE ATTRIBUTE (options)'
 
+      # (see EncryptedAttributeBase#assert_valid_args)
       def assert_valid_args
         assert_attribute_exists(@node_name, @attr_ary)
       end
 
+      # Runs knife command.
       def run
         parse_args
 

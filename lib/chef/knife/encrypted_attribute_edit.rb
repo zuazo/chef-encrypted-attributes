@@ -22,7 +22,11 @@ require 'chef/knife/core/encrypted_attribute_editor_options'
 
 class Chef
   class Knife
-    # knife encrypted attribute edit command
+    # knife encrypted attribute edit command.
+    #
+    # ```
+    # $ knife encrypted attribute edit NODE ATTRIBUTE (options)
+    # ```
     class EncryptedAttributeEdit < Core::EncryptedAttributeBase
       include Knife::Core::EncryptedAttributeDepends
       include Knife::Core::EncryptedAttributeEditorOptions
@@ -36,10 +40,12 @@ class Chef
 
       banner 'knife encrypted attribute edit NODE ATTRIBUTE (options)'
 
+      # (see EncryptedAttributeBase#assert_valid_args)
       def assert_valid_args
         assert_attribute_exists(@node_name, @attr_ary)
       end
 
+      # Runs knife command.
       def run
         parse_args
 
