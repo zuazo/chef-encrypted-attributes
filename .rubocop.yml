@@ -1,0 +1,17 @@
+Style/Documentation:
+  Enabled: false
+Style/AsciiComments:
+  Enabled: false
+Style/FileName:
+  Enabled: false
+Style/ModuleFunction:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 160
+Metrics/MethodLength:
+  Max: 50
+Metrics/AbcSize:
+  Max: 35

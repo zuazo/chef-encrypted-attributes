@@ -27,6 +27,15 @@ Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 
+namespace :style do
+  require 'rubocop/rake_task'
+  desc 'Run Ruby style checks'
+  RuboCop::RakeTask.new(:ruby)
+end
+
+desc 'Run all style checks'
+task style: %w(style:ruby)
+
 {
   test: '{unit,integration}',
   unit: 'unit',
@@ -43,7 +52,7 @@ end
 if RUBY_VERSION < '1.9.3'
   # integration tests are broken in 1.9.2 due to a chef-zero bug
   # https://github.com/opscode/chef-zero/issues/65
-  task default: :unit
+  task default: %w(style unit)
 else
-  task default: :test
+  task default: %w(style test)
 end

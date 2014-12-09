@@ -1,22 +1,33 @@
 # Testing
 
+## Installing the Requirements
+
+You can install gem dependencies with bundler:
+
+    $ gem install bundler
+    $ bundler install
+
 ## All the Tests
 
-    $ rake test
+    $ bundle exec rake test
 
-## Unit Tests
+## Running the Syntax Style Tests
 
-    $ rake unit
+    $ bundle exec rake style
 
-## Integration Tests
+## Running the Unit Tests
 
-    $ rake integration
+    $ bundle exec rake unit
 
-## Benchmarks
+## Running the Integration Tests
+
+    $ bundle exec rake integration
+
+## Running the Benchmarks
 
 You can run some simple benchmarks, not at all realistic:
 
-    $ rspec spec/benchmark/*
+    $ bundle exec rspec spec/benchmark/*
                                                                  user     system      total        real
     Local EncryptedAttribute read (v=0)                  0.410000   0.000000   0.410000 (  0.417956)
     Local EncryptedAttribute read (v=1)                  0.390000   0.010000   0.400000 (  0.398934)
