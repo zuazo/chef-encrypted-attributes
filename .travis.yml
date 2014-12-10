@@ -7,6 +7,7 @@ rvm:
 env:
   - CHEF_VERSION="= 11.4.0"
   - CHEF_VERSION="~> 11.0"
+  - CHEF_VERSION="= 12.0.0"
   - CHEF_VERSION="~> 12.0"
 matrix:
   exclude:
