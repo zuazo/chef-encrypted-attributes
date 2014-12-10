@@ -144,16 +144,16 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       expect(body.can_be_decrypted_by?(keys)).to eql(true)
     end
 
-    it 'throws an InvalidPrivateKey error if the key is invalid' do
+    it 'throws an InvalidKey error if the key is invalid' do
       body = encrypted_mash_version1_class.new
       expect { body.encrypt('value1', 'invalid-key') }
         .to raise_error(
-          Chef::EncryptedAttribute::InvalidPrivateKey,
+          Chef::EncryptedAttribute::InvalidKey,
           /The provided key is invalid:/
         )
     end
 
-    it 'throws an InvalidPrivateKey error if the public key is missing' do
+    it 'throws an InvalidKey error if the public key is missing' do
       allow_any_instance_of(OpenSSL::PKey::RSA)
         .to receive(:public?).and_return(false)
       body = encrypted_mash_version1_class.new
@@ -205,22 +205,22 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       end
     end
 
-    it 'throws an InvalidPrivateKey error if the private key is invalid' do
+    it 'throws an InvalidKey error if the private key is invalid' do
       body = encrypted_mash_version1_class.new
       body.encrypt('value1', key1.public_key)
       expect { body.decrypt('invalid-private-key') }
         .to raise_error(
-          Chef::EncryptedAttribute::InvalidPrivateKey,
+          Chef::EncryptedAttribute::InvalidKey,
           /The provided key is invalid:/
         )
     end
 
-    it 'throws an InvalidPrivateKey error if only the public key is provided' do
+    it 'throws an InvalidKey error if only the public key is provided' do
       body = encrypted_mash_version1_class.new
       body.encrypt('value1', key1.public_key)
       expect { body.decrypt(key1.public_key) }
         .to raise_error(
-          Chef::EncryptedAttribute::InvalidPrivateKey,
+          Chef::EncryptedAttribute::InvalidKey,
           Regexp.new(
             'The provided key for decryption is invalid, a valid '\
             'public and private key is required\.'
