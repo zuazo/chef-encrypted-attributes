@@ -8,7 +8,7 @@
 
 [Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
 
-We recommend using the [`encrypted_attributes`](http://cookbooks.chef.io/cookbooks/encrypted_attributes) cookbook for easy installation.
+We recommend using the [`encrypted_attributes`](https://supermarket.chef.io/cookbooks/encrypted_attributes) cookbook for easy installation.
 
 ## Description
 
@@ -62,7 +62,7 @@ end
 # use `ftp_pass` for something here ...
 ```
 
-**Note:** This example requires the [`openssl`](http://cookbooks.chef.io/cookbooks/openssl) cookbook.
+**Note:** This example requires the [`openssl`](https://supermarket.chef.io/cookbooks/openssl) cookbook.
 
 ### Minimal Write Only Example
 
