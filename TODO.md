@@ -2,7 +2,6 @@ TODO
 ====
 
 * Fix all RuboCop offenses.
-* Document the Ruby code.
 * knife encrypted attribute create/edit from file.
 * Save config inside encrypted data: `:client_search`, `:node_search` and `:keys` (including user keys).
 * Chef internal node attribute integration monkey-patch. It may require some `EncryptedMash` class rewrite or adding some methods.
@@ -13,6 +12,6 @@ TODO
 * Tests: Add more tests for `EncryptedMash::Version1` and `EncryptedMash::Version2`.
 * Tests: Add unit tests for `EncryptedAttribute`.
 * Tests: Add unit tests for all knife commands.
-* Tests: Tests `raise_error` always include regex.
+* Tests: `raise_error` tests always include regex.
 * Add `chef-vault` to benchmarks.
 * Signed attributes?
