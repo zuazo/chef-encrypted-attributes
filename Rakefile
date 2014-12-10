@@ -50,9 +50,10 @@ task style: %w(style:ruby)
 end
 
 if RUBY_VERSION < '1.9.3'
-  # integration tests are broken in 1.9.2 due to a chef-zero bug
-  # https://github.com/opscode/chef-zero/issues/65
-  task default: %w(style unit)
+  # Integration tests are broken in 1.9.2 due to a chef-zero bug:
+  #   https://github.com/opscode/chef-zero/issues/65
+  # RuboCop require Ruby 1.9.3.
+  task default: %w(unit)
 else
   task default: %w(style test)
 end
