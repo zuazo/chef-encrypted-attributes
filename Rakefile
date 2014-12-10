@@ -27,14 +27,14 @@ Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 
-namespace :style do
+desc 'Run RuboCop style checks'
+task :rubocop do
   require 'rubocop/rake_task'
-  desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:ruby)
+  RuboCop::RakeTask.new
 end
 
 desc 'Run all style checks'
-task style: %w(style:ruby)
+task style: %w(rubocop)
 
 {
   test: '{unit,integration}',
