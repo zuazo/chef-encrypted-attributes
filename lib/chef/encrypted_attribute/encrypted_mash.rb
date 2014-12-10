@@ -101,6 +101,7 @@ class Chef
       # Factory method to construct an encrypted Mash.
       #
       # @param version [String, Fixnum] EncryptedMash version to use.
+      # @raise [RequirementsFailure] if the EncryptedMash version cannot be used.
       def self.create(version)
         klass = version_klass(version)
         klass.send(:new)

@@ -106,7 +106,7 @@ class Chef
         #
         # Checks that GCM is correctly supported by Ruby and OpenSSL.
         #
-        # @raise RequirementsFailure if this version cannot be used.
+        # @raise [RequirementsFailure] if this version cannot be used.
         def initialize(enc_hs = nil)
           assert_aead_requirements_met!(ALGORITHM)
           super
@@ -168,7 +168,7 @@ class Chef
         #   * `['iv']`: random initialization vector in Base64.
         #   * `['auth_tag']`: authentication tag in Base64.
         #   * `['data']`: data encrypted and in Base64.
-        # @raise EncryptionFailure if encryption error.
+        # @raise [EncryptionFailure] if encryption error.
         def symmetric_encrypt_value(value, algo = ALGORITHM)
           enc_value = Mash.new('cipher' => algo)
           begin
@@ -196,7 +196,7 @@ class Chef
         #   * `['auth_tag']`: authentication tag in Base64.
         #   * `['data']`: data encrypted in Base64.
         # @param algo [String] symmetric algorithm to use.
-        # @raise DecryptionFailure if decryption error.
+        # @raise [DecryptionFailure] if decryption error.
         # @see #symmetric_encrypt_value
         def symmetric_decrypt_value(enc_value, algo = ALGORITHM)
           # TODO: maybe it's better to ignore [cipher] ?

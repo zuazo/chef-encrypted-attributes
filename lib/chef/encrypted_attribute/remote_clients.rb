@@ -45,8 +45,8 @@ class Chef
       #
       # @param name [String] Chef client name.
       # @return [String] Chef client public key as string.
-      # @raise ClientNotFound if client does not exist.
-      # @raise Net::HTTPServerException for HTTP errors.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for HTTP errors.
       def self.get_public_key(name)
         Chef::ApiClient.load(name).public_key
       rescue Net::HTTPServerException => e

@@ -275,6 +275,8 @@ class Chef
       #   `{ :client_search => "admin:true" }`.
       # @return [EncryptedMash] encrypted attribute value. This is usually what
       #   is saved in the node attributes.
+      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+      #   used.
       def create(value, c = {})
         debug('Creating Encrypted Attribute.')
         enc_attr = EncryptedAttribute.new(config(c))
@@ -302,6 +304,8 @@ class Chef
       # @param c [Config, Hash] a configuration hash. For example:
       #   `{ :client_search => 'admin:true' }`.
       # @return [EncryptedMash] encrypted attribute value.
+      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+      #   used.
       def create_on_node(name, attr_ary, value, c = {})
         debug(
           "Creating Remote Encrypted Attribute on #{name}: #{attr_ary.inspect}"
@@ -336,6 +340,8 @@ class Chef
       #   `#update` method to use the same `config` that the `#create` call.
       # @return [Boolean] `true` if the encrypted attribute has been updated,
       #   `false` if not.
+      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+      #   used.
       def update(enc_hs, c = {})
         debug("Updating Encrypted Attribute: #{enc_hs.inspect}")
         enc_attr = EncryptedAttribute.new(config(c))
@@ -363,6 +369,8 @@ class Chef
       #   call.
       # @return [Boolean] `true` if the encrypted attribute has been updated,
       #   `false` if not.
+      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+      #   used.
       def update_on_node(name, attr_ary, c = {})
         debug(
           "Updating Remote Encrypted Attribute on #{name}: #{attr_ary.inspect}"

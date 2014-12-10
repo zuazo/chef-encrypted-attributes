@@ -147,7 +147,7 @@ class Chef
       #
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @return void
-      # @raise ArgumentError if the attribute path format is wrong.
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def assert_attribute_array(attr_ary)
         return if attr_ary.is_a?(Array)
         fail ArgumentError,

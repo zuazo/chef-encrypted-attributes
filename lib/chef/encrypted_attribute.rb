@@ -132,6 +132,8 @@ class Chef
     #   decrypt the attribute.
     # @return [EncryptedMash] encrypted attribute value. This is usually what is
     #   saved in the node attributes.
+    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+    #   used.
     def create(value, keys = nil)
       decrypted = { 'content' => value }
 
@@ -149,6 +151,8 @@ class Chef
     # @param attr_ary [Array<String>] node attribute path as Array.
     # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt.
     # @return [EncryptedMash] encrypted attribute value.
+    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+    #   used.
     def create_on_node(name, attr_ary, value)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
@@ -180,6 +184,8 @@ class Chef
     # @return [Boolean] Returns `true` if the encrypted attribute (the *Mash*
     #   parameter) has been updated.
     # @see #config
+    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+    #   used.
     def update(enc_hs, keys = nil)
       old_enc_attr = EncryptedMash.json_create(enc_hs)
       if old_enc_attr.needs_update?(target_keys(keys))
@@ -209,6 +215,8 @@ class Chef
     # @return [Boolean] Returns `true` if the remote encrypted attribute has
     #   been updated.
     # @see #config
+    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
+    #   used.
     def update_on_node(name, attr_ary)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)

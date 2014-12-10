@@ -126,7 +126,7 @@ class Chef
         #
         # @param path [String] path file to edit.
         # @return void
-        # @raise RuntimeError if the editing command fails.
+        # @raise [RuntimeError] if the editing command fails.
         def edit_data_run_editor_command(path)
           return if system("#{config[:editor]} #{path}")
           fail 'Please set EDITOR environment variable'
@@ -138,7 +138,7 @@ class Chef
         #
         # @param data [String] data to edit.
         # @return [String] the data after the editing.
-        # @raise RuntimeError if the editing command fails.
+        # @raise [RuntimeError] if the editing command fails.
         def edit_data_run_editor(data)
           return if config[:disable_editing]
           result = nil

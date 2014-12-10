@@ -249,7 +249,7 @@ class Chef
         #   * `['secret']`: random secret used for encryption in Base64.
         #   * `['iv']`: random initialization vector in Base64.
         #   * `['data']`: data encrypted and in Base64.
-        # @raise EncryptionFailure if encryption error.
+        # @raise [EncryptionFailure] if encryption error.
         def symmetric_encrypt_value(value, algo = SYMM_ALGORITHM)
           enc_value = Mash.new('cipher' => algo)
           begin
@@ -274,7 +274,7 @@ class Chef
         #   * `['iv']`: initialization vector in Base64.
         #   * `['data']`: data encrypted in Base64.
         # @param algo [String] symmetric algorithm to use.
-        # @raise DecryptionFailure if decryption error.
+        # @raise [DecryptionFailure] if decryption error.
         # @see #symmetric_encrypt_value
         def symmetric_decrypt_value(enc_value, algo = SYMM_ALGORITHM)
           # TODO: maybe it's better to ignore [cipher] ?
@@ -308,7 +308,7 @@ class Chef
         #   * `['cipher']`: algorithm used.
         #   * `['secret']` random secret used for HMAC calculation in Base64.
         #   * `['data']` HMAC value in Base64.
-        # @raise MessageAuthenticationFailure if HMAC calculation error.
+        # @raise [MessageAuthenticationFailure] if HMAC calculation error.
         def generate_hmac(data, algo = HMAC_ALGORITHM)
           # [cipher] is ignored, only as info
           hmac = Mash.new('cipher' => algo)
@@ -335,7 +335,7 @@ class Chef
         # @param data [String] data to calculate HMAC for.
         # @param algo [String] HMAC algorithm to use.
         # @return [Boolean] `true` if HMAC value matches.
-        # @raise MessageAuthenticationFailure if HMAC calculation error.
+        # @raise [MessageAuthenticationFailure] if HMAC calculation error.
         # @see #generate_hmac
         def hmac_matches?(orig_hmac, data, algo = HMAC_ALGORITHM)
           digest = OpenSSL::Digest.new(algo)

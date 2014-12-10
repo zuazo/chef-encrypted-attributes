@@ -120,7 +120,7 @@ class Chef
         #
         # @param k [String, OpenSSL::PKey::RSA] RSA key to convert.
         # @return [OpenSSL::PKey::RSA] RSA key.
-        # @raise InvalidPrivateKey if the RSA key format is wrong.
+        # @raise [InvalidPrivateKey] if the RSA key format is wrong.
         def pem_to_key(k)
           k.is_a?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
         rescue OpenSSL::PKey::RSAError, TypeError
@@ -131,7 +131,7 @@ class Chef
         #
         # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
         # @return [OpenSSL::PKey::RSA] RSA public key.
-        # @raise InvalidPublicKey if it is not a valid RSA public key.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
         def parse_public_key(key)
           key = pem_to_key(key)
           unless key.public?
@@ -146,8 +146,8 @@ class Chef
         #
         # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
         # @return [OpenSSL::PKey::RSA] RSA key.
-        # @raise InvalidPrivateKey if the RSA key format is wrong.
-        # @raise DecryptionFailure if the data cannot be decrypted by the
+        # @raise [InvalidPrivateKey] if the RSA key format is wrong.
+        # @raise [DecryptionFailure] if the data cannot be decrypted by the
         #   provided key.
         def parse_decryption_key(key)
           key = pem_to_key(key)
