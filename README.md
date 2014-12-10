@@ -6,7 +6,7 @@
 [![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
 [![Inline docs](http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/onddo/chef-encrypted-attributes)
 
-[Chef](http://www.getchef.com) plugin to add Node encrypted attributes support using client keys.
+[Chef](https://www.chef.io/) plugin to add Node encrypted attributes support using client keys.
 
 We recommend using the [`encrypted_attributes`](https://supermarket.chef.io/cookbooks/encrypted_attributes) cookbook for easy installation.
 
@@ -224,7 +224,7 @@ The key fingerprint is (or should be):
 
 ## Testing
 
-See [TESTING.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/TESTING.md).
+See [TESTING.md]((https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md).
 
 ## Contributing
 
