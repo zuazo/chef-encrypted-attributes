@@ -106,7 +106,8 @@ class Chef
         #
         # Checks that GCM is correctly supported by Ruby and OpenSSL.
         #
-        # @raise [RequirementsFailure] if this version cannot be used.
+        # @raise [RequirementsFailure] if the specified encrypted attribute
+        #   version cannot be used.
         def initialize(enc_hs = nil)
           assert_aead_requirements_met!(ALGORITHM)
           super

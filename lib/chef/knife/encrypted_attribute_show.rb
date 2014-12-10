@@ -32,11 +32,22 @@ class Chef
       banner 'knife encrypted attribute show NODE ATTRIBUTE (options)'
 
       # (see EncryptedAttributeBase#assert_valid_args)
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def assert_valid_args
         assert_attribute_exists(@node_name, @attr_ary)
       end
 
       # Runs knife command.
+      #
+      # @return void
+      # @raise [ArgumentError] if the attribute path format is wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def run
         parse_args
 

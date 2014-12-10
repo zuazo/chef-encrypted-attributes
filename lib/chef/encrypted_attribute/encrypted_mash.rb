@@ -61,6 +61,8 @@ class Chef
       # Encrypted Mash constructor.
       #
       # @param enc_hs [Mash] encrypted Mash to clone.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
       def initialize(enc_hs = nil)
         super
         self[JSON_CLASS] = self.class.name
@@ -101,7 +103,12 @@ class Chef
       # Factory method to construct an encrypted Mash.
       #
       # @param version [String, Fixnum] EncryptedMash version to use.
-      # @raise [RequirementsFailure] if the EncryptedMash version cannot be used.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
       def self.create(version)
         klass = version_klass(version)
         klass.send(:new)
@@ -147,6 +154,8 @@ class Chef
       # @param enc_hs [Mash] Encrypted Mash as a Mash. As it is read from node
       #   attributes.
       # @return [EncryptedMash] *EncryptedMash::Version* object.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong.
       # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
       #   format is not supported or unknown.
       def self.json_create(enc_hs)
@@ -162,9 +171,9 @@ class Chef
       #
       # @param class_name [String] the class name as string.
       # @return [Class] the class reference.
-      # @api private
       # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
       #   class name is wrong.
+      # @api private
       def self.string_to_klass(class_name)
         unless class_name.is_a?(String)
           fail UnacceptableEncryptedAttributeFormat,
@@ -187,11 +196,11 @@ class Chef
       #
       # @param version [String, Fixnum] the EncryptedMash version.
       # @return [Class] the EncryptedMash version class reference.
-      # @api private
       # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
       #   version is wrong.
       # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
       #   format is not supported or unknown.
+      # @api private
       def self.version_klass(version)
         version = version.to_s unless version.is_a?(String)
         if version.empty?

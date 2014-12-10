@@ -40,6 +40,12 @@ class Chef
              boolean: true
 
       # Runs knife command.
+      #
+      # @return void
+      # @raise [ArgumentError] if the attribute path format is wrong.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def run
         parse_args
 

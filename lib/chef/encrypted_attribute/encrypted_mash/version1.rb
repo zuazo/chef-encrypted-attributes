@@ -131,6 +131,7 @@ class Chef
         HMAC_ALGORITHM = 'sha256'
 
         # (see EncryptedMash::Version0#encrypt)
+        # @raise [MessageAuthenticationFailure] if HMAC calculation error.
         def encrypt(value, public_keys)
           secrets = {}
           value_json = json_encode(value)
@@ -151,6 +152,7 @@ class Chef
         end
 
         # (see EncryptedMash::Version0#decrypt)
+        # @raise [MessageAuthenticationFailure] if HMAC calculation error.
         def decrypt(key)
           key = parse_decryption_key(key)
           enc_value = self['encrypted_data'].dup

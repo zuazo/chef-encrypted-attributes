@@ -33,8 +33,8 @@ class Chef
     class MessageAuthenticationFailure < StandardError; end
     # Exception raised when the public key is wrong.
     class InvalidPublicKey < StandardError; end
-    # Exception raised when the private key is wrong.
-    class InvalidPrivateKey < StandardError; end
+    # Exception raised when the key is wrong.
+    class InvalidKey < StandardError; end
 
     # Exception raised when you don't have enough privileges in the Chef Server
     # to do what you intend. Usually happens when you try to read Client or Node

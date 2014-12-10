@@ -102,6 +102,10 @@ class Chef
     # @param key [String, OpenSSL::PKey::RSA] private key to use in the
     #   decryption process, uses the local node key by default.
     # @return [Hash, Array, String, ...] decrypted attribute value.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
     def load(enc_hs, key = nil)
       enc_attr = EncryptedMash.json_create(enc_hs)
       decrypted = enc_attr.decrypt(key || local_key)
@@ -115,6 +119,14 @@ class Chef
     # @param key [String, OpenSSL::PKey::RSA] private key to use in the
     #   decryption process, uses the local key by default.
     # @return [Hash, Array, String, ...] decrypted attribute value.
+    # @raise [ArgumentError] if the attribute path format is wrong.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     def load_from_node(name, attr_ary, key = nil)
       remote_node = RemoteNode.new(name)
       load(remote_node.load_attribute(attr_ary, config.partial_search), key)
@@ -130,10 +142,26 @@ class Chef
     #   clear.
     # @param keys [String, OpenSSL::PKey::RSA] public keys that will be able to
     #   decrypt the attribute.
+    # @raise [ArgumentError] if user list is wrong.
     # @return [EncryptedMash] encrypted attribute value. This is usually what is
     #   saved in the node attributes.
-    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-    #   used.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong or does not exist.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
+    # @raise [EncryptionFailure] if there are encryption errors.
+    # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+    # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+    # @raise [InvalidKey] if the RSA key format is wrong.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [RequirementsFailure] if the specified encrypted attribute
+    #   version cannot be used.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     def create(value, keys = nil)
       decrypted = { 'content' => value }
 
@@ -151,8 +179,25 @@ class Chef
     # @param attr_ary [Array<String>] node attribute path as Array.
     # @param value [Hash, Array, String, Fixnum, ...] the value to encrypt.
     # @return [EncryptedMash] encrypted attribute value.
-    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-    #   used.
+    # @raise [ArgumentError] if the attribute path format or the user list is
+    #   wrong.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong or does not exist.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
+    # @raise [EncryptionFailure] if there are encryption errors.
+    # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+    # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+    # @raise [InvalidKey] if the RSA key format is wrong.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [RequirementsFailure] if the specified encrypted attribute
+    #   version cannot be used.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     def create_on_node(name, attr_ary, value)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
@@ -183,9 +228,25 @@ class Chef
     #   able to read the attribute.
     # @return [Boolean] Returns `true` if the encrypted attribute (the *Mash*
     #   parameter) has been updated.
+    # @raise [ArgumentError] if user list is wrong.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong or does not exist.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
+    # @raise [EncryptionFailure] if there are encryption errors.
+    # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+    # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+    # @raise [InvalidKey] if the RSA key format is wrong.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [RequirementsFailure] if the specified encrypted attribute
+    #   version cannot be used.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
-    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-    #   used.
     def update(enc_hs, keys = nil)
       old_enc_attr = EncryptedMash.json_create(enc_hs)
       if old_enc_attr.needs_update?(target_keys(keys))
@@ -214,9 +275,26 @@ class Chef
     # @param attr_ary [Array<String>] node attribute path as Array.
     # @return [Boolean] Returns `true` if the remote encrypted attribute has
     #   been updated.
+    # @raise [ArgumentError] if the attribute path format or the user list is
+    #   wrong.
+    # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+    #   format is wrong or does not exist.
+    # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+    #   format is not supported or unknown.
+    # @raise [EncryptionFailure] if there are encryption errors.
+    # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+    # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+    # @raise [InvalidKey] if the RSA key format is wrong.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [RequirementsFailure] if the specified encrypted attribute
+    #   version cannot be used.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
-    # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-    #   used.
     def update_on_node(name, attr_ary)
       # read the client public key
       node_public_key = RemoteClients.get_public_key(name)
@@ -240,6 +318,11 @@ class Chef
     # the configuration.
     #
     # @return [Array<String>] list of client public keys.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
     def remote_client_keys
       RemoteClients.search_public_keys(
@@ -251,6 +334,13 @@ class Chef
     # configuration.
     #
     # @return [Array<String>] list of node public keys.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
     def remote_node_keys
       RemoteNodes.search_public_keys(config.node_search, config.partial_search)
@@ -259,6 +349,7 @@ class Chef
     # Gets remote user keys using the configured user list.
     #
     # @return [Array<String>] list of user public keys.
+    # @raise [ArgumentError] if user list is wrong.
     # @see #config
     def remote_user_keys
       RemoteUsers.get_public_keys(config.users)
@@ -273,6 +364,14 @@ class Chef
     # @param keys [Array<String>] list of public keys to include in addition to
     #   the configured.
     # @return [Array<String>] list of user public keys.
+    # @raise [ArgumentError] if user list is wrong.
+    # @raise [InsufficientPrivileges] if you lack enough privileges to read
+    #   the keys from the Chef Server.
+    # @raise [ClientNotFound] if client does not exist.
+    # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+    # @raise [SearchFailure] if there is a Chef search error.
+    # @raise [SearchFatalError] if the Chef search response is wrong.
+    # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
     # @see #remote_client_keys
     # @see #remote_node_keys

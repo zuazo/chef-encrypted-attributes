@@ -160,6 +160,7 @@ class Chef
         # @param data [String] default data value to edit.
         # @param format [String] `'plain'` or `'json'`.
         # @return [String] resulting data value after edition.
+        # @raise [RuntimeError] if the editing command fails.
         def edit_data(data = nil, format = 'plain')
           output = edit_data_string_to_obj(data, format)
           output = edit_data_run_editor(output)

@@ -228,6 +228,10 @@ class Chef
       #   `{ :partial_search => false }`.
       # @return [Hash, Array, String, ...] the attribute in clear text,
       #   decrypted.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
       def load(enc_hs, c = {})
         debug("Loading Local Encrypted Attribute from: #{enc_hs.inspect}")
         enc_attr = EncryptedAttribute.new(config(c))
@@ -249,6 +253,14 @@ class Chef
       # @param c [Config, Hash] a configuration hash. For example:
       #   `{ :partial_search => false }`.
       # @return [Hash, Array, String, ...] decrypted attribute value.
+      # @raise [ArgumentError] if the attribute path format is wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def load_from_node(name, attr_ary, c = {})
         debug(
           "Loading Remote Encrypted Attribute from #{name}: #{attr_ary.inspect}"
@@ -275,8 +287,24 @@ class Chef
       #   `{ :client_search => "admin:true" }`.
       # @return [EncryptedMash] encrypted attribute value. This is usually what
       #   is saved in the node attributes.
-      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-      #   used.
+      # @raise [ArgumentError] if user list is wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [EncryptionFailure] if there are encryption errors.
+      # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+      # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+      # @raise [InvalidKey] if the RSA key format is wrong.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def create(value, c = {})
         debug('Creating Encrypted Attribute.')
         enc_attr = EncryptedAttribute.new(config(c))
@@ -304,8 +332,25 @@ class Chef
       # @param c [Config, Hash] a configuration hash. For example:
       #   `{ :client_search => 'admin:true' }`.
       # @return [EncryptedMash] encrypted attribute value.
-      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-      #   used.
+      # @raise [ArgumentError] if the attribute path format or the user list is
+      #   wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [EncryptionFailure] if there are encryption errors.
+      # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+      # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+      # @raise [InvalidKey] if the RSA key format is wrong.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def create_on_node(name, attr_ary, value, c = {})
         debug(
           "Creating Remote Encrypted Attribute on #{name}: #{attr_ary.inspect}"
@@ -340,8 +385,24 @@ class Chef
       #   `#update` method to use the same `config` that the `#create` call.
       # @return [Boolean] `true` if the encrypted attribute has been updated,
       #   `false` if not.
-      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-      #   used.
+      # @raise [ArgumentError] if user list is wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [EncryptionFailure] if there are encryption errors.
+      # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+      # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+      # @raise [InvalidKey] if the RSA key format is wrong.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def update(enc_hs, c = {})
         debug("Updating Encrypted Attribute: #{enc_hs.inspect}")
         enc_attr = EncryptedAttribute.new(config(c))
@@ -369,8 +430,25 @@ class Chef
       #   call.
       # @return [Boolean] `true` if the encrypted attribute has been updated,
       #   `false` if not.
-      # @raise [RequirementsFailure] if the encrypted attribute version cannot be
-      #   used.
+      # @raise [ArgumentError] if the attribute path format or the user list is
+      #   wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [EncryptionFailure] if there are encryption errors.
+      # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+      # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+      # @raise [InvalidKey] if the RSA key format is wrong.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def update_on_node(name, attr_ary, c = {})
         debug(
           "Updating Remote Encrypted Attribute on #{name}: #{attr_ary.inspect}"
@@ -415,6 +493,7 @@ class Chef
       #   `{ :partial_search => false }`.
       # @return [Boolean] `true` if an encrypted attribute is found, `false` if
       #   not.
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def exist_on_node?(name, attr_ary, c = {})
         debug("Checking if Remote Encrypted Attribute exists on #{name}")
         remote_node = RemoteNode.new(name)

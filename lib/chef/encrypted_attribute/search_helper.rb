@@ -100,8 +100,8 @@ class Chef
 
       # Assert that the search keys structure format is correct.
       #
-      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       # @return void
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       # @api private
       def assert_search_keys(keys)
         return if valid_search_keys?(keys)
@@ -129,7 +129,11 @@ class Chef
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
       # @param rows [Fixnum, String] maximum number of rows to return.
       # @param partial_search [Boolean] whether to use partial search.
-      # @raise [SearchFailure] if there is a search error.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def search(type, query, keys, rows = 1000, partial_search = true)
         return [] if empty_search?(query) # avoid empty searches
         search_method = partial_search ? :partial_search : :normal_search
@@ -147,7 +151,7 @@ class Chef
       #
       # @param resp [Array] normal search result.
       # @return void
-      # @raise [SearchFatalError] if the search response is wrong.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
       # @api private
       def assert_normal_search_response(resp)
         return if resp.is_a?(Array)
@@ -159,6 +163,8 @@ class Chef
       #
       # @param row [Array] the normal search result row.
       # @param attr_ary [Array<String>] key path as Array.
+      # @return [Hash] A hash with the response row, for example:
+      #   `[ 'ipaddress' => '192.168.1.1' }`
       # @api private
       def parse_normal_search_row_attribute(row, attr_ary)
         attr_ary.reduce(row) do |r, attr|
@@ -175,6 +181,8 @@ class Chef
       # @param resp [Array] normal search result.
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
       # @api private
       def parse_normal_search_response(resp, keys)
         resp.map do |row|
@@ -195,6 +203,9 @@ class Chef
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
       # @param rows [Fixnum, String] maximum number of rows to return.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def normal_search(type, query, keys, rows = 1000)
         escaped_query = escape_query(query)
         Chef::Log.info(
@@ -212,7 +223,7 @@ class Chef
       # @param resp [Hash] partial search result. For example:
       #   `{ 'rows' => [ 'data' => { 'ipaddress' => '192.168.1.1' } }] }`.
       # @return void
-      # @raise [SearchFatalError] if the search response is wrong.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
       # @api private
       def assert_partial_search_response(resp)
         return if resp.is_a?(Hash) && resp.key?('rows') &&
@@ -225,7 +236,9 @@ class Chef
       #
       # @param resp [Hash] partial search result. For example:
       #   `{ 'rows' => [ 'data' => { 'ipaddress' => '192.168.1.1' } }] }`.
-      # @raise [SearchFatalError] if the search response is wrong.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [SearchFatalError] if the Chef search response is wrong.
       # @api private
       def parse_partial_search_response(resp)
         resp['rows'].map do |row|
@@ -248,6 +261,10 @@ class Chef
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
       # @param rows [Fixnum, String] maximum number of rows to return.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
       def partial_search(type, query, keys, rows = 1000)
         escaped_query =
           "search/#{escape(type)}?q=#{escape_query(query)}&start=0&rows=#{rows}"

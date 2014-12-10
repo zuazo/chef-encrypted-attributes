@@ -65,8 +65,8 @@ class Chef
       #
       # @param name [String] user name.
       # @return [String] user public key as string.
-      # @raise [InsufficientPrivileges] if a 403 error is received from the Chef
-      #   server.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
       # @api private
       def self.get_user_public_key(name)
         return cache[name] if cache.key?(name)

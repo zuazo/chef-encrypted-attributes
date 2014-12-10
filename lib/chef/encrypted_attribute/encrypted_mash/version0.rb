@@ -59,6 +59,9 @@ class Chef
         # @param public_keys [Array<String, OpenSSL::PKey::RSA>] publics keys
         #   that will be able to decrypt the {EncryptedMash}.
         # @return [EncryptedMash] the value encrypted.
+        # @raise [EncryptionFailure] if there are encryption errors.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def encrypt(value, public_keys)
           value_json = json_encode(value)
           public_keys = parse_public_keys(public_keys)
@@ -72,6 +75,10 @@ class Chef
         # @param key [String, OpenSSL::PKey::RSA] RSA private key used to
         #   decrypt.
         # @return [Mixed] the value decrypted.
+        # @raise [DecryptionFailure] if the data cannot be decrypted by the
+        #   provided key.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def decrypt(key)
           key = parse_decryption_key(key)
           value_json = rsa_decrypt_multi_key(self['encrypted_data'], key)
@@ -84,6 +91,8 @@ class Chef
         #
         # @param keys [Array<OpenSSL::PKey::RSA>] list of public keys.
         # @return [Boolean] `true` if all keys can decrypt the data.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def can_be_decrypted_by?(keys)
           return false unless encrypted?
           data_can_be_decrypted_by_keys?(self['encrypted_data'], keys)
@@ -101,6 +110,8 @@ class Chef
         #   keys.
         # @return [Boolean] `true` if all keys can decrypt the data and only
         #   those keys can decrypt the data.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def needs_update?(keys)
           keys = parse_public_keys(keys)
           !can_be_decrypted_by?(keys) ||
@@ -120,11 +131,11 @@ class Chef
         #
         # @param k [String, OpenSSL::PKey::RSA] RSA key to convert.
         # @return [OpenSSL::PKey::RSA] RSA key.
-        # @raise [InvalidPrivateKey] if the RSA key format is wrong.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def pem_to_key(k)
           k.is_a?(OpenSSL::PKey::RSA) ? k : OpenSSL::PKey::RSA.new(k)
         rescue OpenSSL::PKey::RSAError, TypeError
-          raise InvalidPrivateKey, "The provided key is invalid: #{k.inspect}"
+          raise InvalidKey, "The provided key is invalid: #{k.inspect}"
         end
 
         # Parses a RSA public key used for encryption.
@@ -132,6 +143,7 @@ class Chef
         # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
         # @return [OpenSSL::PKey::RSA] RSA public key.
         # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def parse_public_key(key)
           key = pem_to_key(key)
           unless key.public?
@@ -146,13 +158,14 @@ class Chef
         #
         # @param key [String, OpenSSL::PKey::RSA] RSA key to parse.
         # @return [OpenSSL::PKey::RSA] RSA key.
-        # @raise [InvalidPrivateKey] if the RSA key format is wrong.
         # @raise [DecryptionFailure] if the data cannot be decrypted by the
         #   provided key.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def parse_decryption_key(key)
           key = pem_to_key(key)
           unless key.public? && key.private?
-            fail InvalidPrivateKey,
+            fail InvalidKey,
                  'The provided key for decryption is invalid, a valid public '\
                  'and private key is required.'
           end
@@ -168,6 +181,8 @@ class Chef
         #
         # @param keys [Array<String, OpenSSL::PKey::RSA>] list of keys.
         # @return [Array<OpenSSL::PKey::RSA>] list of keys parsed.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def parse_public_keys(keys)
           keys = [keys].flatten
           keys_parsed = keys.map { |k| parse_public_key(k) }
@@ -276,6 +291,7 @@ class Chef
         # @param value [String] data to encrypt.
         # @param public_keys [Array<OpenSSL::PKey::RSA>] public keys list.
         # @return [Mash] data encrypted.
+        # @raise [EncryptionFailure] if there are encryption errors.
         # @see #node_key
         # @see #rsa_encrypt_value
         def rsa_encrypt_multi_key(value, public_keys)
@@ -292,7 +308,7 @@ class Chef
         # @param key [OpenSSL::PKey::RSA] RSA key to use (public and private key
         #   is required).
         # @return [String] data decrypted.
-        # @see #rsa_encrypt_multi_key
+        # @see #rsa_decrypt_value
         def rsa_decrypt_multi_key(enc_value, key)
           enc_value = enc_value[node_key(key.public_key)]
           rsa_decrypt_value(enc_value, key)
@@ -318,6 +334,8 @@ class Chef
         #   `self['encrypted_data']`.
         # @param keys [Array<OpenSSL::PKey::RSA>] list of public keys.
         # @return [Boolean] `true` if all keys can decrypt the data.
+        # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+        # @raise [InvalidKey] if the RSA key format is wrong.
         def data_can_be_decrypted_by_keys?(data, keys)
           parse_public_keys(keys).reduce(true) do |r, k|
             r && data_can_be_decrypted_by_key?(data, k)

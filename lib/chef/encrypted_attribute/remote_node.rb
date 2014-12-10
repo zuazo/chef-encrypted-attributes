@@ -66,6 +66,10 @@ class Chef
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @param partial_search [Boolean] whether to use partial search.
       # @return [Mixed] node attribute value.
+      # @raise [ArgumentError] if the attribute path format is wrong.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def load_attribute(attr_ary, partial_search = true)
         assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
@@ -80,6 +84,7 @@ class Chef
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @param value [Mixed] node attribute value to set.
       # @return [Mixed] node attribute value.
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def save_attribute(attr_ary, value)
         assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
@@ -101,6 +106,7 @@ class Chef
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @return [Boolean] whether the node attribute has been found and
       #   successfully deleted.
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def delete_attribute(attr_ary)
         assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)

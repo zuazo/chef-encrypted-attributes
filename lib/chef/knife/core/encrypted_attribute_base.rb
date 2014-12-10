@@ -55,6 +55,7 @@ class Chef
         # @param node_name [String] Chef node name.
         # @param attr_ary [Array<String>] node attribute path as Array.
         # @return void
+        # @raise [ArgumentError] if the attribute path format is wrong.
         def assert_attribute_exists(node_name, attr_ary)
           return if Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
           die('Encrypted attribute not found')
@@ -67,6 +68,7 @@ class Chef
         # @param node_name [String] Chef node name.
         # @param attr_ary [Array<String>] node attribute path as Array.
         # @return void
+        # @raise [ArgumentError] if the attribute path format is wrong.
         def assert_attribute_does_not_exist(node_name, attr_ary)
           return unless
             Chef::EncryptedAttribute.exist_on_node?(node_name, attr_ary)
@@ -107,11 +109,26 @@ class Chef
         # @param node_name [String] Chef node name.
         # @param attr_ary [Array<String>] node attribute path as Array.
         # @return void
+        # @raise [ArgumentError] if the attribute path format is wrong.
+        # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+        #   format is wrong.
+        # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+        #   format is not supported or unknown.
+        # @raise [SearchFailure] if there is a Chef search error.
+        # @raise [SearchFatalError] if the Chef search response is wrong.
+        # @raise [InvalidSearchKeys] if search keys structure is wrong.
         def assert_attribute_readable(node_name, attr_ary)
           # try to read the attribute
           Chef::EncryptedAttribute.load_from_node(node_name, attr_ary)
         end
 
+        # Parses the escape character from an array path string.
+        #
+        # @param str [String] the full string to parse.
+        # @param i [String] string position that contains the escape character.
+        # @param delim [String] delimiter used for string notation.
+        # @return [String] the character unscaped.
+        # see #attribute_path_to_ary
         # @api private
         def attribute_path_to_ary_read_escape(str, i, delim)
           if str[i + 1] == delim

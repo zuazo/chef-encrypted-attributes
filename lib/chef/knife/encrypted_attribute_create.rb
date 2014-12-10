@@ -41,12 +41,35 @@ class Chef
       banner 'knife encrypted attribute create NODE ATTRIBUTE (options)'
 
       # (see EncryptedAttributeBase#assert_valid_args)
+      # @raise [ArgumentError] if the attribute path format is wrong.
       def assert_valid_args
         # check if the encrypted attribute already exists
         assert_attribute_does_not_exist(@node_name, @attr_ary)
       end
 
       # Runs knife command.
+      #
+      # @raise [RuntimeError] if the editing command fails.
+      # @raise [ArgumentError] if the attribute path format or the user list is
+      #   wrong.
+      # @raise [UnacceptableEncryptedAttributeFormat] if encrypted attribute
+      #   format is wrong or does not exist.
+      # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
+      #   format is not supported or unknown.
+      # @raise [EncryptionFailure] if there are encryption errors.
+      # @raise [MessageAuthenticationFailure] if HMAC calculation error.
+      # @raise [InvalidPublicKey] if it is not a valid RSA public key.
+      # @raise [InvalidKey] if the RSA key format is wrong.
+      # @raise [InsufficientPrivileges] if you lack enough privileges to read
+      #   the keys from the Chef Server.
+      # @raise [ClientNotFound] if client does not exist.
+      # @raise [Net::HTTPServerException] for Chef Server HTTP errors.
+      # @raise [RequirementsFailure] if the specified encrypted attribute
+      #   version cannot be used.
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
+      # @return void
       def run
         parse_args
 
