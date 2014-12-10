@@ -2,6 +2,42 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.4.0 (2014-12-10)
+
+* Add Chef `12` support.
+* Read `node['public_key']` instead of client public key when set.
+* Add *chef/encrypted_attributes* library file.
+ * **Deprecates** *chef-encrypted-attributes* library file.
+* Replace `yajl` gem by `ffi_yajl` gem.
+* Gemspec: fix Ruby `< 1.9.3` support (mixlib-shellout `< 1.6.1`).
+* Rename `InvalidPrivateKey` exception to `InvalidKey`.
+* Add UTF-8 encoding header to all files.
+* Big code refactor and clean-up.
+  * Code refactor all clases.
+  * Add `Chef::EncryptedAttribute::API` module.
+  * Clean-up Gemspec and Rakefile files code.
+
+* Tests:
+ * Review and clean-up all tests.
+ * Integrate tests with `should_not` gem.
+ * Integrate with RuboCop.
+ * Add some knife unit tests.
+ * Update tests to RSpec `3.1`.
+ * Update tests to chef-zero `3.2`.
+
+* Documentation:
+ * Document all classes and integrate them with yard and inch.
+ * Add KNIFE.md file.
+ * Move INTERNAL.md documentation to gem documentation.
+ * Move API.md documentation to gem documentation.
+ * README:
+  * Multiple fixes and improvements.
+  * Use chef.io domain for links.
+  * Add codeclimate badge.
+  * Add inch-ci documentation badge.
+ * Fix CHANGELOG format.
+ * CONTRIBUTING: add documetation about documentation.
+
 ## 0.3.0 (2014-08-25)
 
 * gemspec: added the missing CONTRIBUTING.md file
