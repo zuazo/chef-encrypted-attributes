@@ -66,7 +66,7 @@ class Chef
       #
       # @param attr_ary [Array<String>] node attribute path as Array.
       # @param partial_search [Boolean] whether to use partial search.
-      # @return [Mixed] node attribute value.
+      # @return [Mixed] node attribute value, `nil` if not found.
       # @raise [ArgumentError] if the attribute path format is wrong.
       # @raise [SearchFailure] if there is a Chef search error.
       # @raise [SearchFatalError] if the Chef search response is wrong.

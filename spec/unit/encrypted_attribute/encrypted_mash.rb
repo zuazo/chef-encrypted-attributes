@@ -203,6 +203,16 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       expect(new['key1']).to eql('value1')
     end
 
+    it 'throws an error if wrong attribute is passed as arg' do
+      # silence Chef::Log.error by EncryptedMash#string_to_klass
+      allow(Chef::Log).to receive(:error)
+      expect { encrypted_mash_class.json_create(nil) }
+        .to raise_error(
+          Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat,
+          'Encrypted attribute not found or corrupted.'
+        )
+    end
+
     it 'throws an error if empty attribute is passed as arg' do
       # silence Chef::Log.error by EncryptedMash#string_to_klass
       allow(Chef::Log).to receive(:error)

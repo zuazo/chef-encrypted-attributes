@@ -160,6 +160,10 @@ class Chef
       # @raise [UnsupportedEncryptedAttributeFormat] if encrypted attribute
       #   format is not supported or unknown.
       def self.json_create(enc_hs)
+        unless enc_hs.is_a?(Hash)
+          fail UnacceptableEncryptedAttributeFormat,
+               'Encrypted attribute not found or corrupted.'
+        end
         klass = string_to_klass(enc_hs[JSON_CLASS])
         if klass.nil?
           fail UnsupportedEncryptedAttributeFormat,

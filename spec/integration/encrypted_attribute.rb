@@ -132,6 +132,17 @@ describe Chef::EncryptedAttribute do
                 )
               ).to eql(@clear_attr)
             end
+
+            it 'throws an error if not found' do
+              expect do
+                Chef::EncryptedAttribute.load_from_node(
+                  Chef::Config[:node_name], %w(bad encrypted attribute)
+                )
+              end.to raise_error(
+                Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat,
+                'Encrypted attribute not found or corrupted.'
+              )
+            end
           end # context using #load_from_node
 
         end # context loading the encrypted attribute
