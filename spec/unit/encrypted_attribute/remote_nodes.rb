@@ -145,6 +145,5 @@ describe Chef::EncryptedAttribute::RemoteNodes do
         /encrypted_attributes::expose_key/
       )
     end
-
   end # describe #search_public_keys
 end

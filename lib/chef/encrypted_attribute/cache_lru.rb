@@ -75,12 +75,9 @@ class Chef
       # @param key [String, Symbol] cache key to read.
       # @return [Mixed] cache key value.
       def [](key)
-        if key?(key)
-          val = super(key)
-          self[key] = val
-        else
-          nil
-        end
+        return nil unless key?(key)
+        val = super(key)
+        self[key] = val
       end
 
       # Sets a cache key.

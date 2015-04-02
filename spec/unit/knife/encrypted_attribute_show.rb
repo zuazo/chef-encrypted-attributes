@@ -61,7 +61,6 @@ describe Chef::Knife::EncryptedAttributeShow do
   end
 
   context '#attribute_path_to_ary' do
-
     {
       'encrypted.attribute' => %w(encrypted attribute),
       '.encrypted.attribute.' => ['', 'encrypted', 'attribute', ''],
@@ -73,11 +72,9 @@ describe Chef::Knife::EncryptedAttributeShow do
       'encrypted\\.attr.i\\\\\\\\.bu\\\\\\\\\.te' =>
         ['encrypted.attr', 'i\\\\\\\\', 'bu\\\\\\\\.te']
     }.each do |str, ary|
-
       it "converts #{str.inspect} to #{ary.inspect}" do
         expect(@knife.attribute_path_to_ary(str)).to eql(ary)
       end
-
     end # each do |str, ary|
   end # context #attribute_path_to_ary
 end

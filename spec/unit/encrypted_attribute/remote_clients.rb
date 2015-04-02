@@ -34,7 +34,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
   end
 
   describe '#get_public_key' do
-
     it 'gets client public key' do
       fake_client = Chef::ApiClient.new
       allow(fake_client).to receive(:public_key).and_return('OK')
@@ -47,7 +46,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
       '404' => Chef::EncryptedAttribute::ClientNotFound,
       'anything_else' => Net::HTTPServerException
     }.each do |code, exception|
-
       it "throws an #{exception} exception if the server returns a "\
          "#{code} code" do
         allow(Chef::ApiClient).to receive(:load) do
@@ -60,9 +58,7 @@ describe Chef::EncryptedAttribute::RemoteClients do
           remote_clients_class.get_public_key('random_client')
         end.to raise_error(exception)
       end
-
     end
-
   end # #get_public_key
 
   describe '#search_public_keys' do
@@ -121,6 +117,5 @@ describe Chef::EncryptedAttribute::RemoteClients do
       remote_clients_class.search_public_keys(query)
       remote_clients_class.search_public_keys(query) # cached
     end
-
   end # describe #search_public_keys
 end

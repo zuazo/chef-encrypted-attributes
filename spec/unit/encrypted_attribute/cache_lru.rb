@@ -23,7 +23,6 @@ describe Chef::EncryptedAttribute::CacheLru do
   let(:cache_lru_class) { Chef::EncryptedAttribute::CacheLru }
 
   describe '#new' do
-
     it 'creates a cache without errors' do
       expect { cache_lru_class.new }.not_to raise_error
     end
@@ -33,11 +32,9 @@ describe Chef::EncryptedAttribute::CacheLru do
         .to receive(:max_size).with(25).once
       cache_lru_class.new(25)
     end
-
   end
 
   describe '#max_size' do
-
     it 'returns 1024 by default' do
       cache = cache_lru_class.new
       expect(cache.max_size).to eql(1024)
@@ -56,7 +53,6 @@ describe Chef::EncryptedAttribute::CacheLru do
       cache.max_size(10)
       expect(cache.size).to eql(10)
     end
-
   end
 
   describe '#[]' do
@@ -70,7 +66,6 @@ describe Chef::EncryptedAttribute::CacheLru do
     it 'returns nil if the key does not exist' do
       expect(cache['key2']).to eql(nil)
     end
-
   end
 
   describe '#[]=' do
@@ -99,6 +94,5 @@ describe Chef::EncryptedAttribute::CacheLru do
       (4..8).step.each { |x| expect(cache.key?(x)).to be_truthy }
       (10..14).step.each { |x| expect(cache.key?(x)).to be_truthy }
     end
-
   end
 end

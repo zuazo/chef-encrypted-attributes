@@ -71,9 +71,11 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       node_private_key = create_ssl_key(@node1_client.private_key)
       allow_any_instance_of(Chef::EncryptedAttribute::LocalNode)
         .to receive(:key).and_return(node_private_key)
-      expect(Chef::EncryptedAttribute.load_from_node(
-        'node1', %w(encrypted attribute)
-      )).to eql('random-data')
+      expect(
+        Chef::EncryptedAttribute.load_from_node(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql('random-data')
     end
 
     it 'the client is not able to update the encrypted attribute by default' do
@@ -145,6 +147,5 @@ describe Chef::Knife::EncryptedAttributeUpdate do
       expect(knife.ui).to receive(:fatal)
       expect { knife.run }.to raise_error(SystemExit)
     end
-
   end
 end

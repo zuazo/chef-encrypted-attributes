@@ -36,7 +36,6 @@ describe Chef::EncryptedAttribute::RemoteNode do
   end
 
   describe '#name' do
-
     it 'returns the node name' do
       expect(remote_node_class.new('bob').name).to eql('bob')
     end
@@ -50,11 +49,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
     it 'throws an error if the name is not valid' do
       expect { remote_node_class.new({}) }.to raise_error(ArgumentError)
     end
-
   end
 
   describe '#load_attribute' do
-
     it 'reads the node attribute using SearchHelper' do
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
@@ -141,7 +138,6 @@ describe Chef::EncryptedAttribute::RemoteNode do
       expect { remote_node.load_attribute('incorrect-attr-ary') }
         .to raise_error(ArgumentError)
     end
-
   end
 
   context '#save_attribute' do
@@ -178,7 +174,6 @@ describe Chef::EncryptedAttribute::RemoteNode do
       expect { remote_node.save_attribute('incorrect-attr-ary', 'value1') }
         .to raise_error(ArgumentError)
     end
-
   end # context #save_attribute
 
   context '#delete_attribute' do
@@ -208,6 +203,5 @@ describe Chef::EncryptedAttribute::RemoteNode do
       expect { remote_node.delete_attribute('incorrect-attr-ary') }
         .to raise_error(ArgumentError)
     end
-
   end # context #delete_attribute
 end

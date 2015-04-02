@@ -98,6 +98,5 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect { knife.run }
         .to raise_error(RuntimeError, 'Please set EDITOR environment variable')
     end
-
   end # context #edit_data
 end

@@ -46,7 +46,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
     end
 
     context '#get_public_key' do
-
       it 'returns client public key' do
         expect(remote_clients_class.get_public_key('admin1'))
           .to eq(@admin1.public_key)
@@ -56,11 +55,9 @@ describe Chef::EncryptedAttribute::RemoteClients do
         expect { remote_clients_class.get_public_key('unknown') }
           .to raise_error(Chef::EncryptedAttribute::ClientNotFound)
       end
-
     end
 
     context '#search_public_keys' do
-
       it 'gets all client public_keys by default' do
         expect(remote_clients_class.search_public_keys.sort)
           .to eql(@clients.map(&:public_key).sort)
@@ -77,7 +74,6 @@ describe Chef::EncryptedAttribute::RemoteClients do
         query = 'this_will_return_no_results:true'
         expect(remote_clients_class.search_public_keys(query).sort).to eql([])
       end
-
     end # context #search_public_keys
   end # when_the_chef_server is ready to rock!
 end

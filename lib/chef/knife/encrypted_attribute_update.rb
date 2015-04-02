@@ -66,9 +66,8 @@ class Chef
         parse_args
 
         # update encrypted attribute
-        enc_attr = Chef::EncryptedAttribute.new(
-                     Chef::Config[:knife][:encrypted_attributes]
-                   )
+        knife_config = Chef::Config[:knife][:encrypted_attributes]
+        enc_attr = Chef::EncryptedAttribute.new(knife_config)
         if enc_attr.update_on_node(@node_name, @attr_ary)
           ui.info('Encrypted attribute updated.')
         else

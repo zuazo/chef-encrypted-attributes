@@ -30,7 +30,6 @@ class Chef
         # @param includer [Class] includer class.
         def self.included(includer)
           includer.class_eval do
-
             # Helper method to set the encrypted attributes configuration.
             def self.encrypted_attributes_option_set(key, value)
               Chef::Config[:knife][:encrypted_attributes][key] = value

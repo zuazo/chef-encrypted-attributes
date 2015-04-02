@@ -59,7 +59,6 @@ describe Chef::EncryptedAttribute do
         .to receive(:create).with(%w(a)).and_return('create')
       expect(encrypted_attribute_class.create(%w(a))).to eql('create')
     end
-
   end # context #self.create
 
   context '#self.create_on_node' do
@@ -93,11 +92,9 @@ describe Chef::EncryptedAttribute do
       expect(encrypted_attribute_class.create_on_node('node1', %w(a), 'value'))
         .to eql('create_on_node')
     end
-
   end # context #self.create_on_node
 
   %w(load update).each do |meth|
-
     context "#self.#{meth}" do
       before do
         allow_any_instance_of(encrypted_attribute_class).to receive(meth.to_sym)
@@ -124,9 +121,7 @@ describe Chef::EncryptedAttribute do
           .to receive(meth.to_sym) .with(%w(a)).and_return(meth)
         expect(encrypted_attribute_class.send(meth, %w(a))).to eql(meth)
       end
-
     end # context #self.meth
-
   end # %w(load update).each do |meth|
 
   context '#self.load_from_node' do
@@ -158,7 +153,6 @@ describe Chef::EncryptedAttribute do
       expect(encrypted_attribute_class.load_from_node('node1', %w(a)))
         .to eql('load_from_node')
     end
-
   end # context #load_from_node
 
   context '#self.update_on_node' do
@@ -190,7 +184,6 @@ describe Chef::EncryptedAttribute do
       expect(encrypted_attribute_class.update_on_node('node1', %w(a)))
         .to eql('update_on_node')
     end
-
   end # context #update_on_node
 
   context '#self.exist?' do
@@ -211,7 +204,6 @@ describe Chef::EncryptedAttribute do
         .to receive(:exist?).with(%w(a)).and_return(false)
       expect(encrypted_attribute_class.exist?(%w(a))).to eql(false)
     end
-
   end # context #exist?
 
   context '#self.exists?' do
@@ -238,7 +230,6 @@ describe Chef::EncryptedAttribute do
   end # context #exists?
 
   context '#self.exist_on_node?' do
-
     it 'loads the remote attribute and calls #exist?' do
       expect(Chef::Log).to_not receive(:warn)
       expect_any_instance_of(config_class)
@@ -251,11 +242,9 @@ describe Chef::EncryptedAttribute do
       expect(encrypted_attribute_class.exist_on_node?('node1', %w(attr)))
         .to eql('exist?')
     end
-
   end # context #self.exist_on_node?
 
   context '#self.exists_on_node?' do
-
     it 'loads the remote attribute and calls #exist?' do
       expect(Chef::Log).to receive(:warn).once.with(/is deprecated in favor of/)
       expect_any_instance_of(config_class)
@@ -268,6 +257,5 @@ describe Chef::EncryptedAttribute do
       expect(encrypted_attribute_class.exists_on_node?('node1', %w(attr)))
         .to eql('exist?')
     end
-
   end # context #self.exists_on_node?
 end # describe Chef::EncryptedAttribute::Config

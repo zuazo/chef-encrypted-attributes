@@ -52,7 +52,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
   end
 
   describe '#get_public_keys' do
-
     it 'returns empty array by default' do
       expect(remote_users_class.get_public_keys).to eql([])
     end
@@ -83,15 +82,13 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     [
-      'bad-user-list', true, false, Hash.new, Object.new
+      'bad-user-list', true, false, {}, Object.new
     ].each do |bad_users|
-
       it 'throws an ArgumentError for user list of kind '\
          "#{bad_users.class.name} (#{bad_users.inspect})" do
         expect { remote_users_class.get_public_keys(bad_users) }
           .to raise_error(ArgumentError)
       end
-
     end # each do |bad_users|
 
     it 'returns valid public keys' do
@@ -107,7 +104,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       '404' => Chef::EncryptedAttribute::UserNotFound,
       'anything_else' => Net::HTTPServerException
     }.each do |code, exception|
-
       it "throws an #{exception} exception if the server returns a "\
          "#{code} code" do
         allow(Chef::User).to receive(:load) do
@@ -119,7 +115,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         expect { remote_users_class.get_public_keys(%w(random_user)) }
           .to raise_error(exception)
       end
-
     end # each do |code, exception|
   end # describe #get_public_keys
 end

@@ -134,11 +134,10 @@ class Chef
       # @param res [Array<Hash>] {SearchHelper#search} result.
       # @return [Mixed] final search result value.
       def parse_search_result(res)
-        if res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
-          res[0]['value']
-        else
-          nil
+        unless res.is_a?(Array) && res[0].is_a?(Hash) && res[0].key?('value')
+          return nil
         end
+        res[0]['value']
       end
 
       # Generates the cache key.

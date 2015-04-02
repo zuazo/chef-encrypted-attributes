@@ -40,7 +40,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     end
 
     context '#name' do
-
       it 'returns the node name' do
         expect(remote_node.name).to eql(node_name)
       end
@@ -50,11 +49,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         remote_node.name(new_name)
         expect(remote_node.name).to eql(new_name)
       end
-
     end # context #name
 
     context '#load_attribute' do
-
       it 'reads an existing node attribute' do
         expect(remote_node.load_attribute(%w(attr1))).to eql(attr1)
         expect(remote_node.load_attribute(%w(sub-attr attr2)))
@@ -69,11 +66,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         expect { remote_node.load_attribute('incorrect-attr-ary') }
           .to raise_error(ArgumentError)
       end
-
     end # context #load_attribute
 
     context '#save_attribute' do
-
       it 'saves the attribute' do
         remote_node.save_attribute(%w(saved-attr subattr2), 'A precious value')
         Chef::EncryptedAttribute::RemoteUsers.cache.clear
@@ -95,11 +90,9 @@ describe Chef::EncryptedAttribute::RemoteUsers do
           remote_node.save_attribute('incorrect-attr-ary', 'some value')
         end.to raise_error(ArgumentError)
       end
-
     end # context #save_attribute
 
     context '#delete_attribute' do
-
       it 'deletes a node attribute' do
         node = Chef::Node.load(node_name)
         expect(node['sub-attr']['attr2']).not_to eql(nil)
@@ -120,7 +113,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         expect { remote_node.delete_attribute('incorrect-attr-ary') }
           .to raise_error(ArgumentError)
       end
-
     end # context #delete_attribute
   end # when_the_chef_server is ready to rock!
 end

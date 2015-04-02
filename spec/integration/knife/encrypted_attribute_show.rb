@@ -78,6 +78,5 @@ describe Chef::Knife::EncryptedAttributeShow do
       expect(@knife.ui).to receive(:fatal)
       expect { @knife.run }.to raise_error(SystemExit)
     end
-
   end
 end

@@ -48,32 +48,32 @@ describe Chef::EncryptedAttribute::Config do
       version: {
         default: 1,
         ok: [1, 'any-string'],
-        error: [true, false, 0.2, Hash.new, Array.new, Object.new]
+        error: [true, false, 0.2, {}, [], Object.new]
       },
       partial_search: {
         default: true,
         ok: [true, false],
-        error: [1, 0.2, 'any-string', Hash.new, Array.new, Object.new]
+        error: [1, 0.2, 'any-string', {}, [], Object.new]
       },
       client_search: {
         default: [],
         # string case is treated below separately
         ok: [['admin:false'], %w(admin:true admin:false), []],
-        error: [1, 0.2, Hash.new, Object.new]
+        error: [1, 0.2, {}, Object.new]
       },
       node_search: {
         default: [],
         # string case is treated below separately
         ok: [['role:webapp'], %w(role:webapp role:ftp), []],
-        error: [1, 0.2, Hash.new, Object.new]
+        error: [1, 0.2, {}, Object.new]
       },
       users: {
         default: [],
         ok: ['*', [], ['admin1'], %w(admin1 admin2)],
         error:
           [
-            1, 0.2, 'any-string', Hash.new, Object.new, [2],
-            ['admin1', Hash.new], 'invalid.u$er'
+            1, 0.2, 'any-string', {}, Object.new, [2],
+            ['admin1', {}], 'invalid.u$er'
           ]
       },
       keys: {
@@ -91,7 +91,7 @@ describe Chef::EncryptedAttribute::Config do
           ]
         ],
         error: [
-          true, false, 1, 0.2, 'any-string', Hash.new,
+          true, false, 1, 0.2, 'any-string', {},
           create_ssl_key,
           [create_ssl_key.public_key.to_pem, 4],
           ['bad-key']
@@ -99,9 +99,7 @@ describe Chef::EncryptedAttribute::Config do
         ]
       }
     }.each do |method, values|
-
       describe "##{method}" do
-
         it 'returns the correct default value '\
            "(#{values[:default].inspect[0..10]}...)" do
           expect(config.send(method)).to eql(values[:default])
@@ -122,9 +120,7 @@ describe Chef::EncryptedAttribute::Config do
               .to raise_error(Chef::Exceptions::ValidationFailed)
           end
         end
-
       end # describe method
-
     end # methods each
 
     it '#client_search accepts String type tunrning it into an Array' do
@@ -239,11 +235,9 @@ describe Chef::EncryptedAttribute::Config do
         expect(config.node_search).to eql(config2[:node_search])
         expect(config.keys).to eql(config2[:keys])
       end
-
     end # describe #update!
 
     context '#[]' do
-
       it 'reads a configuration variable' do
         config1 = config_class.new(partial_search: true)
         expect(config1[:partial_search]).to eql(true)
@@ -253,11 +247,9 @@ describe Chef::EncryptedAttribute::Config do
         config1 = config_class.new
         expect { config1[:random_config_options] }.not_to raise_error
       end
-
     end # context #[]
 
     context '#[]=' do
-
       it 'writes a configuration variable' do
         config1 = config_class.new(partial_search: false)
         expect(config1[:partial_search]).to eql(false)
@@ -269,7 +261,6 @@ describe Chef::EncryptedAttribute::Config do
         config1 = config_class.new
         expect { config1[:random_config_options] = 5 }.not_to raise_error
       end
-
     end # context #[]=
   end # describe Chef::EncryptedAttribute::Config instance
 end # describe Chef::EncryptedAttribute::Config

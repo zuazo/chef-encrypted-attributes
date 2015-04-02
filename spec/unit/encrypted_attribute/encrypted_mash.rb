@@ -24,7 +24,6 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   before(:all) { clear_all_caches }
 
   context '#new' do
-
     it 'creates an EncryptedMash object without errors' do
       expect { encrypted_mash_class.new }.not_to raise_error
     end
@@ -38,17 +37,14 @@ describe Chef::EncryptedAttribute::EncryptedMash do
     end
 
     %w(encrypt decrypt can_be_decrypted_by? needs_update?).each do |meth|
-
       it "##{meth} method raises a NotImplementedError error" do
         body = encrypted_mash_class.new
         expect { body.send(meth) }.to raise_error(NotImplementedError)
       end
-
     end # each do |meth|
   end # context #new
 
   context '#self.exist?' do
-
     [
       encrypted_mash_class.new,
       {
@@ -75,11 +71,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         expect(encrypted_mash_class.exist?(o)).to be_falsey
       end
     end
-
   end # context #self.exist?
 
   context '#self.exists?' do
-
     [
       encrypted_mash_class.new,
       {
@@ -108,11 +102,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         expect(encrypted_mash_class.exists?(o)).to be_falsey
       end
     end
-
   end # context #self.exists?
 
   context '#self.create' do
-
     it 'creates a EncryptedMash subclass object' do
       o = encrypted_mash_class.create(0)
       expect(o).to be_kind_of(encrypted_mash_class)
@@ -142,11 +134,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         .to receive(:const_get).with('Chef', true).once.and_return(Chef)
       encrypted_mash_class.create(0)
     end
-
   end # context #self.create
 
   context '#to_json' do
-
     it 'returns a JSON object' do
       o = encrypted_mash_class.create(0)
       expect(o.to_json).to eql(o.to_hash.to_json)
@@ -159,21 +149,17 @@ describe Chef::EncryptedAttribute::EncryptedMash do
       expect_any_instance_of(Hash).to receive(:to_json).with(1, 2, 3, 4)
       o.to_json(1, 2, 3, 4)
     end
-
   end # context #to_json
 
   context '#for_json' do
-
     it 'returns a Hash object' do
       o = encrypted_mash_class.new
       expect(o.for_json).to be_instance_of(Hash)
       expect(o.for_json).to eql(o.to_hash)
     end
-
   end # context #for_json
 
   context '#update_from!' do
-
     it 'updates the encrypted attribute from another encrypted attribute' do
       orig = encrypted_mash_class.new
       orig['key1'] = 'value1'
@@ -189,11 +175,9 @@ describe Chef::EncryptedAttribute::EncryptedMash do
           Chef::EncryptedAttribute::UnacceptableEncryptedAttributeFormat
         )
     end
-
   end # context #update_from!
 
   context '#self.json_create' do
-
     it 'creates a new object from a JSON Hash' do
       orig = encrypted_mash_class.new
       orig['key1'] = 'value1'
@@ -233,6 +217,5 @@ describe Chef::EncryptedAttribute::EncryptedMash do
         Chef::EncryptedAttribute::UnsupportedEncryptedAttributeFormat
       )
     end
-
   end # context #self.json_create
 end # describe Chef::EncryptedAttribute::EncryptedMash

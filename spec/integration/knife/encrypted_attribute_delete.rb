@@ -85,9 +85,11 @@ describe Chef::Knife::EncryptedAttributeDelete do
       expect(knife_delete.ui).to receive(:info)
         .with('Encrypted attribute deleted.')
       expect { knife_delete.run }.not_to raise_error
-      expect(Chef::EncryptedAttribute.exist_on_node?(
-        'node1', %w(encrypted attribute)
-      )).to eql(false)
+      expect(
+        Chef::EncryptedAttribute.exist_on_node?(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql(false)
     end
 
     it 'is able to delete the encrypted attribute if allowed' do
@@ -96,33 +98,41 @@ describe Chef::Knife::EncryptedAttributeDelete do
           %w(node1 encrypted.attribute --client-search admin:true)
         )
       knife_edit.run
-      expect(Chef::EncryptedAttribute.exist_on_node?(
-        'node1', %w(encrypted attribute)
-      )).to eql(true)
+      expect(
+        Chef::EncryptedAttribute.exist_on_node?(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql(true)
 
       knife_delete =
         Chef::Knife::EncryptedAttributeDelete.new(%w(node1 encrypted.attribute))
       expect(knife_delete.ui).to receive(:info)
         .with('Encrypted attribute deleted.')
       knife_delete.run
-      expect(Chef::EncryptedAttribute.exist_on_node?(
-        'node1', %w(encrypted attribute)
-      )).to eql(false)
+      expect(
+        Chef::EncryptedAttribute.exist_on_node?(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql(false)
     end
 
     it 'does nothing when the encrypted attribute does not exist' do
-      expect(Chef::EncryptedAttribute.exist_on_node?(
-        'node1', %w(non existent attribute)
-      )).to eql(false)
+      expect(
+        Chef::EncryptedAttribute.exist_on_node?(
+          'node1', %w(non existent attribute)
+        )
+      ).to eql(false)
       knife =
         Chef::Knife::EncryptedAttributeDelete.new(
           %w(node1 non.existent.attribute)
         )
       expect(knife.ui).not_to receive(:info)
         .with('Encrypted attribute deleted.')
-      expect(Chef::EncryptedAttribute.exist_on_node?(
-        'node1', %w(non existent attribute)
-      )).to eql(false)
+      expect(
+        Chef::EncryptedAttribute.exist_on_node?(
+          'node1', %w(non existent attribute)
+        )
+      ).to eql(false)
       knife.run
     end
 
@@ -139,6 +149,5 @@ describe Chef::Knife::EncryptedAttributeDelete do
       expect(knife.ui).to receive(:fatal)
       expect { knife.run }.to raise_error(SystemExit)
     end
-
   end
 end

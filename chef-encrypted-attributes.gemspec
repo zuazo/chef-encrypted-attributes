@@ -49,7 +49,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'coveralls', '~> 0.7'
   s.add_development_dependency 'simplecov', '~> 0.9'
   s.add_development_dependency 'should_not', '~> 1.1'
-  s.add_development_dependency 'rubocop', '= 0.27.1' if RUBY_VERSION >= '1.9.3'
+  s.add_development_dependency 'rubocop', '= 0.29.1' if RUBY_VERSION >= '1.9.3'
 
   s.cert_chain = [::File.join('certs', 'team_onddo.crt')]
 end

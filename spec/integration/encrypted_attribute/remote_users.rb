@@ -29,7 +29,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     after { @users.each(&:destroy) }
 
     context '#get_public_keys' do
-
       it 'returns empty array by default' do
         expect(remote_users_class.get_public_keys).to eql([])
       end
@@ -56,7 +55,6 @@ describe Chef::EncryptedAttribute::RemoteUsers do
         expect { remote_users_class.get_public_keys(%w(unknown1)) }
           .to raise_error(Chef::EncryptedAttribute::UserNotFound)
       end
-
     end # context #get_public_keys
   end # when_the_chef_server is ready to rock!
 end

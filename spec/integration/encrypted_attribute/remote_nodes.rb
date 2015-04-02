@@ -51,7 +51,6 @@ describe Chef::EncryptedAttribute::RemoteNodes do
     end
 
     context '#search_public_keys' do
-
       it 'gets all client public_keys by default' do
         expect(remote_nodes_class.search_public_keys.sort)
           .to eql(@public_keys.sort)
@@ -78,7 +77,6 @@ describe Chef::EncryptedAttribute::RemoteNodes do
           expect(remote_nodes_class.search_public_keys.sort)
             .to eql(public_keys.sort)
         end
-
       end # context with node[public_key] set
 
       it 'reads the correct clients when a search query is passed as arg' do
@@ -91,7 +89,6 @@ describe Chef::EncryptedAttribute::RemoteNodes do
         query = 'this_will_return_no_results:true'
         expect(remote_nodes_class.search_public_keys(query).sort).to eql([])
       end
-
     end # context #search_public_keys
   end # when_the_chef_server is ready to rock!
 end

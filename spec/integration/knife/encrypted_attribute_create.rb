@@ -55,9 +55,11 @@ describe Chef::Knife::EncryptedAttributeCreate do
       node_private_key = create_ssl_key(@node_client.private_key)
       allow_any_instance_of(Chef::EncryptedAttribute::LocalNode)
         .to receive(:key).and_return(node_private_key)
-      expect(Chef::EncryptedAttribute.load_from_node(
-        'node1', %w(encrypted attribute)
-      )).to eql('5')
+      expect(
+        Chef::EncryptedAttribute.load_from_node(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql('5')
     end
 
     it 'the client is not able to read the encrypted attribute by default' do
@@ -90,9 +92,11 @@ describe Chef::Knife::EncryptedAttributeCreate do
       private_key = create_ssl_key(@admin_client.private_key)
       allow_any_instance_of(Chef::EncryptedAttribute::LocalNode)
         .to receive(:key).and_return(private_key)
-      expect(Chef::EncryptedAttribute.load_from_node(
-        'node1', %w(encrypted attribute)
-      )).to eql('5')
+      expect(
+        Chef::EncryptedAttribute.load_from_node(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql('5')
     end
 
     it 'the user is not able to read the encrypted attribute by default' do
@@ -116,19 +120,23 @@ describe Chef::Knife::EncryptedAttributeCreate do
 
     it 'the user is able to read the encrypted attribute if allowed' do
       knife =
-        Chef::Knife::EncryptedAttributeCreate.new([
-          'node1', 'encrypted.attribute', '--encrypted-attribute-user',
-          @admin_user.name
-        ])
+        Chef::Knife::EncryptedAttributeCreate.new(
+          [
+            'node1', 'encrypted.attribute', '--encrypted-attribute-user',
+            @admin_user.name
+          ]
+        )
       expect(knife).to receive(:edit_data).with(nil, nil).and_return('5')
       knife.run
 
       private_key = create_ssl_key(@admin_user.private_key)
       allow_any_instance_of(Chef::EncryptedAttribute::LocalNode)
         .to receive(:key).and_return(private_key)
-      expect(Chef::EncryptedAttribute.load_from_node(
-        'node1', %w(encrypted attribute)
-      )).to eql('5')
+      expect(
+        Chef::EncryptedAttribute.load_from_node(
+          'node1', %w(encrypted attribute)
+        )
+      ).to eql('5')
     end
 
     it 'prints error message when the attribute exists' do
@@ -155,6 +163,5 @@ describe Chef::Knife::EncryptedAttributeCreate do
       expect(knife.ui).to receive(:fatal)
       expect { knife.run }.to raise_error(SystemExit)
     end
-
   end
 end

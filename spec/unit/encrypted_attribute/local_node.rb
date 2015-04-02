@@ -60,5 +60,4 @@ describe Chef::EncryptedAttribute::LocalNode do
       create_ssl_key(open(Chef::Config[:client_key]).read).public_key
     expect(local_node.public_key.to_s).to eql(public_key.to_s)
   end
-
 end

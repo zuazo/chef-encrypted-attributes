@@ -165,6 +165,5 @@ describe 'Chef::EncryptedAttribute Benchmarks' do
         Chef::EncryptedDataBagItem.load('encrypted', 'data_bag_id')
       enc_data_bag_item['data']
     end
-
   end # when_the_chef_server is ready to rock!
 end

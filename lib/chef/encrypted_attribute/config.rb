@@ -254,8 +254,6 @@ class Chef
             rescue OpenSSL::PKey::RSAError, TypeError
               nil
             end
-          else
-            nil
           end
         return false if rsa_k.nil?
         rsa_k.public?

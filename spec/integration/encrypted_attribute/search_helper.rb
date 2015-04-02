@@ -25,7 +25,6 @@ describe Chef::EncryptedAttribute::SearchHelper do
   extend ChefZero::RSpec
 
   when_the_chef_server 'is ready to rock!' do
-
     context '#search' do
       before do
         @default_clients = Chef::ApiClient.list.keys.map do |c|
@@ -51,12 +50,13 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
       [true, false].each do |partial_search|
         context "with partial_search=#{partial_search}" do
-
           it 'searches node attributes without errors' do
-            expect(search_helper_class.search(
-              :node, 'name:*', { 'value' => %w(some deep) }, 1000,
-              partial_search
-            )).to eql(
+            expect(
+              search_helper_class.search(
+                :node, 'name:*', { 'value' => %w(some deep) }, 1000,
+                partial_search
+              )
+            ).to eql(
               @nodes.map { |n| { 'value' => n['some']['deep'] } }
             )
           end
@@ -64,38 +64,49 @@ describe Chef::EncryptedAttribute::SearchHelper do
           it 'searches all client public_keys without errors' do
             # load the default clients
             all_clients = @default_clients + @node_clients + @new_clients
-            expect(search_helper_class.search(
-              :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
-            ).count).to eql(all_clients.count)
+            expect(
+              search_helper_class.search(
+                :client, '*:*', { 'key' => %w(public_key) }, 1000,
+                partial_search
+              ).count
+            ).to eql(all_clients.count)
 
-            expect(search_helper_class.search(
-              :client, '*:*', { 'key' => %w(public_key) }, 1000, partial_search
-            ).map { |x| x['key'] }.sort)
+            expect(
+              search_helper_class.search(
+                :client, '*:*', { 'key' => %w(public_key) }, 1000,
+                partial_search
+              ).map { |x| x['key'] }.sort)
               .to eql(all_clients.map(&:public_key).sort)
           end
 
           it 'searches some client public_keys without errors' do
             search_ary = @new_clients.map { |c| "name:#{c.name}" }
-            expect(search_helper_class.search(
-              :client, search_ary, { 'key' => %w(public_key) }, 1000,
-              partial_search
-            )).to eql(
+            expect(
+              search_helper_class.search(
+                :client, search_ary, { 'key' => %w(public_key) }, 1000,
+                partial_search
+              )
+            ).to eql(
               @new_clients.map { |n| { 'key' => n.public_key } }
             )
           end
 
           it 'returns empty results without errors' do
-            expect(search_helper_class.search(
-              :client, 'empty-result:true', { 'key' => %w(public_key) }, 1000,
-              partial_search
-            )).to eql([])
+            expect(
+              search_helper_class.search(
+                :client, 'empty-result:true', { 'key' => %w(public_key) }, 1000,
+                partial_search
+              )
+            ).to eql([])
           end
 
           it 'returns empty results without bad types' do
-            expect(search_helper_class.search(
-              :bad_type, '*:*', { 'key' => %w(public_key) }, 1000,
-              partial_search
-            )).to eql([])
+            expect(
+              search_helper_class.search(
+                :bad_type, '*:*', { 'key' => %w(public_key) }, 1000,
+                partial_search
+              )
+            ).to eql([])
           end
 
           it 'throws an error for invalid keys' do
@@ -105,7 +116,6 @@ describe Chef::EncryptedAttribute::SearchHelper do
               )
             end.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
           end
-
         end # context partial_search=?
       end # each do |partial_search|
     end # context #search

@@ -25,16 +25,13 @@ describe Chef::EncryptedAttribute::EncryptedMash do
   before(:all) { clear_all_caches }
 
   when_the_chef_server 'is ready to rock!' do
-
     context '#update' do
-
       it 'calls RemoteClients#search_public_keys only once' do
         body = Chef::EncryptedAttribute.create(0)
         expect(Chef::EncryptedAttribute::RemoteClients)
           .to receive(:search_public_keys).once.and_return([])
         Chef::EncryptedAttribute.update(body)
       end
-
     end # context update
   end # when_the_chef_server is ready to rock!
 end

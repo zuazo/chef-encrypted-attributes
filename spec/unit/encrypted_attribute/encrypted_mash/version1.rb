@@ -34,7 +34,6 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
   let(:key2) { create_ssl_key }
 
   context '#new' do
-
     it 'creates an EncryptedMash::Version1 object without errors' do
       expect { encrypted_mash_version1_class.new }.not_to raise_error
     end
@@ -50,11 +49,9 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       expect(o[encrypted_mash_class::JSON_CLASS])
         .to eql(encrypted_mash_version1_class.to_s)
     end
-
   end # context #new
 
   context '#encrypt and #can_be_decrypted_by?' do
-
     it 'encrypts a value passing a OpenSSL::PKey::RSA key' do
       body = encrypted_mash_version1_class.new
       expect(body.can_be_decrypted_by?(key1)).to eql(false)
@@ -192,11 +189,9 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
           /OpenSSL::HMACError/
         )
     end
-
   end # context #encrypt and #can_be_decrypted_by?
 
   context '#decrypt' do
-
     [
       true, false, 0, 'value1', [], {}
     ].each do |v|
@@ -297,11 +292,9 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
           /OpenSSL::HMACError/
         )
     end
-
   end # context #decrypt
 
   context '#needs_update?' do
-
     it 'returns false if there no new keys' do
       keys = [key1.public_key]
       body = encrypted_mash_version1_class.new
@@ -331,6 +324,5 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
       body.encrypt('value1', keys)
       expect(body.needs_update?([keys[1], keys[0].to_pem])).to be_falsey
     end
-
   end # context #needs_update?
 end # describe Chef::EncryptedAttribute::EncryptedMash::Version1
