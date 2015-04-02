@@ -28,7 +28,6 @@ end
 
 require 'chef/encrypted_attributes'
 require 'chef/exceptions'
-require 'chef/node'
 
 require 'rspec/autorun'
 require 'should_not/rspec'
