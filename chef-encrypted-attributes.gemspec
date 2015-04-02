@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   end
 
   s.add_development_dependency 'rake', '~> 10.0'
-  s.add_development_dependency 'chef-zero', '~> 3.2'
+  s.add_development_dependency 'chef-zero', '~> 4.1'
   s.add_development_dependency 'rspec-core', '~> 3.1'
   s.add_development_dependency 'rspec-expectations', '~> 3.1'
   s.add_development_dependency 'rspec-mocks', '~> 3.1'
