@@ -182,7 +182,8 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
         )
     end
 
-    it 'throws an error if the hmac generation fails' do
+    it 'throws an error if the hmac generation fails',
+       unless: RUBY_VERSION < '2' do
       body = encrypted_mash_version1_class.new
       expect(OpenSSL::HMAC).to receive(:digest).and_raise(OpenSSL::HMACError)
       expect { body.encrypt('value1', key1) }
@@ -285,7 +286,8 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version1 do
         )
     end
 
-    it 'throws an error if the hmac generation for checking fails' do
+    it 'throws an error if the hmac generation for checking fails',
+       unless: RUBY_VERSION < '2' do
       body = encrypted_mash_version1_class.new
       body.encrypt('value1', key1.public_key)
       expect(OpenSSL::HMAC).to receive(:digest).and_raise(OpenSSL::HMACError)

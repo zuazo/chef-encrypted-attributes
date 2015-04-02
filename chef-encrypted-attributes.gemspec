@@ -34,7 +34,12 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'ffi-yajl', '~> 1.0'
   s.add_dependency 'chef', chef_version
+  # Support old deprecated Ruby versions:
   s.add_dependency 'mixlib-shellout', '< 1.6.1' if RUBY_VERSION < '1.9.3'
+  if RUBY_VERSION < '2'
+    s.add_dependency 'highline', '< 1.7'
+    s.add_dependency 'ohai', '< 8'
+  end
 
   s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'chef-zero', '~> 3.2'
