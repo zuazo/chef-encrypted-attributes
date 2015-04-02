@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
-  s.add_dependency 'ffi-yajl', '~> 1.0'
+  s.add_dependency 'ffi-yajl', '>= 1.0', '< 3.0' # As Chef gem
   s.add_dependency 'chef', chef_version
   # Support old deprecated Ruby versions:
   s.add_dependency 'mixlib-shellout', '< 1.6.1' if RUBY_VERSION < '1.9.3'
