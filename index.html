@@ -1,42 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
+    <meta charset="UTF-8">
     <title>Chef-encrypted-attributes by onddo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Chef-encrypted-attributes</h1>
-        <h2>Chef plugin to add Node encrypted attributes support using client keys.</h2>
-        <a href="https://github.com/onddo/chef-encrypted-attributes" class="button"><small>View project on</small> GitHub</a>
-      </div>
-    </header>
+    <section class="page-header">
+      <h1 class="project-name">Chef-encrypted-attributes</h1>
+      <h2 class="project-tagline">Chef plugin to add Node encrypted attributes support using client keys.</h2>
+      <a href="https://github.com/onddo/chef-encrypted-attributes" class="btn">View on GitHub</a>
+      <a href="https://github.com/onddo/chef-encrypted-attributes/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/onddo/chef-encrypted-attributes/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+    <section class="main-content">
+      <h1>
 <a id="chef-encrypted-attributes" class="anchor" href="#chef-encrypted-attributes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chef-Encrypted-Attributes</h1>
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://gemnasium.com/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat" alt="Dependency Status"></a>
 <a href="https://codeclimate.com/github/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Code Climate"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.4.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.4.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.4.0.svg?style=flat" alt="Coverage Status"></a>
-<a href="http://inch-ci.org/github/onddo/chef-encrypted-attributes"><img src="http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=0.4.0&amp;style=flat" alt="Inline docs"></a></p>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.5.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.5.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.5.0.svg?style=flat" alt="Coverage Status"></a>
+<a href="http://inch-ci.org/github/onddo/chef-encrypted-attributes"><img src="http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=0.5.0&amp;style=flat" alt="Inline docs"></a></p>
 
 <p><a href="https://www.chef.io/">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
 
@@ -75,30 +66,30 @@
 
 <p>You need to install and include the <code>chef-encrypted-attributes</code> gem before using encrypted attributes inside a cookbook.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s1"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
-<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span></pre></div>
+<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span></pre></div>
 
 <h3>
 <a id="typical-example" class="anchor" href="#typical-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Typical Example</h3>
 
 <p>In the following example we save a simple FTP user password.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s1"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
-<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
 <span class="pl-c"># include the #secure_password method</span>
-<span class="pl-s3">Chef</span>::<span class="pl-s3">Recipe</span>.send(<span class="pl-c1">:include</span>, <span class="pl-s3">Opscode</span>::<span class="pl-s3">OpenSSL</span>::<span class="pl-vo">Password</span>)
+<span class="pl-c1">Chef</span>::<span class="pl-c1">Recipe</span>.send(<span class="pl-c1">:include</span>, <span class="pl-c1">Opscode</span>::<span class="pl-c1">OpenSSL</span>::<span class="pl-c1">Password</span>)
 
-<span class="pl-k">if</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.exist?(node[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
+<span class="pl-k">if</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.exist?(node[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
   <span class="pl-c"># update with the new keys</span>
-  <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.update(node.set[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
+  <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.update(node.set[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
 
   <span class="pl-c"># read the password</span>
-  ftp_pass <span class="pl-k">=</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.load(node[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
+  ftp_pass <span class="pl-k">=</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.load(node[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>])
 <span class="pl-k">else</span>
   <span class="pl-c"># create the password and save it</span>
   ftp_pass <span class="pl-k">=</span> secure_password
-  node.set[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.create(ftp_pass)
+  node.set[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>ftp_password<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.create(ftp_pass)
 <span class="pl-k">end</span>
 
 <span class="pl-c"># use `ftp_pass` for something here ...</span></pre></div>
@@ -110,39 +101,39 @@
 
 <p>In this example we only need to save some data from the local node and read it from another:</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s1"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
-<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
 <span class="pl-c"># Allow all admin clients to read the attributes encrypted by me</span>
-<span class="pl-s3">Chef</span>::<span class="pl-s3">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:client_search</span>] <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>admin:true<span class="pl-pds">'</span></span>
+<span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:client_search</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>admin:true<span class="pl-pds">'</span></span>
 
 <span class="pl-c"># Allow all webapp nodes to read the attributes encrypted by me</span>
-<span class="pl-s3">Chef</span>::<span class="pl-s3">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:node_search</span>] <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>role:webapp<span class="pl-pds">'</span></span>
+<span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:node_search</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>role:webapp<span class="pl-pds">'</span></span>
 
-<span class="pl-k">if</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.exist?(node[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>])
+<span class="pl-k">if</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.exist?(node[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>])
   <span class="pl-c"># when can used #load here as above if we need the `encrypted_data` outside</span>
   <span class="pl-c"># this `if`</span>
 
   <span class="pl-c"># update with the new keys</span>
-  <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.update(node.set[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>])
+  <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.update(node.set[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>])
 <span class="pl-k">else</span>
   <span class="pl-c"># create the data, encrypt and save it</span>
   data_to_encrypt <span class="pl-k">=</span> <span class="pl-c"># ....</span>
-  node.set[<span class="pl-s1"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>
-    <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.create(data_to_encrypt)
+  node.set[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>
+    <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.create(data_to_encrypt)
 <span class="pl-k">end</span></pre></div>
 
 <p>Then we can read this attribute from another allowed node (a <code>'role:webapp'</code> node):</p>
 
-<div class="highlight highlight-ruby"><pre>include_recipe <span class="pl-s1"><span class="pl-pds">'</span>encrypted_attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-ruby"><pre>include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attributes<span class="pl-pds">'</span></span>
 <span class="pl-c"># Expose the public key for encryption</span>
-include_recipe <span class="pl-s1"><span class="pl-pds">'</span>encrypted_attributes::expose_key<span class="pl-pds">'</span></span>
+include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attributes::expose_key<span class="pl-pds">'</span></span>
 
-<span class="pl-k">if</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.exist_on_node?(
-     <span class="pl-s1"><span class="pl-pds">'</span>random.example.com<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">%w(</span>myapp encrypted_data<span class="pl-pds">)</span></span>
+<span class="pl-k">if</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.exist_on_node?(
+     <span class="pl-s"><span class="pl-pds">'</span>random.example.com<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">%w(</span>myapp encrypted_data<span class="pl-pds">)</span></span>
    )
-  data <span class="pl-k">=</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">EncryptedAttribute</span>.load_from_node(
-    <span class="pl-s1"><span class="pl-pds">'</span>random.example.com<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">%w(</span>myapp encrypted_data<span class="pl-pds">)</span></span>
+  data <span class="pl-k">=</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.load_from_node(
+    <span class="pl-s"><span class="pl-pds">'</span>random.example.com<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">%w(</span>myapp encrypted_data<span class="pl-pds">)</span></span>
   )
 
   <span class="pl-c"># use `data` for something here ...</span>
@@ -158,26 +149,26 @@ include_recipe <span class="pl-s1"><span class="pl-pds">'</span>encrypted_attrib
 <p>You need to create a Data Bag Item with a content similar to the following:</p>
 
 <div class="highlight highlight-json"><pre>{
-  <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>chef_users<span class="pl-pds">"</span></span>,
-  <span class="pl-s1"><span class="pl-pds">"</span>bob<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>,
-  <span class="pl-s1"><span class="pl-pds">"</span>alice<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>
+  <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>chef_users<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>bob<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>alice<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>
 }</pre></div>
 
 <p>This data bag will contain the user public keys retrieved with <code>knife user show USER -a public_key -f json</code>.</p>
 
 <p>Then, from a recipe, you can read this user keys and allow them to read the attributes.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s1"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
-<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
-chef_users <span class="pl-k">=</span> <span class="pl-s3">Chef</span>::<span class="pl-s3">DataBagItem</span>.load(<span class="pl-s1"><span class="pl-pds">'</span>global_data_bag<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>chef_users<span class="pl-pds">'</span></span>)
+chef_users <span class="pl-k">=</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">DataBagItem</span>.load(<span class="pl-s"><span class="pl-pds">'</span>global_data_bag<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>chef_users<span class="pl-pds">'</span></span>)
 <span class="pl-c"># remove the data bag "id" to avoid to confuse it with a user:</span>
-chef_users.delete(<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>)
+chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>)
 
-<span class="pl-s3">Chef</span>::<span class="pl-s3">Log</span>.debug(
-  <span class="pl-s1"><span class="pl-pds">"</span>Chef Users able to read the Encrypted Attributes: <span class="pl-pse">#{</span><span class="pl-s2">chef_users.keys.inspect</span><span class="pl-pse"><span class="pl-s2">}</span></span><span class="pl-pds">"</span></span>
+<span class="pl-c1">Chef</span>::<span class="pl-c1">Log</span>.debug(
+  <span class="pl-s"><span class="pl-pds">"</span>Chef Users able to read the Encrypted Attributes: <span class="pl-pse">#{</span><span class="pl-s1">chef_users.keys.inspect</span><span class="pl-pse"><span class="pl-s1">}</span></span><span class="pl-pds">"</span></span>
 )
-<span class="pl-s3">Chef</span>::<span class="pl-s3">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:keys</span>] <span class="pl-k">=</span> chef_users.values
+<span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:keys</span>] <span class="pl-k">=</span> chef_users.values
 
 <span class="pl-c"># if Chef::EncryptedAttribute.exist?(...)</span>
 <span class="pl-c">#   Chef::EncryptedAttribute.update(...)</span>
@@ -241,12 +232,12 @@ chef_users.delete(<span class="pl-s1"><span class="pl-pds">'</span>id<span class
 
 <p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain the official signature here:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.4.0/certs/team_onddo.crt
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.5.0/certs/team_onddo.crt
 </code></pre>
 
 <p>To be sure the gem you install has not been tampered with:</p>
 
-<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.4.0/certs/team_onddo.crt)
+<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.5.0/certs/team_onddo.crt)
 $ gem install chef-encrypted-attributes -P MediumSecurity
 </code></pre>
 
@@ -269,7 +260,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 
 <p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of <code>chef-encrypted-attributes</code> users, you can report it securely by sending a GPG encrypted message. Please use the following key:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.4.0/zuazo.gpg
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.5.0/zuazo.gpg
 </code></pre>
 
 <p>The key fingerprint is (or should be):</p>
@@ -280,7 +271,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <h2>
 <a id="testing" class="anchor" href="#testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing</h2>
 
-<p>See [TESTING.md]((<a href="https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md">https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md</a>).</p>
+<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md">TESTING.md</a>.</p>
 
 <h2>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
@@ -311,8 +302,16 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <a href="https://github.com/zuazo">Xabier de Zuazo</a> (<a href="mailto:xabier@onddo.com">xabier@onddo.com</a>)</td>
 </tr>
 <tr>
+<td align="left"><strong>Contributor:</strong></td>
+<td align="left"><a href="https://github.com/joshk">Josh Kalderimis</a></td>
+</tr>
+<tr>
+<td align="left"><strong>Contributor:</strong></td>
+<td align="left"><a href="https://github.com/chhsiung">@chhsiung</a></td>
+</tr>
+<tr>
 <td align="left"><strong>Copyright:</strong></td>
-<td align="left">Copyright (c) 2014 Onddo Labs, SL. (<a href="http://www.onddo.com">www.onddo.com</a>)</td>
+<td align="left">Copyright (c) 2014-2015 Onddo Labs, SL. (<a href="http://www.onddo.com">www.onddo.com</a>)</td>
 </tr>
 <tr>
 <td align="left"><strong>License:</strong></td>
@@ -333,24 +332,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 </code></pre>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/onddo/chef-encrypted-attributes/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/onddo/chef-encrypted-attributes/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/onddo/chef-encrypted-attributes">Chef-encrypted-attributes</a> is maintained by <a href="https://github.com/onddo">onddo</a>.</span>
 
-          <p class="repo-owner"><a href="https://github.com/onddo/chef-encrypted-attributes"></a> is maintained by <a href="https://github.com/onddo">onddo</a>.</p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
+    </section>
 
             <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -365,3 +354,4 @@ limitations under the License.
 
   </body>
 </html>
+
