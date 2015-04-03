@@ -224,7 +224,7 @@ The key fingerprint is (or should be):
 
 ## Testing
 
-See [TESTING.md]((https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md).
+See [TESTING.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md).
 
 ## Contributing
 
