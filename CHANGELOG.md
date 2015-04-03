@@ -2,6 +2,20 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.5.0 (2015-04-03)
+
+* `#load_from_node` raises an exception if no ecnrypted attribute is found.
+* GemSpec:
+  * Fix Ruby < 2 support ([issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
+  * Depend on `ffi-yajl` `< 3` as in Chef.
+
+* Tests:
+  * Use the new build environment on Travis ([issue #1](https://github.com/onddo/chef-encrypted-attributes/pull/1), thanks [Josh Kalderimis](https://github.com/joshk))
+  * GemSpec: Update RuboCop to version `0.29.1` (new offenses fixed).
+
+* Documentation:
+  * README: Fix testing link.
+
 ## 0.4.0 (2014-12-10)
 
 * Add Chef `12` support.

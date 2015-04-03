@@ -241,7 +241,9 @@ See [TODO.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TOD
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
 | **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@onddo.com>)
-| **Copyright:**       | Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+| **Contributor:**     | [Josh Kalderimis](https://github.com/joshk)
+| **Contributor:**     | [@chhsiung](https://github.com/chhsiung)
+| **Copyright:**       | Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 | **License:**         | Apache License, Version 2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");

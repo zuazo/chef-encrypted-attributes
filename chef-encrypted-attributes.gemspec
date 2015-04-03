@@ -16,7 +16,7 @@ chef_version =
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'
   s.version = ::Chef::EncryptedAttribute::VERSION
-  s.date = '2014-12-10'
+  s.date = '2015-04-03'
   s.platform = Gem::Platform::RUBY
   s.summary = 'Chef Encrypted Attributes'
   s.description =
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'ffi-yajl', '>= 1.0', '< 3.0' # As Chef gem
   s.add_dependency 'chef', chef_version
+
   # Support old deprecated Ruby versions:
   s.add_dependency 'mixlib-shellout', '< 1.6.1' if RUBY_VERSION < '1.9.3'
   if RUBY_VERSION < '2'
