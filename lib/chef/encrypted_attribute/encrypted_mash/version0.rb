@@ -17,9 +17,20 @@
 # limitations under the License.
 #
 
+require 'chef/version'
 require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/encrypted_attribute/exceptions'
-require 'ffi_yajl'
+
+# Use the YAJL library that Chef provides.  Determine which to use based on
+# Chef version.
+major, minor = Chef::VERSION.split('.').take(2).map(&:to_i)
+if ([major, minor] <=> [11, 12]) == 1 # If [major, minor] > [11, 12]
+  require 'ffi_yajl'
+  YAJL_NAMESPACE = FFI_Yajl
+else
+  require 'yajl'
+  YAJL_NAMESPACE = Yajl
+end
 
 class Chef
   class EncryptedAttribute
@@ -197,7 +208,7 @@ class Chef
         def json_encode(o)
           # TODO: This does not check if the object is correct, should be an
           # Array or a Hash
-          FFI_Yajl::Encoder.encode(o)
+          YAJL_NAMESPACE::Encoder.encode(o)
         end
 
         # Decodes a JSON string.
@@ -206,8 +217,8 @@ class Chef
         # @return [Mixed] Ruby representation of the JSON string.
         # @raise [DecryptionFailure] if JSON string format is wrong.
         def json_decode(o)
-          FFI_Yajl::Parser.parse(o.to_s)
-        rescue FFI_Yajl::ParseError => e
+          YAJL_NAMESPACE::Parser.parse(o.to_s)
+        rescue YAJL_NAMESPACE::ParseError => e
           raise DecryptionFailure, "#{e.class.name}: #{e}"
         end
 
