@@ -97,7 +97,7 @@ class Chef
     #
     # ```ruby
     # ftp_pass = Chef::EncryptedAttribute.load(
-    #   node['myapp']['ftp_password'], { :partial_search => false }
+    #   node['myapp']['ftp_password'], :partial_search => false
     # )
     # ```
     #
