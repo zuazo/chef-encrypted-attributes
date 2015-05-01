@@ -20,17 +20,11 @@
 require 'chef/version'
 require 'chef/encrypted_attribute/encrypted_mash'
 require 'chef/encrypted_attribute/exceptions'
+require 'chef/encrypted_attribute/yajl'
 
 # Use the YAJL library that Chef provides.  Determine which to use based on
 # Chef version.
-major, minor = Chef::VERSION.split('.').take(2).map(&:to_i)
-if ([major, minor] <=> [11, 12]) == 1 # If [major, minor] > [11, 12]
-  require 'ffi_yajl'
-  YAJL_NAMESPACE = FFI_Yajl
-else
-  require 'yajl'
-  YAJL_NAMESPACE = Yajl
-end
+YAJL_NAMESPACE = Chef::EncryptedAttribute::Yajl.load_requirement(Chef::VERSION)
 
 class Chef
   class EncryptedAttribute
