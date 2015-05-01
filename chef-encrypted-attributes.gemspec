@@ -32,7 +32,6 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
-  s.add_dependency 'ffi-yajl', '>= 1.0', '< 3.0' # As Chef gem
   s.add_dependency 'chef', chef_version
 
   # Support old deprecated Ruby versions:

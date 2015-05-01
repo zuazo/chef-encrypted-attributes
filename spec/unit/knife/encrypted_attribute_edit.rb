@@ -86,7 +86,7 @@ describe Chef::Knife::EncryptedAttributeEdit do
       expect(IO).to receive(:read).and_return('Bad-json')
       expect_any_instance_of(Chef::EncryptedAttribute)
         .not_to receive(:create_on_node)
-      expect { knife.run }.to raise_error(FFI_Yajl::ParseError)
+      expect { knife.run }.to raise_error(YAJL_NAMESPACE::ParseError)
     end
 
     it 'throws an error if the editor fails' do

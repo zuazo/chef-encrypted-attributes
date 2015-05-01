@@ -230,7 +230,7 @@ describe Chef::EncryptedAttribute::EncryptedMash::Version0 do
       end]
       expect { body.decrypt(key1) }
         .to raise_error(
-          Chef::EncryptedAttribute::DecryptionFailure, /FFI_Yajl::ParseError/
+          Chef::EncryptedAttribute::DecryptionFailure, /ParseError/
         )
     end
   end # context #decrypt

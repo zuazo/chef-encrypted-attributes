@@ -116,7 +116,7 @@ class Chef
         def edit_data_obj_to_string(data, format)
           case format
           when 'JSON', 'json'
-            FFI_Yajl::Parser.parse(data)
+            YAJL_NAMESPACE::Parser.parse(data)
           else
             data
           end
