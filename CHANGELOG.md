@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.6.0.beta.1 (2015-05-01)
+
+* Conditional gem dependency installation within a gemspec ([issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
+
 ## 0.5.0 (2015-04-03)
 
 * `#load_from_node` raises an exception if no ecnrypted attribute is found.
