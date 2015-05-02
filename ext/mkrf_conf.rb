@@ -36,9 +36,9 @@ begin
   end
   if RUBY_VERSION < '2'
     puts "Installing highline < 1.7 because Ruby #{RUBY_VERSION}"
-    s.add_dependency 'highline', '< 1.7'
+    di.install 'highline', '< 1.7'
     puts "Installing ohai < 8 because Ruby #{RUBY_VERSION}"
-    s.add_dependency 'ohai', '< 8'
+    di.install 'ohai', '< 8'
   end
 rescue => e
   warn "#{$PROGRAM_NAME}: #{e}"
