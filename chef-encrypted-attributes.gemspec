@@ -16,7 +16,7 @@ chef_version =
 Gem::Specification.new do |s|
   s.name = 'chef-encrypted-attributes'
   s.version = ::Chef::EncryptedAttribute::VERSION
-  s.date = '2015-05-01'
+  s.date = '2015-05-02'
   s.platform = Gem::Platform::RUBY
   s.summary = 'Chef Encrypted Attributes'
   s.description =
