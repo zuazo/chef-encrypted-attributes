@@ -27,6 +27,16 @@ Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 
+desc 'Generate Ruby documentation'
+task :yard do
+  require 'yard'
+  YARD::Rake::YardocTask.new do |t|
+    t.stats_options = %w(--list-undoc)
+  end
+end
+
+task doc: %w(yard)
+
 desc 'Run RuboCop style checks'
 task :rubocop do
   require 'rubocop/rake_task'
