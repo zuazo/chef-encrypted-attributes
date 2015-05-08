@@ -2,8 +2,8 @@
 [![Gem Version](http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat)](http://badge.fury.io/rb/chef-encrypted-attributes)
 [![Dependency Status](http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/onddo/chef-encrypted-attributes)
 [![Code Climate](http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/onddo/chef-encrypted-attributes)
-[![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.6.0.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
-[![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.6.0.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.6.0)
+[![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
+[![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
 [![Inline docs](http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/onddo/chef-encrypted-attributes)
 
 [Chef](https://www.chef.io/) plugin to add Node encrypted attributes support using client keys.
