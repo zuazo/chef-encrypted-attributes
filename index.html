@@ -24,8 +24,8 @@
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://codeclimate.com/github/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Code Climate"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.5.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.5.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.5.0.svg?style=flat" alt="Coverage Status"></a>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.6.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.6.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.6.0.svg?style=flat" alt="Coverage Status"></a>
 <a href="http://inch-ci.org/github/onddo/chef-encrypted-attributes"><img src="https://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Inline docs"></a></p>
 
 <p><a href="https://www.chef.io/">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
@@ -47,7 +47,7 @@
 </li>
 <li>Chef Client <code>~&gt; 11.4</code>
 </li>
-<li>ffi_yajl <code>~&gt; 1.0</code> (included with Chef)</li>
+<li>yajl_ruby <code>~&gt; 1.1</code> or ffi_yajl <code>&gt;= 1.0, &lt;3.0</code> (included with Chef)</li>
 <li>If you want to use protocol version 2 to use <a href="http://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM</a> (disabled by default):
 
 <ul>
@@ -307,6 +307,10 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <tr>
 <td align="left"><strong>Contributor:</strong></td>
 <td align="left"><a href="https://github.com/chhsiung">@chhsiung</a></td>
+</tr>
+<tr>
+<td align="left"><strong>Contributor:</strong></td>
+<td align="left"><a href="https://github.com/ldanz">Lisa Danz</a></td>
 </tr>
 <tr>
 <td align="left"><strong>Copyright:</strong></td>
