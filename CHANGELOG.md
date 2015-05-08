@@ -2,9 +2,11 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
-## 0.6.0.beta.1 (2015-05-01)
+## 0.6.0 (2015-05-08)
 
 * Conditional gem dependency installation within a gemspec ([issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
+* Choose YAJL library based on chef version ([issue #4](https://github.com/onddo/chef-encrypted-attributes/pull/4), thanks [Lisa Danz](https://github.com/ldanz)).
+* Add doc Rake task to generate the documentation.
 
 ## 0.5.0 (2015-04-03)
 
