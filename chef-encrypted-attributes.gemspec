@@ -32,10 +32,9 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob('{test,spec,features}/*')
   s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
 
-  s.add_dependency 'chef', chef_version
+  s.add_development_dependency 'chef', chef_version
 
   # Support old deprecated Ruby versions:
-  s.extensions << 'ext/mkrf_conf.rb'
   if RUBY_VERSION < '1.9.3'
     s.add_development_dependency 'mixlib-shellout', '< 1.6.1'
   end
