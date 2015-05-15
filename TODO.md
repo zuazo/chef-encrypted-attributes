@@ -1,6 +1,7 @@
 TODO
 ====
 
+* Refactor `SearchHelper` class.
 * Fix all RuboCop offenses.
 * knife encrypted attribute create/edit from file.
 * Save config inside encrypted data: `:client_search`, `:node_search` and `:keys` (including user keys).

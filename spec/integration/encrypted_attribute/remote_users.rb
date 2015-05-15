@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
       end
 
       it 'returns valid public keys' do
-        pkey_pem = remote_users_class.get_public_keys(['user1'])[0]
+        pkey_pem = remote_users_class.get_public_keys(%w(user1))[0]
         expect(pkey_pem).to be_a(String)
         pkey = create_ssl_key(pkey_pem)
         expect(pkey.public?).to be_truthy

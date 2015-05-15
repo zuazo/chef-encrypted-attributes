@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
   context '#valid_search_keys?' do
     [
-      { 'public_key' => ['public_key'] },
+      { 'public_key' => %w(public_key) },
       { cpu_flags: %w(cpu 0 flags) }
     ].each do |keys|
       it "returns true for #{keys.inspect}" do
@@ -103,12 +103,14 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'calls #partial_search when partial_search=true' do
-      expect(search_helper_class).to receive(:partial_search).with(1, 2, 3, 4)
+      expect(search_helper_class)
+        .to receive(:partial_search).with(1, nil, 2, 3, 4)
       search_helper_class.search(1, 2, 3, 4, true)
     end
 
     it 'calls #normal_search when partial_search=false' do
-      expect(search_helper_class).to receive(:normal_search).with(1, 2, 3, 4)
+      expect(search_helper_class)
+        .to receive(:normal_search).with(1, nil, 2, 3, 4)
       search_helper_class.search(1, 2, 3, 4, false)
     end
 
@@ -185,7 +187,95 @@ describe Chef::EncryptedAttribute::SearchHelper do
         end.to raise_error(Chef::EncryptedAttribute::SearchFailure)
       end
     end # with partial search
-  end
+  end # #search
+
+  context '#search_by_name' do
+    it 'calls #partial_search when partial_search=true' do
+      expect(search_helper_class)
+        .to receive(:partial_search).with(1, 2, 'name:2', 3, 4)
+      search_helper_class.search_by_name(1, 2, 3, 4, true)
+    end
+
+    it 'calls #normal_search when partial_search=false' do
+      expect(search_helper_class)
+        .to receive(:normal_search).with(1, 2, 'name:2', 3, 4)
+      search_helper_class.search_by_name(1, 2, 3, 4, false)
+    end
+
+    context 'with normal search' do
+      it 'returns empty result for HTTP Not Found errors' do
+        expect_any_instance_of(Chef::Search::Query).to receive(:search)
+          .and_raise(
+            Net::HTTPServerException.new(
+              'Net::HTTPServerException',
+              Net::HTTPResponse.new('1.1', '404', 'Not Found')
+            )
+          )
+        expect(
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, false
+          )
+        ).to eql([])
+      end
+
+      it 'throws search error for HTTP Server Exception errors' do
+        expect_any_instance_of(Chef::Search::Query).to receive(:search)
+          .and_raise(Net::HTTPServerException.new('unit test', 0))
+        expect do
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, false
+          )
+        end.to raise_error(Chef::EncryptedAttribute::SearchFailure)
+      end
+
+      it 'throws search error for HTTP Fatal errors' do
+        expect_any_instance_of(Chef::Search::Query).to receive(:search)
+          .and_raise(Net::HTTPFatalError.new('unit test', 0))
+        expect do
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, false
+          )
+        end.to raise_error(Chef::EncryptedAttribute::SearchFailure)
+      end
+    end # with normal search
+
+    context 'with partial search' do
+      it 'returns empty result for HTTP Not Found errors' do
+        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+          .and_raise(
+            Net::HTTPServerException.new(
+              'Net::HTTPServerException',
+              Net::HTTPResponse.new('1.1', '404', 'Not Found')
+            )
+          )
+        expect(
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, true
+          )
+        ).to eql([])
+      end
+
+      it 'throws search error for HTTP Server Exception errors' do
+        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+          .and_raise(Net::HTTPServerException.new('unit test', 0))
+        expect do
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, true
+          )
+        end.to raise_error(Chef::EncryptedAttribute::SearchFailure)
+      end
+
+      it 'throws search error for HTTP Fatal errors' do
+        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+          .and_raise(Net::HTTPFatalError.new('unit test', 0))
+        expect do
+          search_helper_class.search_by_name(
+            :node, 'node1', { 'valid' => %w(keys) }, 1000, true
+          )
+        end.to raise_error(Chef::EncryptedAttribute::SearchFailure)
+      end
+    end # with partial search
+  end # #search_by_name
 
   context '#normal_search' do
     before do
@@ -194,17 +284,13 @@ describe Chef::EncryptedAttribute::SearchHelper do
           { 'attr1' => { 'subattr1'  => 'leo' } },
           { 'attr1'  => { 'subattr1' => :donnie } },
           { 'attr1' =>
-            begin # respond_to?(:subattr1)
-              o = Object.new
+            # respond_to?(:subattr1)
+            Object.new.tap do |o|
               allow(o).to receive(:subattr1).and_return('ralph')
-              o
             end
           },
-          begin # node.attributes
-            n = Chef::Node.new
-            n.set[:attr1]['subattr1'] = 'mikey'
-            n
-          end
+          # node.attributes
+          Chef::Node.new.tap { |n| n.set[:attr1]['subattr1'] = 'mikey' }
         ]]
       )
     end
@@ -212,14 +298,14 @@ describe Chef::EncryptedAttribute::SearchHelper do
     it 'returns search results without errors' do
       expect(
         search_helper_class.normal_search(
-          :node, '*:*', value: %w(attr1 subattr1)
+          :node, nil, '*:*', value: %w(attr1 subattr1)
         )
         ).to eql(
           [
             { value: 'leo' },
             { value: :donnie },
-            { value:  'ralph' },
-            { value:  'mikey' }
+            { value: 'ralph' },
+            { value: 'mikey' }
           ]
         )
     end
@@ -228,7 +314,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       expect(search_helper_class)
         .to receive(:valid_search_keys?).and_return(false)
       expect do
-        search_helper_class.normal_search(:node, '*:*', 'invalid_query')
+        search_helper_class.normal_search(:node, nil, '*:*', 'invalid_query')
       end.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
     end
 
@@ -236,10 +322,57 @@ describe Chef::EncryptedAttribute::SearchHelper do
       expect_any_instance_of(Chef::Search::Query)
         .to receive(:search).and_return('bad result :(')
       expect do
-        search_helper_class.normal_search(:node, '*:*', 'valid' => %w(keys))
+        search_helper_class
+          .normal_search(:node, nil, '*:*', 'valid' => %w(keys))
       end.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
-  end
+
+    context 'searching by name' do
+      before do
+        allow_any_instance_of(Chef::Search::Query)
+          .to receive(:search).and_return(
+            [[
+              Chef::Node.new.tap do |n|
+                n.name('node1')
+                n.set[:attr1]['subattr1'] = 'leo'
+              end,
+              Chef::Node.new.tap do |n|
+                n.name('node2')
+                n.set[:attr1]['name'] = 'node1' # GitHub issue #3
+                n.set[:attr1]['subattr1'] = 'donnie'
+              end
+            ]]
+          )
+      end
+
+      it 'returns search results without errors' do
+        expect(
+          search_helper_class.normal_search(
+            :node, 'node1', 'name:node1', value: %w(attr1 subattr1)
+          )).to eql([value: 'leo'])
+      end
+
+      it 'throws fatal error if returns multiple results' do
+        allow_any_instance_of(Chef::Search::Query)
+          .to receive(:search).and_return(
+            [[
+              Chef::Node.new.tap do |n|
+                n.name('node1')
+                n.set[:attr1]['subattr1'] = 'leo'
+              end,
+              Chef::Node.new.tap do |n|
+                n.name('node1')
+                n.set[:attr1]['subattr1'] = 'donnie'
+              end
+            ]]
+          )
+        expect do
+          search_helper_class
+            .normal_search(:node, 'node1', 'name:node1', 'valid' => %w(keys))
+        end.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
+      end
+    end # searching by name
+  end # #normal_search
 
   context '#partial_search' do
     before do
@@ -254,7 +387,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     it 'returns search results without errors' do
       expect(
         search_helper_class.partial_search(
-          :node, '*:*', D: ['valid_keys']
+          :node, nil, '*:*', D: %w(valid_keys)
         )
       ).to eql(
         [
@@ -268,7 +401,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       expect(search_helper_class)
         .to receive(:valid_search_keys?).and_return(false)
       expect do
-        search_helper_class.partial_search(:node, '*:*', 'invalid_query')
+        search_helper_class.partial_search(:node, nil, '*:*', 'invalid_query')
       end.to raise_error(Chef::EncryptedAttribute::InvalidSearchKeys)
     end
 
@@ -276,7 +409,8 @@ describe Chef::EncryptedAttribute::SearchHelper do
       expect_any_instance_of(Chef::REST)
         .to receive(:post_rest).and_return('rows' => ':(')
       expect do
-        search_helper_class.partial_search(:node, '*:*', 'valid' => %w(keys))
+        search_helper_class
+          .partial_search(:node, nil, '*:*', 'valid' => %w(keys))
       end.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
 
@@ -284,8 +418,41 @@ describe Chef::EncryptedAttribute::SearchHelper do
       expect_any_instance_of(Chef::REST)
         .to receive(:post_rest).and_return('rows' => ['bad_data' => ':('])
       expect do
-        search_helper_class.partial_search(:node, '*:*', 'valid' => %w(keys))
+        search_helper_class
+          .partial_search(:node, nil, '*:*', 'valid' => %w(keys))
       end.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
     end
-  end
+
+    context 'searching by name' do
+      before do
+        allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
+          'rows' => [
+            { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
+            { 'data' => { 'raph' => 'mikey', 'name' => 'node2' } } # GH issue #3
+          ]
+        )
+      end
+
+      it 'returns search results without errors' do
+        expect(
+          search_helper_class.partial_search(
+            :node, 'node1', 'name:node1', D: %w(valid_keys)
+          )
+        ).to eql(['leo' => 'donnie'])
+      end
+
+      it 'throws fatal error if returns multiple results' do
+        allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
+          'rows' => [
+            { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
+            { 'data' => { 'raph' => 'mikey', 'name' => 'node1' } }
+          ]
+        )
+        expect do
+          search_helper_class
+            .partial_search(:node, 'node1', 'name:node1', 'valid' => %w(keys))
+        end.to raise_error(Chef::EncryptedAttribute::SearchFatalError)
+      end
+    end # searching by name
+  end # #partial_search
 end

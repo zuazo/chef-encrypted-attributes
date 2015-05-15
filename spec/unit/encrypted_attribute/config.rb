@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,18 +58,18 @@ describe Chef::EncryptedAttribute::Config do
       client_search: {
         default: [],
         # string case is treated below separately
-        ok: [['admin:false'], %w(admin:true admin:false), []],
+        ok: [%w(admin:false), %w(admin:true admin:false), []],
         error: [1, 0.2, {}, Object.new]
       },
       node_search: {
         default: [],
         # string case is treated below separately
-        ok: [['role:webapp'], %w(role:webapp role:ftp), []],
+        ok: [%w(role:webapp), %w(role:webapp role:ftp), []],
         error: [1, 0.2, {}, Object.new]
       },
       users: {
         default: [],
-        ok: ['*', [], ['admin1'], %w(admin1 admin2)],
+        ok: ['*', [], %w(admin1), %w(admin1 admin2)],
         error:
           [
             1, 0.2, 'any-string', {}, Object.new, [2],
@@ -94,7 +94,7 @@ describe Chef::EncryptedAttribute::Config do
           true, false, 1, 0.2, 'any-string', {},
           create_ssl_key,
           [create_ssl_key.public_key.to_pem, 4],
-          ['bad-key']
+          %w(bad-key)
           # TODO: non-public key string arrays
         ]
       }
@@ -125,12 +125,12 @@ describe Chef::EncryptedAttribute::Config do
 
     it '#client_search accepts String type tunrning it into an Array' do
       expect { config.client_search('admin:false') }.not_to raise_error
-      expect(config.client_search).to eql(['admin:false'])
+      expect(config.client_search).to eql(%w(admin:false))
     end
 
     it '#node_search  accepts String type tunrning it into an Array' do
       expect { config.node_search('role:webapp') }.not_to raise_error
-      expect(config.node_search).to eql(['role:webapp'])
+      expect(config.node_search).to eql(%w(role:webapp))
     end
 
     describe '#update!' do

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ describe Chef::Knife::EncryptedAttributeShow do
   end
 
   it 'prints usage and exit when an attribute is not provided' do
-    @knife.name_args = ['node1']
+    @knife.name_args = %w(node1)
     expect(@knife).to receive(:show_usage)
     expect(@knife.ui).to receive(:fatal)
     expect { @knife.run }.to raise_error(SystemExit)

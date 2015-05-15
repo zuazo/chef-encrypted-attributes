@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
   let(:remote_node_class) { Chef::EncryptedAttribute::RemoteNode }
   before do
     clear_cache(:node)
-    allow_any_instance_of(remote_node_class).to receive(:search)
+    allow_any_instance_of(remote_node_class).to receive(:search_by_name)
   end
 
   it 'creates a remote node without errors' do
@@ -55,9 +55,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
     it 'reads the node attribute using SearchHelper' do
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).to receive(:search).with(
+      expect(remote_node).to receive(:search_by_name).with(
         :node,
-        "name:#{remote_node.name}",
+        remote_node.name,
         { 'value' => attr_ary },
         1,
         true
@@ -72,9 +72,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(0)
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).to receive(:search).twice.with(
+      expect(remote_node).to receive(:search_by_name).twice.with(
         :node,
-        "name:#{remote_node.name}",
+        remote_node.name,
         { 'value' => attr_ary },
         1,
         true
@@ -89,9 +89,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
       Chef::EncryptedAttribute::RemoteNode.cache.max_size(10)
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).to receive(:search).once.with(
+      expect(remote_node).to receive(:search_by_name).once.with(
         :node,
-        "name:#{remote_node.name}",
+        remote_node.name,
         { 'value' => attr_ary },
         1,
         true
@@ -105,9 +105,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
     it 'returns nil if the attribute is not found' do
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).to receive(:search).with(
+      expect(remote_node).to receive(:search_by_name).with(
         :node,
-        "name:#{remote_node.name}",
+        remote_node.name,
         { 'value' => attr_ary },
         1,
         true
@@ -120,9 +120,9 @@ describe Chef::EncryptedAttribute::RemoteNode do
     it 'returns nil if the search result is wrong' do
       attr_ary = %w(attr1 subattr1)
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).to receive(:search).with(
+      expect(remote_node).to receive(:search_by_name).with(
         :node,
-        "name:#{remote_node.name}",
+        remote_node.name,
         { 'value' => attr_ary },
         1,
         true
@@ -134,7 +134,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
 
     it 'throws an error if the attribute list is incorrect' do
       remote_node = remote_node_class.new('bob')
-      expect(remote_node).not_to receive(:search)
+      expect(remote_node).not_to receive(:search_by_name)
       expect { remote_node.load_attribute('incorrect-attr-ary') }
         .to raise_error(ArgumentError)
     end
@@ -164,7 +164,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
       remote_node.save_attribute(%w(attr1 subattr1), 'value1')
 
       remote_node2 = Chef::EncryptedAttribute::RemoteNode.new('node1')
-      expect(remote_node2).not_to receive(:search)
+      expect(remote_node2).not_to receive(:search_by_name)
       # cached:
       expect(remote_node2.load_attribute(%w(attr1 subattr1))).to eql('value1')
     end
@@ -195,7 +195,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
 
     it 'does not delete a non existent attribute' do
       expect(node).not_to receive(:save)
-      expect(remote_node.delete_attribute(['non-existent'])).to eql(false)
+      expect(remote_node.delete_attribute(%w(non-existent))).to eql(false)
     end
 
     it 'throws an error if the attribute list is incorrect' do

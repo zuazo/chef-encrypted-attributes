@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +76,7 @@ class Chef
         cache_key = cache_key(name, attr_ary)
         return self.class.cache[cache_key] if self.class.cache.key?(cache_key)
         keys = { 'value' => attr_ary }
-        res = search(:node, "name:#{@name}", keys, 1, partial_search)
+        res = search_by_name(:node, @name, keys, 1, partial_search)
         self.class.cache[cache_key] = parse_search_result(res)
       end
 

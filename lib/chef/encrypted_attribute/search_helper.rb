@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -138,7 +138,33 @@ class Chef
       def search(type, query, keys, rows = 1000, partial_search = true)
         return [] if empty_search?(query) # avoid empty searches
         search_method = partial_search ? :partial_search : :normal_search
-        send(search_method, type, query, keys, rows)
+        send(search_method, type, nil, query, keys, rows)
+      rescue Net::HTTPServerException => e
+        unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
+          raise SearchFailure, "Search exception #{e.class}: #{e}"
+        end
+        return []
+      rescue Net::HTTPFatalError => e
+        raise SearchFailure, "Search exception #{e.class}: #{e}"
+      end
+
+      # Does a search in the Chef Server by node or client name.
+      #
+      # @param type [Symbol] search index to use. See [Chef Search Indexes]
+      #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      # @param name [String] node name to search.
+      # @param keys [Hash] search keys structure. For example:
+      #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
+      # @param rows [Fixnum, String] maximum number of rows to return.
+      # @param partial_search [Boolean] whether to use partial search.
+      # @return [Array<Hash>] An array with the response, for example:
+      #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [SearchFailure] if there is a Chef search error.
+      # @raise [SearchFatalError] if the Chef search response is wrong.
+      # @raise [InvalidSearchKeys] if search keys structure is wrong.
+      def search_by_name(type, name, keys, rows = 1000, partial_search = true)
+        search_method = partial_search ? :partial_search : :normal_search
+        send(search_method, type, name, "name:#{name}", keys, rows)
       rescue Net::HTTPServerException => e
         unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
           raise SearchFailure, "Search exception #{e.class}: #{e}"
@@ -177,16 +203,39 @@ class Chef
         end
       end
 
+      # Filters normal search results that do not correspond to the searched
+      # node.
+      #
+      # Used when searching by node name.
+      #
+      # @param resp [Array] normal search result.
+      # @param name [String, nil] searched node name.
+      # @return [Array] The search result removing the filtered results.
+      # @raise [SearchFatalError] if more than one result is returned when
+      #   searching by node name.
+      # @api private
+      def filter_normal_search_response(resp, name)
+        return resp if name.nil?
+        resp.select { |row| row.name == name }.tap do |r|
+          fail SearchFatalError,
+               'Multiple responses received from Partial Search:'\
+               " #{r.inspect}" if r.count > 1
+        end
+      end
+
       # Parses a normal (no partial) full search search response.
       #
       # @param resp [Array] normal search result.
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
+      # @param name [String, nil] searched node name.
       # @return [Array<Hash>] An array with the response, for example:
       #   `[{ 'ipaddress' => '192.168.1.1' }]`
+      # @raise [SearchFatalError] if more than one result is returned when
+      #   searching by node name.
       # @api private
-      def parse_normal_search_response(resp, keys)
-        resp.map do |row|
+      def parse_normal_search_response(resp, keys, name)
+        filter_normal_search_response(resp, name).map do |row|
           Hash[keys.map do |key_name, attr_ary|
             value = parse_normal_search_row_attribute(row, attr_ary)
             [key_name, value]
@@ -198,6 +247,7 @@ class Chef
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
       #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      # @param name [String, nil] searched node name.
       # @param query [String, Array<String>] search query. For example:
       #   `%w(admin:true)`. Results will be *OR*-ed when multiple string queries
       #   are provided.
@@ -207,7 +257,9 @@ class Chef
       # @return [Array<Hash>] An array with the response, for example:
       #   `[{ 'ipaddress' => '192.168.1.1' }]`
       # @raise [InvalidSearchKeys] if search keys structure is wrong.
-      def normal_search(type, query, keys, rows = 1000)
+      # @raise [SearchFatalError] if more than one result is returned when
+      #   searching by node name.
+      def normal_search(type, name, query, keys, rows = 1000)
         escaped_query = escape_query(query)
         Chef::Log.info(
           "Normal Search query: #{escaped_query}, keys: #{keys.inspect}"
@@ -216,7 +268,7 @@ class Chef
 
         resp = self.query.search(type, escaped_query, nil, 0, rows)[0]
         assert_normal_search_response(resp)
-        parse_normal_search_response(resp, keys)
+        parse_normal_search_response(resp, keys, name)
       end
 
       # Assert that the partial search response is correct.
@@ -233,18 +285,60 @@ class Chef
              "Wrong response received from Partial Search: #{resp.inspect}"
       end
 
+      # Adds the `name` key to the search keys structure.
+      #
+      # Used to get the node name when searching nodes by name.
+      #
+      # @param keys [Hash] search keys structure. For example:
+      #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
+      # @return [Hash] the search keys structure including the `name` key. For
+      #   example:
+      #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version),
+      #     name: %w(name) }`.
+      # @api private
+      def generate_partial_search_keys(keys)
+        keys.merge('name' => %w(name))
+      end
+
+      # Filters partial search results that do not correspond to the searched
+      # node.
+      #
+      # Used when searching by node name.
+      #
+      # @param resp [Hash] partial search result. For example:
+      #   `{ 'rows' => [ 'data' => { 'ipaddress' => '192.168.1.1' } }] }`.
+      # @param name [String, nil] searched node name.
+      # @return [Hash] The search result removing the filtered results.
+      # @raise [SearchFatalError] if more than one result is returned when
+      #   searching by node name.
+      # @api private
+      def filter_partial_search_response(resp, name)
+        return resp if name.nil?
+        filtered_resp = resp.select do |row|
+          row['data']['name'] == name
+        end
+        filtered_resp.tap do |r|
+          fail SearchFatalError,
+               'Multiple responses received from Partial Search:'\
+               " #{r.inspect}" if r.count > 1
+        end
+      end
+
       # Parses a partial full search search response.
       #
       # @param resp [Hash] partial search result. For example:
       #   `{ 'rows' => [ 'data' => { 'ipaddress' => '192.168.1.1' } }] }`.
+      # @param name [String, nil] searched node name.
+      # @param keys [Hash] search keys structure. For example:
+      #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
       # @return [Array<Hash>] An array with the response, for example:
       #   `[{ 'ipaddress' => '192.168.1.1' }]`
       # @raise [SearchFatalError] if the Chef search response is wrong.
       # @api private
-      def parse_partial_search_response(resp)
-        resp['rows'].map do |row|
+      def parse_partial_search_response(resp, name, keys)
+        filter_partial_search_response(resp['rows'], name).map do |row|
           if row.is_a?(Hash) && row['data'].is_a?(Hash)
-            row['data']
+            row['data'].tap { |r| r.delete('name') unless keys.key?('name') }
           else
             fail SearchFatalError,
                  "Wrong row format received from Partial Search: #{row.inspect}"
@@ -256,6 +350,7 @@ class Chef
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
       #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      # @param name [String, nil] searched node name.
       # @param query [String, Array<String>] search query. For example:
       #   `%w(admin:true)`. Results will be *OR*-ed when multiple string queries
       #   are provided.
@@ -266,7 +361,7 @@ class Chef
       #   `[{ 'ipaddress' => '192.168.1.1' }]`
       # @raise [InvalidSearchKeys] if search keys structure is wrong.
       # @raise [SearchFatalError] if the Chef search response is wrong.
-      def partial_search(type, query, keys, rows = 1000)
+      def partial_search(type, name, query, keys, rows = 1000)
         escaped_query =
           "search/#{escape(type)}?q=#{escape_query(query)}&start=0&rows=#{rows}"
         Chef::Log.info(
@@ -275,9 +370,9 @@ class Chef
         assert_search_keys(keys)
 
         rest = Chef::REST.new(Chef::Config[:chef_server_url])
-        resp = rest.post_rest(escaped_query, keys)
+        resp = rest.post_rest(escaped_query, generate_partial_search_keys(keys))
         assert_partial_search_response(resp)
-        parse_partial_search_response(resp)
+        parse_partial_search_response(resp, name, keys)
       end
     end
   end
