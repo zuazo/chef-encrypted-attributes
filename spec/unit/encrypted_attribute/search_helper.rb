@@ -300,14 +300,14 @@ describe Chef::EncryptedAttribute::SearchHelper do
         search_helper_class.normal_search(
           :node, nil, '*:*', value: %w(attr1 subattr1)
         )
-        ).to eql(
-          [
-            { value: 'leo' },
-            { value: :donnie },
-            { value: 'ralph' },
-            { value: 'mikey' }
-          ]
-        )
+      ).to eql(
+        [
+          { value: 'leo' },
+          { value: :donnie },
+          { value: 'ralph' },
+          { value: 'mikey' }
+        ]
+      )
     end
 
     it 'throws an error for invalid keys' do

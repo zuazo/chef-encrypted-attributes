@@ -119,6 +119,22 @@ class Chef
           query.is_a?(Array) && query.count == 0
       end
 
+      # Translates Chef HTTP exceptions to search exceptions.
+      #
+      # @yield [] the block doing the Chef Search.
+      # @return [Mixed] the value returned by the block.
+      # @api private
+      def catch_search_exceptions(&block)
+        block.call
+      rescue Net::HTTPServerException => e
+        unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
+          raise SearchFailure, "Search exception #{e.class}: #{e}"
+        end
+        return []
+      rescue Net::HTTPFatalError => e
+        raise SearchFailure, "Search exception #{e.class}: #{e}"
+      end
+
       # Does a search in the Chef Server.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
@@ -138,14 +154,9 @@ class Chef
       def search(type, query, keys, rows = 1000, partial_search = true)
         return [] if empty_search?(query) # avoid empty searches
         search_method = partial_search ? :partial_search : :normal_search
-        send(search_method, type, nil, query, keys, rows)
-      rescue Net::HTTPServerException => e
-        unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
-          raise SearchFailure, "Search exception #{e.class}: #{e}"
+        catch_search_exceptions do
+          send(search_method, type, nil, query, keys, rows)
         end
-        return []
-      rescue Net::HTTPFatalError => e
-        raise SearchFailure, "Search exception #{e.class}: #{e}"
       end
 
       # Does a search in the Chef Server by node or client name.
@@ -164,14 +175,9 @@ class Chef
       # @raise [InvalidSearchKeys] if search keys structure is wrong.
       def search_by_name(type, name, keys, rows = 1000, partial_search = true)
         search_method = partial_search ? :partial_search : :normal_search
-        send(search_method, type, name, "name:#{name}", keys, rows)
-      rescue Net::HTTPServerException => e
-        unless e.response.is_a?(Net::HTTPResponse) && e.response.code == '404'
-          raise SearchFailure, "Search exception #{e.class}: #{e}"
+        catch_search_exceptions do
+          send(search_method, type, name, "name:#{name}", keys, rows)
         end
-        return []
-      rescue Net::HTTPFatalError => e
-        raise SearchFailure, "Search exception #{e.class}: #{e}"
       end
 
       # Assert that the normal (no partial) search response is correct.

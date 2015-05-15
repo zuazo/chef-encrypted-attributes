@@ -15,3 +15,5 @@ Metrics/MethodLength:
   Max: 50
 Metrics/AbcSize:
   Max: 35
+Metrics/ModuleLength:
+  Max: 142
