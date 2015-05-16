@@ -242,7 +242,7 @@ See [TODO.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TOD
 |:---------------------|:-----------------------------------------|
 | **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@onddo.com>)
 | **Contributor:**     | [Josh Kalderimis](https://github.com/joshk)
-| **Contributor:**     | [@chhsiung](https://github.com/chhsiung)
+| **Contributor:**     | [Crystal Hsiung](https://github.com/chhsiung)
 | **Contributor:**     | [Lisa Danz](https://github.com/ldanz)
 | **Copyright:**       | Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 | **License:**         | Apache License, Version 2.0
