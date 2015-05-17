@@ -27,6 +27,8 @@ Node attributes are encrypted using chef client and user keys with public key in
 
 ## Usage in Recipes
 
+Before reading all the documentation below, we recommend you take a look at the [`encrypted_attributes` cookbook's helper libraries](https://github.com/onddo/encrypted_attributes-cookbook#helper-libraries). Those libraries are easier to use than the underlying API and cover the most common use cases.
+
 ### Installing and Including the Gem
 
 You need to install and include the `chef-encrypted-attributes` gem before using encrypted attributes inside a cookbook.
@@ -79,7 +81,7 @@ Chef::Config[:encrypted_attributes][:client_search] = 'admin:true'
 Chef::Config[:encrypted_attributes][:node_search] = 'role:webapp'
 
 if Chef::EncryptedAttribute.exist?(node['myapp']['encrypted_data'])
-  # when can used #load here as above if we need the `encrypted_data` outside
+  # we can used #load here as above if we need the `encrypted_data` outside
   # this `if`
 
   # update with the new keys
