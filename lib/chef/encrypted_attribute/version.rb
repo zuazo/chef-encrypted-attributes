@@ -20,6 +20,6 @@
 class Chef
   class EncryptedAttribute
     # `chef-encrypted-attributes` gem version.
-    VERSION = '0.7.0'
+    VERSION = '0.8.0.dev'
   end
 end
