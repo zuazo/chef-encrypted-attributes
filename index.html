@@ -60,6 +60,8 @@
 <h2>
 <a id="usage-in-recipes" class="anchor" href="#usage-in-recipes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage in Recipes</h2>
 
+<p>Before reading all the documentation below, we recommend you take a look at the <a href="https://github.com/onddo/encrypted_attributes-cookbook#helper-libraries"><code>encrypted_attributes</code> cookbook's helper libraries</a>. Those libraries are easier to use than the underlying API and cover the most common use cases.</p>
+
 <h3>
 <a id="installing-and-including-the-gem" class="anchor" href="#installing-and-including-the-gem" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing and Including the Gem</h3>
 
@@ -110,7 +112,7 @@
 <span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:node_search</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>role:webapp<span class="pl-pds">'</span></span>
 
 <span class="pl-k">if</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">EncryptedAttribute</span>.exist?(node[<span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>][<span class="pl-s"><span class="pl-pds">'</span>encrypted_data<span class="pl-pds">'</span></span>])
-  <span class="pl-c"># when can used #load here as above if we need the `encrypted_data` outside</span>
+  <span class="pl-c"># we can used #load here as above if we need the `encrypted_data` outside</span>
   <span class="pl-c"># this `if`</span>
 
   <span class="pl-c"># update with the new keys</span>
@@ -306,7 +308,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 </tr>
 <tr>
 <td align="left"><strong>Contributor:</strong></td>
-<td align="left"><a href="https://github.com/chhsiung">@chhsiung</a></td>
+<td align="left"><a href="https://github.com/chhsiung">Crystal Hsiung</a></td>
 </tr>
 <tr>
 <td align="left"><strong>Contributor:</strong></td>
