@@ -59,16 +59,20 @@ class Chef
       #
       # @param search [Array<String>, String] search queries to perform, the
       #   query result will be *OR*-ed.
+      # @param rows [Integer] maximum number of rows to return in searches.
+      # @param partial_search [Boolean] whether to use partial search.
       # @return [Array<String>] list of public keys.
       # @raise [SearchFailure] if there is a Chef search error.
       # @raise [SearchFatalError] if the Chef search response is wrong.
       # @raise [InvalidSearchKeys] if search keys structure is wrong.
-      def self.search_public_keys(search = '*:*', partial_search = true)
+      def self.search_public_keys(
+            search = '*:*', rows = 1000, partial_search = true
+      )
         escaped_query = escape_query(search)
         return cache[escaped_query] if cache.key?(escaped_query)
         cache[escaped_query] = search(
           :client, search,
-          { 'public_key' => %w(public_key) }, 1000, partial_search
+          { 'public_key' => %w(public_key) }, rows, partial_search
         ).map { |client| client['public_key'] }.compact
       end
     end

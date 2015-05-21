@@ -61,6 +61,11 @@ describe Chef::EncryptedAttribute::Config do
         ok: [%w(admin:false), %w(admin:true admin:false), []],
         error: [1, 0.2, {}, Object.new]
       },
+      search_max_rows: {
+        default: 1000,
+        ok: [5, 10_000],
+        error: [true, false, 0.2, 'string', {}, [], Object.new]
+      },
       node_search: {
         default: [],
         # string case is treated below separately
@@ -207,6 +212,12 @@ describe Chef::EncryptedAttribute::Config do
         config2 = { node_search: %w(*:*) }
         config.update!(config2)
         expect(config.node_search).to eql(config2[:node_search])
+      end
+
+      it 'updates search_max_rows value from a Hash with symbol keys' do
+        config2 = { search_max_rows: 10_000 }
+        config.update!(config2)
+        expect(config.search_max_rows).to eql(config2[:search_max_rows])
       end
 
       it 'updates users value from a Hash with symbol keys' do

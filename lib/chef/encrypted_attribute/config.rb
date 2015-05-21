@@ -32,6 +32,7 @@ class Chef
         :version,
         :partial_search,
         :client_search,
+        :search_max_rows,
         :node_search,
         :users,
         :keys
@@ -84,6 +85,20 @@ class Chef
       #   http://docs.getchef.com/chef_search.html Chef Search documentation
       def client_search(arg = nil)
         set_or_return_search_array(:client_search, arg)
+      end
+
+      # Set the maximum number of rows to be returned by internal search
+      # functions.
+      #
+      # You must set this value to your maximum number of nodes in your Chef
+      # Server. Defaults to `1000`.
+      #
+      # @param arg [Integer] maximum rows number.
+      # @return [Integer] maximum rows number.
+      def search_max_rows(arg = nil)
+        set_or_return(
+          :search_max_rows, arg, kind_of: Integer, default: 1000
+        )
       end
 
       # Reads or sets node search query.

@@ -59,7 +59,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         remote_node.name,
         { 'value' => attr_ary },
-        1,
+        1000,
         true
       ).and_return(
         [{ 'value' => 'value1' }]
@@ -76,7 +76,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         remote_node.name,
         { 'value' => attr_ary },
-        1,
+        1000,
         true
       ).and_return(
         [{ 'value' => 'value1' }]
@@ -93,7 +93,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         remote_node.name,
         { 'value' => attr_ary },
-        1,
+        1000,
         true
       ).and_return(
         [{ 'value' => 'value1' }]
@@ -109,7 +109,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         remote_node.name,
         { 'value' => attr_ary },
-        1,
+        1000,
         true
       ).and_return(
         [{ 'value' => nil }]
@@ -124,7 +124,7 @@ describe Chef::EncryptedAttribute::RemoteNode do
         :node,
         remote_node.name,
         { 'value' => attr_ary },
-        1,
+        1000,
         true
       ).and_return(
         [{ 'bad-value' => 'wrong' }]

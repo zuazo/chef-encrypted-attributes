@@ -73,6 +73,9 @@ class Chef
     #   *OR*-ed.
     # * `:node_search` - Search query for nodes allowed to read the encrypted
     #   attribute. Can be a simple string or an array of queries to be *OR*-ed.
+    # * `:search_max_rows` - Maximum nodes returned by the internal chef
+    #   searches. This number should be above the maximum expected nodes in the
+    #   Chef Server. Defaults to `1000` nodes.
     # * `:users` - Array of user names to be allowed to read the encrypted
     #   attribute(s). `"*"` to allow access to all users. Keep in mind that only
     #   admin clients or admin users are allowed to read user public keys. It is
@@ -498,8 +501,12 @@ class Chef
       def exist_on_node?(name, attr_ary, c = {})
         debug("Checking if Remote Encrypted Attribute exists on #{name}")
         remote_node = RemoteNode.new(name)
+        config_merged = config(c)
         node_attr =
-          remote_node.load_attribute(attr_ary, config(c).partial_search)
+          remote_node.load_attribute(
+            attr_ary, config_merged.search_max_rows,
+            config_merged.partial_search
+          )
         Chef::EncryptedAttribute.exist?(node_attr)
       end
 

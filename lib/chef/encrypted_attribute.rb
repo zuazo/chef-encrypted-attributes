@@ -130,7 +130,11 @@ class Chef
     # @raise [InvalidSearchKeys] if search keys structure is wrong.
     def load_from_node(name, attr_ary, key = nil)
       remote_node = RemoteNode.new(name)
-      load(remote_node.load_attribute(attr_ary, config.partial_search), key)
+      enc_hs =
+        remote_node.load_attribute(
+          attr_ary, config.search_max_rows, config.partial_search
+        )
+      load(enc_hs, key)
     end
 
     # Creates an encrypted attribute from a Hash.
@@ -302,7 +306,10 @@ class Chef
 
       # update the encrypted attribute
       remote_node = RemoteNode.new(name)
-      enc_hs = remote_node.load_attribute(attr_ary, config.partial_search)
+      enc_hs =
+        remote_node.load_attribute(
+          attr_ary, config.search_max_rows, config.partial_search
+        )
       updated = update(enc_hs, [node_public_key])
 
       # save encrypted attribute
@@ -327,7 +334,7 @@ class Chef
     # @see #config
     def remote_client_keys
       RemoteClients.search_public_keys(
-        config.client_search, config.partial_search
+        config.client_search, config.search_max_rows, config.partial_search
       )
     end
 
@@ -344,7 +351,9 @@ class Chef
     # @raise [InvalidSearchKeys] if search keys structure is wrong.
     # @see #config
     def remote_node_keys
-      RemoteNodes.search_public_keys(config.node_search, config.partial_search)
+      RemoteNodes.search_public_keys(
+        config.node_search, config.search_max_rows, config.partial_search
+      )
     end
 
     # Gets remote user keys using the configured user list.

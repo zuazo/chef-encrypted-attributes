@@ -65,18 +65,19 @@ class Chef
       # Loads a remote node attribute.
       #
       # @param attr_ary [Array<String>] node attribute path as Array.
+      # @param rows [Integer] maximum number of rows to return in searches.
       # @param partial_search [Boolean] whether to use partial search.
       # @return [Mixed] node attribute value, `nil` if not found.
       # @raise [ArgumentError] if the attribute path format is wrong.
       # @raise [SearchFailure] if there is a Chef search error.
       # @raise [SearchFatalError] if the Chef search response is wrong.
       # @raise [InvalidSearchKeys] if search keys structure is wrong.
-      def load_attribute(attr_ary, partial_search = true)
+      def load_attribute(attr_ary, rows = 1000, partial_search = true)
         assert_attribute_array(attr_ary)
         cache_key = cache_key(name, attr_ary)
         return self.class.cache[cache_key] if self.class.cache.key?(cache_key)
         keys = { 'value' => attr_ary }
-        res = search_by_name(:node, @name, keys, 1, partial_search)
+        res = search_by_name(:node, @name, keys, rows, partial_search)
         self.class.cache[cache_key] = parse_search_result(res)
       end
 

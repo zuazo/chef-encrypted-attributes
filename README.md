@@ -176,6 +176,14 @@ To fix this limitation you should expose de *Chef Client* *public key* in the `n
 
 Exposing the public key through attributes should not be considered a security breach, so it's not a problem to include it on all machines.
 
+## Maximum Number of Nodes
+
+This gem is ready to be used with Chef Servers that have less than `1000` nodes by default. You can increase this limit setting the `search_max_rows` configuration option:
+
+```ruby
+Chef::Config[:encrypted_attributes][:search_max_rows] = 50_000
+```
+
 ## Knife Commands
 
 See the [KNIFE.md](http://www.rubydoc.info/gems/chef-encrypted-attributes/file/KNIFE.md) file.
