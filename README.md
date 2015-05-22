@@ -2,8 +2,8 @@
 [![Gem Version](http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat)](http://badge.fury.io/rb/chef-encrypted-attributes)
 [![Dependency Status](http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/onddo/chef-encrypted-attributes)
 [![Code Climate](http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/onddo/chef-encrypted-attributes)
-[![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
-[![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.8.0)
+[![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
+[![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
 [![Inline docs](http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/onddo/chef-encrypted-attributes)
 
 [Chef](https://www.chef.io/) plugin to add Node encrypted attributes support using client keys.
@@ -203,11 +203,11 @@ See the [official gem documentation](http://www.rubydoc.info/gems/chef-encrypted
 
 The `chef-encrypted-attributes` gem is cryptographically signed by Onddo Labs's certificate, which identifies as *team@onddo.com*. You can obtain the official signature here:
 
-    https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt
+    https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt
 
 To be sure the gem you install has not been tampered with:
 
-    $ gem cert --add <(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt)
+    $ gem cert --add <(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt)
     $ gem install chef-encrypted-attributes -P MediumSecurity
 
 The *MediumSecurity* trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all of `chef-encrypted-attributes`'s dependencies are signed, so we cannot use *HighSecurity*.
@@ -226,7 +226,7 @@ Still, this gem should be considered experimental until audited by professional 
 
 If you have discovered a bug in `chef-encrypted-attributes` of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-attributes` users, you can report it securely by sending a GPG encrypted message. Please use the following key:
 
-    https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/zuazo.gpg
+    https://raw.github.com/onddo/chef-encrypted-attributes/master/zuazo.gpg
 
 The key fingerprint is (or should be):
 
