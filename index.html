@@ -24,8 +24,8 @@
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
 <a href="https://codeclimate.com/github/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Code Climate"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.7.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.7.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.7.0.svg?style=flat" alt="Coverage Status"></a>
+<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.8.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat" alt="Coverage Status"></a>
 <a href="http://inch-ci.org/github/onddo/chef-encrypted-attributes"><img src="https://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Inline docs"></a></p>
 
 <p><a href="https://www.chef.io/">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
@@ -205,6 +205,13 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 <p>Exposing the public key through attributes should not be considered a security breach, so it's not a problem to include it on all machines.</p>
 
 <h2>
+<a id="maximum-number-of-nodes" class="anchor" href="#maximum-number-of-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maximum Number of Nodes</h2>
+
+<p>This gem is ready to be used with Chef Servers that have less than <code>1000</code> nodes by default. You can increase this limit setting the <code>search_max_rows</code> configuration option:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:search_max_rows</span>] <span class="pl-k">=</span> <span class="pl-c1">50_000</span></pre></div>
+
+<h2>
 <a id="knife-commands" class="anchor" href="#knife-commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Knife Commands</h2>
 
 <p>See the <a href="http://www.rubydoc.info/gems/chef-encrypted-attributes/file/KNIFE.md">KNIFE.md</a> file.</p>
@@ -233,12 +240,12 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 
 <p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain the official signature here:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.7.0/certs/team_onddo.crt
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt
 </code></pre>
 
 <p>To be sure the gem you install has not been tampered with:</p>
 
-<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.7.0/certs/team_onddo.crt)
+<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt)
 $ gem install chef-encrypted-attributes -P MediumSecurity
 </code></pre>
 
@@ -261,7 +268,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 
 <p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of <code>chef-encrypted-attributes</code> users, you can report it securely by sending a GPG encrypted message. Please use the following key:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.7.0/zuazo.gpg
+<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/zuazo.gpg
 </code></pre>
 
 <p>The key fingerprint is (or should be):</p>
