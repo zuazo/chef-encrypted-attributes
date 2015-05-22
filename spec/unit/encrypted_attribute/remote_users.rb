@@ -40,8 +40,7 @@ describe Chef::EncryptedAttribute::RemoteUsers do
     clear_cache(:users)
 
     @prev_chef_server = Chef::Config[:chef_server_url]
-    Chef::Config[:chef_server_url] =
-      'https://api.opscode.com/organizations/opscode'
+    Chef::Config[:chef_server_url] = 'https://api.chef.io/organizations/org1'
     allow(Chef::User).to receive(:load).and_return(users[0])
     allow(Chef::User).to receive(:list).and_return(user_list)
   end

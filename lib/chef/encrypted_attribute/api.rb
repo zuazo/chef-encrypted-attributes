@@ -35,8 +35,8 @@ class Chef
     # {Chef::EncryptedAttribute} class.
     #
     # These methods are intended to be used from Chef
-    # [Recipes](http://docs.getchef.com/recipes.html) or
-    # [Resources](https://docs.getchef.com/resource.html).
+    # [Recipes](http://docs.chef.io/recipes.html) or
+    # [Resources](https://docs.chef.io/resource.html).
     #
     # The attributes created by these methods are encrypted **only for the local
     # node** by default.

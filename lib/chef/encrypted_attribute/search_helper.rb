@@ -138,7 +138,7 @@ class Chef
       # Does a search in the Chef Server.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
-      #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      #   (http://docs.chef.io/chef_search.html#search-indexes).
       # @param query [Array<String>, String] search query. For example:
       #   `%w(admin:true)`. Results will be *OR*-ed when multiple string queries
       #   are provided.
@@ -162,7 +162,7 @@ class Chef
       # Does a search in the Chef Server by node or client name.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
-      #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      #   (http://docs.chef.io/chef_search.html#search-indexes).
       # @param name [String] node name to search.
       # @param keys [Hash] search keys structure. For example:
       #   `{ipaddress: %w(ipaddress), mysql_version: %w(mysql version) }`.
@@ -252,7 +252,7 @@ class Chef
       # Does a normal (no partial) search in the Chef Server.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
-      #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      #   (http://docs.chef.io/chef_search.html#search-indexes).
       # @param name [String, nil] searched node name.
       # @param query [String, Array<String>] search query. For example:
       #   `%w(admin:true)`. Results will be *OR*-ed when multiple string queries
@@ -355,7 +355,7 @@ class Chef
       # Does a partial search in the Chef Server.
       #
       # @param type [Symbol] search index to use. See [Chef Search Indexes]
-      #   (http://docs.getchef.com/chef_search.html#search-indexes).
+      #   (http://docs.chef.io/chef_search.html#search-indexes).
       # @param name [String, nil] searched node name.
       # @param query [String, Array<String>] search query. For example:
       #   `%w(admin:true)`. Results will be *OR*-ed when multiple string queries

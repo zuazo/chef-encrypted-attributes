@@ -61,7 +61,7 @@ end
 
 if RUBY_VERSION < '1.9.3'
   # Integration tests are broken in 1.9.2 due to a chef-zero bug:
-  #   https://github.com/opscode/chef-zero/issues/65
+  #   https://github.com/chef/chef-zero/issues/65
   # RuboCop require Ruby 1.9.3.
   task default: %w(unit)
 else

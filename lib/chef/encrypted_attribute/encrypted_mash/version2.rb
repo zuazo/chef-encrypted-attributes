@@ -32,7 +32,7 @@ class Chef
       # (http://en.wikipedia.org/wiki/Galois/Counter_Mode).
       #
       # * This protocol version is based on the [Chef 12 Encrypted Data Bags
-      #   Version 3 implementation](https://github.com/opscode/chef/pull/1591).
+      #   Version 3 implementation](https://github.com/chef/chef/pull/1591).
       # * To use it, the following **special requirements** must be met:
       #   Ruby `>= 2` and OpenSSL `>= 1.0.1`.
       # * This implementation can be improved, is not optimized either for

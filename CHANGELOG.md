@@ -75,7 +75,7 @@ This file is used to list changes made in each version of `chef-encrypted-attrib
 
 * Deprecate `#exists?` methods in favor of `#exist?` methods
 * Fixed all RSpec deprecation warnings
-* Added Protocol Version 2 (*disabled by default*): uses [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) as in [Chef 12 Encrypted Data Bags Version 3](https://github.com/opscode/chef/pull/1591).
+* Added Protocol Version 2 (*disabled by default*): uses [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) as in [Chef 12 Encrypted Data Bags Version 3](https://github.com/chef/chef/pull/1591).
  * Added `RequirementsFailure` exception
 * README, CONTRIBUTING, TODO: multiple documentation improvements
  * Added some security related sections to the README
