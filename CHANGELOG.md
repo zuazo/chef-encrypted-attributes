@@ -2,6 +2,11 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.8.0 (2015-05-22)
+
+* Do not limit `RemoteNode#load_attribute` search result to one row (related to [issue #3](https://github.com/onddo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).
+* Update opscode and github links to chef.io and chef.
+
 ## 0.7.0 (2015-05-20)
 
 * Move chef to dev dependency and remove dynamic dependency installation extension (related to [cookbook issue #2](https://github.com/onddo/encrypted_attributes-cookbook/pull/2#issuecomment-101454221) and [issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [Lisa Danz](https://github.com/ldanz) for reporting).
