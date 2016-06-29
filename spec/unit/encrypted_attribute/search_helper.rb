@@ -153,7 +153,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
     context 'with partial search' do
       it 'returns empty result for HTTP Not Found errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(
             Net::HTTPServerException.new(
               'Net::HTTPServerException',
@@ -168,7 +168,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws search error for HTTP Server Exception errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(Net::HTTPServerException.new('unit test', 0))
         expect do
           search_helper_class.search(
@@ -178,7 +178,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws search error for HTTP Fatal errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(Net::HTTPFatalError.new('unit test', 0))
         expect do
           search_helper_class.search(
@@ -241,7 +241,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
     context 'with partial search' do
       it 'returns empty result for HTTP Not Found errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(
             Net::HTTPServerException.new(
               'Net::HTTPServerException',
@@ -256,7 +256,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws search error for HTTP Server Exception errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(Net::HTTPServerException.new('unit test', 0))
         expect do
           search_helper_class.search_by_name(
@@ -266,7 +266,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws search error for HTTP Fatal errors' do
-        expect_any_instance_of(Chef::REST).to receive(:post_rest)
+        expect_any_instance_of(Chef::ServerAPI).to receive(:post_rest)
           .and_raise(Net::HTTPFatalError.new('unit test', 0))
         expect do
           search_helper_class.search_by_name(
@@ -376,7 +376,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
   context '#partial_search' do
     before do
-      allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
+      allow_any_instance_of(Chef::ServerAPI).to receive(:post_rest).and_return(
         'rows' => [
           { 'data' => { 'leo' => 'donnie' } },
           { 'data' => { 'raph' => 'mikey' } }
@@ -406,7 +406,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'throws fatal error for invalid search results' do
-      expect_any_instance_of(Chef::REST)
+      expect_any_instance_of(Chef::ServerAPI)
         .to receive(:post_rest).and_return('rows' => ':(')
       expect do
         search_helper_class
@@ -415,7 +415,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
     end
 
     it 'throws fatal error for invalid row results' do
-      expect_any_instance_of(Chef::REST)
+      expect_any_instance_of(Chef::ServerAPI)
         .to receive(:post_rest).and_return('rows' => ['bad_data' => ':('])
       expect do
         search_helper_class
@@ -425,7 +425,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
     context 'searching by name' do
       before do
-        allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
+        allow_any_instance_of(Chef::ServerAPI).to receive(:post_rest).and_return(
           'rows' => [
             { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
             { 'data' => { 'raph' => 'mikey', 'name' => 'node2' } } # GH issue #3
@@ -442,7 +442,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws fatal error if returns multiple results' do
-        allow_any_instance_of(Chef::REST).to receive(:post_rest).and_return(
+        allow_any_instance_of(Chef::ServerAPI).to receive(:post_rest).and_return(
           'rows' => [
             { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
             { 'data' => { 'raph' => 'mikey', 'name' => 'node1' } }
