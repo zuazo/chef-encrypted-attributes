@@ -18,6 +18,7 @@
 #
 
 require 'spec_helper'
+require 'chef/node'
 
 describe Chef::EncryptedAttribute::SearchHelper do
   let(:search_helper_class) { Chef::EncryptedAttribute::SearchHelper }
