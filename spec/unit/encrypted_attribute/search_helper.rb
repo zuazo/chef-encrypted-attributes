@@ -427,11 +427,12 @@ describe Chef::EncryptedAttribute::SearchHelper do
       before do
         allow_any_instance_of(Chef::ServerAPI)
           .to receive(:post_rest).and_return(
-          'rows' => [
-            { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
-            { 'data' => { 'raph' => 'mikey', 'name' => 'node2' } } # GH issue #3
-          ]
-        )
+            'rows' => [
+              { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
+              { 'data' => { 'raph' => 'mikey', 'name' => 'node2' } }
+              # GH issue #3
+            ]
+          )
       end
 
       it 'returns search results without errors' do
@@ -445,11 +446,11 @@ describe Chef::EncryptedAttribute::SearchHelper do
       it 'throws fatal error if returns multiple results' do
         allow_any_instance_of(Chef::ServerAPI)
           .to receive(:post_rest).and_return(
-          'rows' => [
-            { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
-            { 'data' => { 'raph' => 'mikey', 'name' => 'node1' } }
-          ]
-        )
+            'rows' => [
+              { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
+              { 'data' => { 'raph' => 'mikey', 'name' => 'node1' } }
+            ]
+          )
         expect do
           search_helper_class
             .partial_search(:node, 'node1', 'name:node1', 'valid' => %w(keys))
