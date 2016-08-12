@@ -425,7 +425,8 @@ describe Chef::EncryptedAttribute::SearchHelper do
 
     context 'searching by name' do
       before do
-        allow_any_instance_of(Chef::ServerAPI).to receive(:post_rest).and_return(
+        allow_any_instance_of(Chef::ServerAPI)
+          .to receive(:post_rest).and_return(
           'rows' => [
             { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
             { 'data' => { 'raph' => 'mikey', 'name' => 'node2' } } # GH issue #3
@@ -442,7 +443,8 @@ describe Chef::EncryptedAttribute::SearchHelper do
       end
 
       it 'throws fatal error if returns multiple results' do
-        allow_any_instance_of(Chef::ServerAPI).to receive(:post_rest).and_return(
+        allow_any_instance_of(Chef::ServerAPI)
+          .to receive(:post_rest).and_return(
           'rows' => [
             { 'data' => { 'leo' => 'donnie', 'name' => 'node1' } },
             { 'data' => { 'raph' => 'mikey', 'name' => 'node1' } }
