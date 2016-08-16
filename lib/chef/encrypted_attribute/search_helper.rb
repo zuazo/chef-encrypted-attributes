@@ -377,7 +377,7 @@ class Chef
         assert_search_keys(keys)
 
         rest = Chef::ServerAPI.new(Chef::Config[:chef_server_url])
-        resp = rest.post_rest(escaped_query, generate_partial_search_keys(keys))
+        resp = rest.post(escaped_query, generate_partial_search_keys(keys))
         assert_partial_search_response(resp)
         parse_partial_search_response(resp, name, keys)
       end
