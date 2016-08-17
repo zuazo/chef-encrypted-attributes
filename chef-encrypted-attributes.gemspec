@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
 
   # Support old deprecated Ruby versions:
   if RUBY_VERSION < '2.1'
-    s.add_development_dependency 'ffi-yajl',  '~> 2.2.3'
+    s.add_development_dependency 'ffi-yajl',  '<= 2.2.3'
     s.add_development_dependency 'chef-zero', '< 4.6.0'
     s.add_development_dependency 'ohai', '< 8.18.0'
   end
