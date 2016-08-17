@@ -42,6 +42,12 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'highline', '< 1.7'
     s.add_development_dependency 'ohai', '< 8'
   end
+  if RUBY_VERSION < '2.1'
+    s.add_development_dependency 'ffi-yajl',  '~> 2.2.3'
+    s.add_development_dependency 'chef-zero', '< 4.6.0'
+    s.add_development_dependency 'ohai', '< 8.18.0'
+    s.add_development_dependency 'chef', '< 12.9.0'
+  end
 
   s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'rack', '~> 1.0' if RUBY_VERSION < '2.2.2'
