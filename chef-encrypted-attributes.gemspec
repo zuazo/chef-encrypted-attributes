@@ -30,18 +30,11 @@ Gem::Specification.new do |s|
     .yardopts Rakefile LICENSE
   ) + Dir.glob('*.md') + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
-  s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
+  s.required_ruby_version = Gem::Requirement.new('>= 2.0.0')
 
   s.add_development_dependency 'chef', chef_version
 
   # Support old deprecated Ruby versions:
-  if RUBY_VERSION < '1.9.3'
-    s.add_development_dependency 'mixlib-shellout', '< 1.6.1'
-  end
-  if RUBY_VERSION < '2'
-    s.add_development_dependency 'highline', '< 1.7'
-    s.add_development_dependency 'ohai', '< 8'
-  end
   if RUBY_VERSION < '2.1'
     s.add_development_dependency 'ffi-yajl',  '~> 2.2.3'
     s.add_development_dependency 'chef-zero', '< 4.6.0'
