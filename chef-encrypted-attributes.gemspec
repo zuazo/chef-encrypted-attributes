@@ -10,7 +10,7 @@ chef_version =
   if ENV.key?('CHEF_VERSION')
     ENV['CHEF_VERSION']
   else
-    ['>= 11.8', '< 13']
+    RUBY_VERSION < '2.1' ? ['>= 11.8', '< 12.9'] : ['>= 11.8', '< 13']
   end
 
 Gem::Specification.new do |s|
@@ -39,7 +39,6 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'ffi-yajl',  '~> 2.2.3'
     s.add_development_dependency 'chef-zero', '< 4.6.0'
     s.add_development_dependency 'ohai', '< 8.18.0'
-    s.add_development_dependency 'chef', '< 12.9.0'
   end
 
   s.add_development_dependency 'rake', '~> 10.0'
