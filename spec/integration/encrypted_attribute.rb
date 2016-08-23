@@ -19,6 +19,7 @@
 
 require 'integration_helper'
 require 'chef/api_client'
+require 'chef/node'
 
 describe Chef::EncryptedAttribute do
   extend ChefZero::RSpec

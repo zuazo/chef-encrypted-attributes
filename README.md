@@ -18,8 +18,8 @@ Node attributes are encrypted using chef client and user keys with public key in
 
 ## Requirements
 
-* Ruby `>= 1.9`
-* Chef Client `~> 11.4`
+* Ruby `>= 2.0`
+* Chef Client `~> 11.8`
 * yajl_ruby `~> 1.1` or ffi_yajl `>= 1.0, <3.0` (included with Chef)
 * If you want to use protocol version 2 to use [GCM](http://en.wikipedia.org/wiki/Galois/Counter_Mode) (disabled by default):
  * Ruby `>= 2`.

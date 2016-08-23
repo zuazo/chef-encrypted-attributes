@@ -10,7 +10,7 @@ chef_version =
   if ENV.key?('CHEF_VERSION')
     ENV['CHEF_VERSION']
   else
-    ['>= 11.4', '< 13']
+    RUBY_VERSION < '2.1' ? ['>= 11.8', '< 12.9'] : ['>= 11.8', '< 13']
   end
 
 Gem::Specification.new do |s|
@@ -30,21 +30,19 @@ Gem::Specification.new do |s|
     .yardopts Rakefile LICENSE
   ) + Dir.glob('*.md') + Dir.glob('lib/**/*')
   s.test_files = Dir.glob('{test,spec,features}/*')
-  s.required_ruby_version = Gem::Requirement.new('>= 1.9.2')
+  s.required_ruby_version = Gem::Requirement.new('>= 2.0.0')
 
   s.add_development_dependency 'chef', chef_version
 
   # Support old deprecated Ruby versions:
-  if RUBY_VERSION < '1.9.3'
-    s.add_development_dependency 'mixlib-shellout', '< 1.6.1'
-  end
-  if RUBY_VERSION < '2'
-    s.add_development_dependency 'highline', '< 1.7'
-    s.add_development_dependency 'ohai', '< 8'
+  if RUBY_VERSION < '2.1'
+    s.add_development_dependency 'ffi-yajl',  '<= 2.2.3'
+    s.add_development_dependency 'chef-zero', '< 4.6.0'
+    s.add_development_dependency 'ohai', '< 8.18.0'
   end
 
   s.add_development_dependency 'rake', '~> 10.0'
-  s.add_development_dependency 'chef-zero', '~> 3.2'
+  s.add_development_dependency 'rack', '~> 1.0' if RUBY_VERSION < '2.2.2'
   s.add_development_dependency 'rspec-core', '~> 3.1'
   s.add_development_dependency 'rspec-expectations', '~> 3.1'
   s.add_development_dependency 'rspec-mocks', '~> 3.1'
