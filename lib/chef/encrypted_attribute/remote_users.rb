@@ -104,7 +104,7 @@ class Chef
       # @api private
       def self.all_public_keys
         # Chef::User.list(inflate=true) has a bug (fixed in 11.14.0)
-        # https://tickets.opscode.com/browse/CHEF-5328
+        # https://tickets.chef.io/browse/CHEF-5328
         get_users_public_keys(Chef::User.list.keys)
       end
     end
