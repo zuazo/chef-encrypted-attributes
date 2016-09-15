@@ -1,5 +1,8 @@
 # Chef-Encrypted-Attributes
 [![Gem Version](http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat)](http://badge.fury.io/rb/chef-encrypted-attributes)
+[![GitHub](http://img.shields.io/badge/github-zuazo/chef--encrypted--attributes-blue.svg?style=flat)](https://github.com/zuazo/chef-encrypted-attributes)
+[![License](https://img.shields.io/github/license/zuazo/chef-encrypted-attributes.svg?style=flat)](#license-and-author)
+
 [![Dependency Status](http://img.shields.io/gemnasium/zuazo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/zuazo/chef-encrypted-attributes)
 [![Code Climate](http://img.shields.io/codeclimate/github/zuazo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/zuazo/chef-encrypted-attributes)
 [![Build Status](http://img.shields.io/travis/zuazo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/zuazo/chef-encrypted-attributes)
