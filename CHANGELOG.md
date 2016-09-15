@@ -2,6 +2,17 @@
 
 This file is used to list changes made in each version of `chef-encrypted-attributes`.
 
+## 0.9.0 (2016-09-15)
+
+* Remove support for Ruby < `2.0` (**breaking change**).
+* Change requirements to Chef `11.8` or higher (**breaking change**).
+* Replace depreciated `Chef::REST` with `Chef::ServerAPI` ([issue #6](https://github.com/zuazo/chef-encrypted-attributes/pull/6), thanks to [Eric Blevins](https://github.com/e100)).
+* Fix integration and unit tests ([see issue #6](https://github.com/zuazo/chef-encrypted-attributes/pull/6), thanks to [Eric Blevins](https://github.com/e100)).
+* Update and fix dependencies in the gemspec ([see issue #6](https://github.com/zuazo/chef-encrypted-attributes/pull/6), thanks to [Eric Blevins](https://github.com/e100)).
+* Update chef links to use *chef.io* domain.
+* Update contact information and links after migration.
+* README: Add GitHub and License badges.
+
 ## 0.8.0 (2015-05-22)
 
 * Do not limit `RemoteNode#load_attribute` search result to one row (related to [issue #3](https://github.com/zuazo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).

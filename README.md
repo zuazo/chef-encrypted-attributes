@@ -5,8 +5,8 @@
 
 [![Dependency Status](http://img.shields.io/gemnasium/zuazo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/zuazo/chef-encrypted-attributes)
 [![Code Climate](http://img.shields.io/codeclimate/github/zuazo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/zuazo/chef-encrypted-attributes)
-[![Build Status](http://img.shields.io/travis/zuazo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/zuazo/chef-encrypted-attributes)
-[![Coverage Status](http://img.shields.io/coveralls/zuazo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/zuazo/chef-encrypted-attributes?branch=master)
+[![Build Status](http://img.shields.io/travis/zuazo/chef-encrypted-attributes/0.9.0.svg?style=flat)](https://travis-ci.org/zuazo/chef-encrypted-attributes)
+[![Coverage Status](http://img.shields.io/coveralls/zuazo/chef-encrypted-attributes/0.9.0.svg?style=flat)](https://coveralls.io/r/zuazo/chef-encrypted-attributes?branch=0.9.0)
 [![Inline docs](http://inch-ci.org/github/zuazo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/zuazo/chef-encrypted-attributes)
 
 [Chef](https://www.chef.io/) plugin to add Node encrypted attributes support using client keys.
@@ -206,11 +206,11 @@ See the [official gem documentation](http://www.rubydoc.info/gems/chef-encrypted
 
 The `chef-encrypted-attributes` gem is cryptographically signed by Onddo Labs's certificate, which identifies as *xabier@zuazo.org*. You can obtain the official signature here:
 
-    https://raw.github.com/zuazo/chef-encrypted-attributes/master/certs/xabier_zuazo.crt
+    https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/certs/xabier_zuazo.crt
 
 To be sure the gem you install has not been tampered with:
 
-    $ gem cert --add <(curl -Ls https://raw.github.com/zuazo/chef-encrypted-attributes/master/certs/xabier_zuazo.crt)
+    $ gem cert --add <(curl -Ls https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/certs/xabier_zuazo.crt)
     $ gem install chef-encrypted-attributes -P MediumSecurity
 
 The *MediumSecurity* trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all of `chef-encrypted-attributes`'s dependencies are signed, so we cannot use *HighSecurity*.
@@ -229,7 +229,7 @@ Still, this gem should be considered experimental until audited by professional 
 
 If you have discovered a bug in `chef-encrypted-attributes` of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-attributes` users, you can report it securely by sending a GPG encrypted message. Please use the following key:
 
-    https://raw.github.com/zuazo/chef-encrypted-attributes/master/zuazo.gpg
+    https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/zuazo.gpg
 
 The key fingerprint is (or should be):
 
