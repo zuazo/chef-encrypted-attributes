@@ -257,6 +257,7 @@ See [TODO.md](https://github.com/zuazo/chef-encrypted-attributes/blob/master/TOD
 | **Contributor:**     | [Josh Kalderimis](https://github.com/joshk)
 | **Contributor:**     | [Crystal Hsiung](https://github.com/chhsiung)
 | **Contributor:**     | [Lisa Danz](https://github.com/ldanz)
+| **Contributor:**     | [Eric Blevins](https://github.com/e100)
 | **Copyright:**       | Copyright (c) 2016 Xabier de Zuazo
 | **Copyright:**       | Copyright (c) 2014-2015 Onddo Labs, SL.
 | **License:**         | Apache License, Version 2.0
