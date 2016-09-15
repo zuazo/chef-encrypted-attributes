@@ -4,7 +4,7 @@ There are multiple commands to read, create and modify the encrypted attributes.
 
 The `ATTRIBUTE` name must be specified using *dots* notation. For example, for `node['encrypted']['attribute']`, you must specify `"encrypted.attribute"` as knife argument. If the attribute key has a *dot* in its name, you must escape it. For example: `"encrypted.attribute\.with\.dots"`.
 
-Read the [Chef Users Limitation](http://onddo.github.io/chef-encrypted-attributes/#chef-user-keys-access-limitation) caveat before trying to use any knife command.
+Read the [Chef Users Limitation](http://zuazo.github.io/chef-encrypted-attributes/#chef-user-keys-access-limitation) caveat before trying to use any knife command.
 
 ## Installing the Required Gem
 

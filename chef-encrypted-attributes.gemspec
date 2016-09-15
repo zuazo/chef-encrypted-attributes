@@ -22,9 +22,9 @@ Gem::Specification.new do |s|
   s.description =
     'Chef plugin to add Node encrypted attributes support using client keys'
   s.license = 'Apache-2.0'
-  s.authors = ['Onddo Labs, SL.']
-  s.email = 'team@onddo.com'
-  s.homepage = 'http://onddo.github.io/chef-encrypted-attributes'
+  s.authors = ['Xabier de Zuazo']
+  s.email = 'xabier@zuazo.org'
+  s.homepage = 'http://zuazo.github.io/chef-encrypted-attributes'
   s.require_path = 'lib'
   s.files = %w(
     .yardopts Rakefile LICENSE
@@ -52,5 +52,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '= 0.31.0' if RUBY_VERSION >= '1.9.3'
   s.add_development_dependency 'yard', '~> 0.8'
 
-  s.cert_chain = [::File.join('certs', 'team_onddo.crt')]
+  s.cert_chain = [::File.join('certs', 'xabier_zuazo.crt')]
 end

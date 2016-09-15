@@ -4,31 +4,31 @@ This file is used to list changes made in each version of `chef-encrypted-attrib
 
 ## 0.8.0 (2015-05-22)
 
-* Do not limit `RemoteNode#load_attribute` search result to one row (related to [issue #3](https://github.com/onddo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).
+* Do not limit `RemoteNode#load_attribute` search result to one row (related to [issue #3](https://github.com/zuazo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).
 * Update opscode and github links to chef.io and chef.
 
 ## 0.7.0 (2015-05-20)
 
-* Move chef to dev dependency and remove dynamic dependency installation extension (related to [cookbook issue #2](https://github.com/onddo/encrypted_attributes-cookbook/pull/2#issuecomment-101454221) and [issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [Lisa Danz](https://github.com/ldanz) for reporting).
-* Fix search by node name to prevent returning incorrect nodes ([issue #3](https://github.com/onddo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).
+* Move chef to dev dependency and remove dynamic dependency installation extension (related to [cookbook issue #2](https://github.com/zuazo/encrypted_attributes-cookbook/pull/2#issuecomment-101454221) and [issue #2](https://github.com/zuazo/chef-encrypted-attributes/pull/2), thanks [Lisa Danz](https://github.com/ldanz) for reporting).
+* Fix search by node name to prevent returning incorrect nodes ([issue #3](https://github.com/zuazo/chef-encrypted-attributes/pull/3), thanks [Crystal Hsiung](https://github.com/chhsiung) for the help).
 * RuboCop update to `0.31.0`.
 * README: Add a link to the cookbook helper libraries.
 
 ## 0.6.0 (2015-05-08)
 
-* Conditional gem dependency installation within a gemspec ([issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
-* Choose YAJL library based on chef version ([issue #4](https://github.com/onddo/chef-encrypted-attributes/pull/4), thanks [Lisa Danz](https://github.com/ldanz)).
+* Conditional gem dependency installation within a gemspec ([issue #2](https://github.com/zuazo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
+* Choose YAJL library based on chef version ([issue #4](https://github.com/zuazo/chef-encrypted-attributes/pull/4), thanks [Lisa Danz](https://github.com/ldanz)).
 * Add doc Rake task to generate the documentation.
 
 ## 0.5.0 (2015-04-03)
 
 * `#load_from_node` raises an exception if no ecnrypted attribute is found.
 * GemSpec:
-  * Fix Ruby < 2 support ([issue #2](https://github.com/onddo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
+  * Fix Ruby < 2 support ([issue #2](https://github.com/zuazo/chef-encrypted-attributes/pull/2), thanks [@chhsiung](https://github.com/chhsiung) for the help).
   * Depend on `ffi-yajl` `< 3` as in Chef.
 
 * Tests:
-  * Use the new build environment on Travis ([issue #1](https://github.com/onddo/chef-encrypted-attributes/pull/1), thanks [Josh Kalderimis](https://github.com/joshk))
+  * Use the new build environment on Travis ([issue #1](https://github.com/zuazo/chef-encrypted-attributes/pull/1), thanks [Josh Kalderimis](https://github.com/joshk))
   * GemSpec: Update RuboCop to version `0.29.1` (new offenses fixed).
 
 * Documentation:

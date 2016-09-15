@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
-# Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
+# Author:: Xabier de Zuazo (<xabier@zuazo.org>)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,7 @@ describe Chef::EncryptedAttribute::SearchHelper do
       'spaced text ' => 'spaced%20text%20',
       'slashed/text' => 'slashed%2Ftext',
       '%20' => '%2520',
-      'http://onddo.com' => 'http%3A%2F%2Fonddo.com',
+      'http://zuazo.org' => 'http%3A%2F%2Fzuazo.org',
       '?var1=1' => '%3Fvar1%3D1',
       '?var1=1&var2=2' => '%3Fvar1%3D1%26var2%3D2'
     }.each do |orig_str, escaped|

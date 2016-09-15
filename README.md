@@ -1,10 +1,10 @@
 # Chef-Encrypted-Attributes
 [![Gem Version](http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat)](http://badge.fury.io/rb/chef-encrypted-attributes)
-[![Dependency Status](http://img.shields.io/gemnasium/onddo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/onddo/chef-encrypted-attributes)
-[![Code Climate](http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/onddo/chef-encrypted-attributes)
-[![Build Status](http://img.shields.io/travis/onddo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/onddo/chef-encrypted-attributes)
-[![Coverage Status](http://img.shields.io/coveralls/onddo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=master)
-[![Inline docs](http://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/onddo/chef-encrypted-attributes)
+[![Dependency Status](http://img.shields.io/gemnasium/zuazo/chef-encrypted-attributes.svg?style=flat)](https://gemnasium.com/zuazo/chef-encrypted-attributes)
+[![Code Climate](http://img.shields.io/codeclimate/github/zuazo/chef-encrypted-attributes.svg?style=flat)](https://codeclimate.com/github/zuazo/chef-encrypted-attributes)
+[![Build Status](http://img.shields.io/travis/zuazo/chef-encrypted-attributes.svg?style=flat)](https://travis-ci.org/zuazo/chef-encrypted-attributes)
+[![Coverage Status](http://img.shields.io/coveralls/zuazo/chef-encrypted-attributes.svg?style=flat)](https://coveralls.io/r/zuazo/chef-encrypted-attributes?branch=master)
+[![Inline docs](http://inch-ci.org/github/zuazo/chef-encrypted-attributes.svg?branch=master&style=flat)](http://inch-ci.org/github/zuazo/chef-encrypted-attributes)
 
 [Chef](https://www.chef.io/) plugin to add Node encrypted attributes support using client keys.
 
@@ -27,7 +27,7 @@ Node attributes are encrypted using chef client and user keys with public key in
 
 ## Usage in Recipes
 
-Before reading all the documentation below, we recommend you take a look at the [`encrypted_attributes` cookbook's helper libraries](https://github.com/onddo/encrypted_attributes-cookbook#helper-libraries). Those libraries are easier to use than the underlying API and cover the most common use cases.
+Before reading all the documentation below, we recommend you take a look at the [`encrypted_attributes` cookbook's helper libraries](https://github.com/zuazo/encrypted_attributes-cookbook#helper-libraries). Those libraries are easier to use than the underlying API and cover the most common use cases.
 
 ### Installing and Including the Gem
 
@@ -201,20 +201,20 @@ See the [official gem documentation](http://www.rubydoc.info/gems/chef-encrypted
 
 ## Using Signed Gems
 
-The `chef-encrypted-attributes` gem is cryptographically signed by Onddo Labs's certificate, which identifies as *team@onddo.com*. You can obtain the official signature here:
+The `chef-encrypted-attributes` gem is cryptographically signed by Onddo Labs's certificate, which identifies as *xabier@zuazo.org*. You can obtain the official signature here:
 
-    https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt
+    https://raw.github.com/zuazo/chef-encrypted-attributes/master/certs/xabier_zuazo.crt
 
 To be sure the gem you install has not been tampered with:
 
-    $ gem cert --add <(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/master/certs/team_onddo.crt)
+    $ gem cert --add <(curl -Ls https://raw.github.com/zuazo/chef-encrypted-attributes/master/certs/xabier_zuazo.crt)
     $ gem install chef-encrypted-attributes -P MediumSecurity
 
 The *MediumSecurity* trust profile will verify signed gems, but allow the installation of unsigned dependencies. This is necessary because not all of `chef-encrypted-attributes`'s dependencies are signed, so we cannot use *HighSecurity*.
 
 We recommend to remove our certificate after the gem has been successfully verified and installed:
 
-    $ gem cert --remove '/cn=team/dc=onddo/dc=com'
+    $ gem cert --remove '/cn=xabier/dc=zuazo/dc=org'
 
 ## Security Notes
 
@@ -226,35 +226,36 @@ Still, this gem should be considered experimental until audited by professional 
 
 If you have discovered a bug in `chef-encrypted-attributes` of a sensitive nature, i.e.  one which can compromise the security of `chef-encrypted-attributes` users, you can report it securely by sending a GPG encrypted message. Please use the following key:
 
-    https://raw.github.com/onddo/chef-encrypted-attributes/master/zuazo.gpg
+    https://raw.github.com/zuazo/chef-encrypted-attributes/master/zuazo.gpg
 
 The key fingerprint is (or should be):
 
-    8EFA 5B17 7275 5F1F 42B2  26B4 8E18 8B67 9DE1 9468
+    ADAE EEFC BD78 6CBB B76B  1662 2195 FF19 5324 14AB
 
 ## Testing
 
-See [TESTING.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md).
+See [TESTING.md](https://github.com/zuazo/chef-encrypted-attributes/blob/master/TESTING.md).
 
 ## Contributing
 
-Please do not hesitate to [open an issue](https://github.com/onddo/chef-encrypted-attributes/issues/new) with any questions or problems.
+Please do not hesitate to [open an issue](https://github.com/zuazo/chef-encrypted-attributes/issues/new) with any questions or problems.
 
-See [CONTRIBUTING.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/zuazo/chef-encrypted-attributes/blob/master/CONTRIBUTING.md).
 
 ## TODO
 
-See [TODO.md](https://github.com/onddo/chef-encrypted-attributes/blob/master/TODO.md).
+See [TODO.md](https://github.com/zuazo/chef-encrypted-attributes/blob/master/TODO.md).
 
 ## License and Author
 
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
-| **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@onddo.com>)
+| **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@zuazo.org>)
 | **Contributor:**     | [Josh Kalderimis](https://github.com/joshk)
 | **Contributor:**     | [Crystal Hsiung](https://github.com/chhsiung)
 | **Contributor:**     | [Lisa Danz](https://github.com/ldanz)
-| **Copyright:**       | Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
+| **Copyright:**       | Copyright (c) 2016 Xabier de Zuazo
+| **Copyright:**       | Copyright (c) 2014-2015 Onddo Labs, SL.
 | **License:**         | Apache License, Version 2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
