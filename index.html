@@ -2,10 +2,10 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Chef-encrypted-attributes by onddo</title>
+    <title>Chef-encrypted-attributes by zuazo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
@@ -13,39 +13,43 @@
     <section class="page-header">
       <h1 class="project-name">Chef-encrypted-attributes</h1>
       <h2 class="project-tagline">Chef plugin to add Node encrypted attributes support using client keys.</h2>
-      <a href="https://github.com/onddo/chef-encrypted-attributes" class="btn">View on GitHub</a>
-      <a href="https://github.com/onddo/chef-encrypted-attributes/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/onddo/chef-encrypted-attributes/tarball/master" class="btn">Download .tar.gz</a>
+      <a href="https://github.com/zuazo/chef-encrypted-attributes" class="btn">View on GitHub</a>
+      <a href="https://github.com/zuazo/chef-encrypted-attributes/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/zuazo/chef-encrypted-attributes/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
       <h1>
-<a id="chef-encrypted-attributes" class="anchor" href="#chef-encrypted-attributes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chef-Encrypted-Attributes</h1>
+<a id="chef-encrypted-attributes" class="anchor" href="#chef-encrypted-attributes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Chef-Encrypted-Attributes</h1>
 
 <p><a href="http://badge.fury.io/rb/chef-encrypted-attributes"><img src="http://img.shields.io/gem/v/chef-encrypted-attributes.svg?style=flat" alt="Gem Version"></a>
-<a href="https://codeclimate.com/github/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/codeclimate/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Code Climate"></a>
-<a href="https://travis-ci.org/onddo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat" alt="Build Status"></a>
-<a href="https://coveralls.io/r/onddo/chef-encrypted-attributes?branch=0.8.0"><img src="http://img.shields.io/coveralls/onddo/chef-encrypted-attributes/0.8.0.svg?style=flat" alt="Coverage Status"></a>
-<a href="http://inch-ci.org/github/onddo/chef-encrypted-attributes"><img src="https://inch-ci.org/github/onddo/chef-encrypted-attributes.svg?style=flat" alt="Inline docs"></a></p>
+<a href="https://github.com/zuazo/chef-encrypted-attributes"><img src="http://img.shields.io/badge/github-zuazo/chef--encrypted--attributes-blue.svg?style=flat" alt="GitHub"></a>
+<a href="#license-and-author"><img src="https://img.shields.io/github/license/zuazo/chef-encrypted-attributes.svg?style=flat" alt="License"></a></p>
+
+<p><a href="https://gemnasium.com/zuazo/chef-encrypted-attributes"><img src="http://img.shields.io/gemnasium/zuazo/chef-encrypted-attributes.svg?style=flat" alt="Dependency Status"></a>
+<a href="https://codeclimate.com/github/zuazo/chef-encrypted-attributes"><img src="http://img.shields.io/codeclimate/github/zuazo/chef-encrypted-attributes.svg?style=flat" alt="Code Climate"></a>
+<a href="https://travis-ci.org/zuazo/chef-encrypted-attributes"><img src="http://img.shields.io/travis/zuazo/chef-encrypted-attributes/0.9.0.svg?style=flat" alt="Build Status"></a>
+<a href="https://coveralls.io/r/zuazo/chef-encrypted-attributes?branch=0.9.0"><img src="http://img.shields.io/coveralls/zuazo/chef-encrypted-attributes/0.9.0.svg?style=flat" alt="Coverage Status"></a>
+<a href="http://inch-ci.org/github/zuazo/chef-encrypted-attributes"><img src="http://inch-ci.org/github/zuazo/chef-encrypted-attributes.svg?branch=master&amp;style=flat" alt="Inline docs"></a></p>
 
 <p><a href="https://www.chef.io/">Chef</a> plugin to add Node encrypted attributes support using client keys.</p>
 
 <p>We recommend using the <a href="https://supermarket.chef.io/cookbooks/encrypted_attributes"><code>encrypted_attributes</code></a> cookbook for easy installation.</p>
 
 <h2>
-<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h2>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h2>
 
 <p>Node attributes are encrypted using chef client and user keys with public key infrastructure (PKI). You can choose which clients, nodes or users will be able to read the attribute.</p>
 
 <p><em>Chef Nodes</em> with read access can be specified using a <code>node_search</code> query. In case new nodes are added or removed, the data will be re-encrypted in the next <em>Chef Run</em> of the encrypting node (using the <code>#update</code> method shown below). Similarly, a <code>client_search</code> query can be used to allow <em>Chef Clients</em> to read the attribute.</p>
 
 <h2>
-<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
 
 <ul>
-<li>Ruby <code>&gt;= 1.9</code>
+<li>Ruby <code>&gt;= 2.0</code>
 </li>
-<li>Chef Client <code>~&gt; 11.4</code>
+<li>Chef Client <code>~&gt; 11.8</code>
 </li>
 <li>yajl_ruby <code>~&gt; 1.1</code> or ffi_yajl <code>&gt;= 1.0, &lt;3.0</code> (included with Chef)</li>
 <li>If you want to use protocol version 2 to use <a href="http://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM</a> (disabled by default):
@@ -58,24 +62,24 @@
 </ul>
 
 <h2>
-<a id="usage-in-recipes" class="anchor" href="#usage-in-recipes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage in Recipes</h2>
+<a id="usage-in-recipes" class="anchor" href="#usage-in-recipes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage in Recipes</h2>
 
-<p>Before reading all the documentation below, we recommend you take a look at the <a href="https://github.com/onddo/encrypted_attributes-cookbook#helper-libraries"><code>encrypted_attributes</code> cookbook's helper libraries</a>. Those libraries are easier to use than the underlying API and cover the most common use cases.</p>
+<p>Before reading all the documentation below, we recommend you take a look at the <a href="https://github.com/zuazo/encrypted_attributes-cookbook#helper-libraries"><code>encrypted_attributes</code> cookbook's helper libraries</a>. Those libraries are easier to use than the underlying API and cover the most common use cases.</p>
 
 <h3>
-<a id="installing-and-including-the-gem" class="anchor" href="#installing-and-including-the-gem" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing and Including the Gem</h3>
+<a id="installing-and-including-the-gem" class="anchor" href="#installing-and-including-the-gem" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing and Including the Gem</h3>
 
 <p>You need to install and include the <code>chef-encrypted-attributes</code> gem before using encrypted attributes inside a cookbook.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
 <span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span></pre></div>
 
 <h3>
-<a id="typical-example" class="anchor" href="#typical-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Typical Example</h3>
+<a id="typical-example" class="anchor" href="#typical-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Typical Example</h3>
 
 <p>In the following example we save a simple FTP user password.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
 <span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
 <span class="pl-c"># include the #secure_password method</span>
@@ -98,11 +102,11 @@
 <p><strong>Note:</strong> This example requires the <a href="https://supermarket.chef.io/cookbooks/openssl"><code>openssl</code></a> cookbook.</p>
 
 <h3>
-<a id="minimal-write-only-example" class="anchor" href="#minimal-write-only-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Minimal Write Only Example</h3>
+<a id="minimal-write-only-example" class="anchor" href="#minimal-write-only-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Minimal Write Only Example</h3>
 
 <p>In this example we only need to save some data from the local node and read it from another:</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
 <span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
 <span class="pl-c"># Allow all admin clients to read the attributes encrypted by me</span>
@@ -126,7 +130,7 @@
 
 <p>Then we can read this attribute from another allowed node (a <code>'role:webapp'</code> node):</p>
 
-<div class="highlight highlight-ruby"><pre>include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-ruby"><pre>include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attributes<span class="pl-pds">'</span></span>
 <span class="pl-c"># Expose the public key for encryption</span>
 include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attributes::expose_key<span class="pl-pds">'</span></span>
 
@@ -143,13 +147,13 @@ include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attribu
 <p><strong>Note:</strong> Be careful when using <code>#exist_on_node?</code> and <code>#load_from_node</code> and remember passing the attribute path to read as <strong>Array of Strings</strong> <del>instead of using <code>node[...]</code> (which points to the local node)</del>.</p>
 
 <h3>
-<a id="example-using-user-keys-data-bag" class="anchor" href="#example-using-user-keys-data-bag" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example Using User Keys Data Bag</h3>
+<a id="example-using-user-keys-data-bag" class="anchor" href="#example-using-user-keys-data-bag" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example Using User Keys Data Bag</h3>
 
 <p>Suppose we want to store users public keys in a data bag and give them access to the attributes. This can be a workaround for the <a href="#chef-user-keys-access-limitation">Chef Users Limitation</a> problem.</p>
 
 <p>You need to create a Data Bag Item with a content similar to the following:</p>
 
-<div class="highlight highlight-json"><pre>{
+<div class="highlight highlight-source-json"><pre>{
   <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>chef_users<span class="pl-pds">"</span></span>,
   <span class="pl-s"><span class="pl-pds">"</span>bob<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>,
   <span class="pl-s"><span class="pl-pds">"</span>alice<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>-----BEGIN PUBLIC KEY-----<span class="pl-cce">\n</span>MIIBIjANBgkqhkiG9w0BAQEFA...<span class="pl-pds">"</span></span>
@@ -159,7 +163,7 @@ include_recipe <span class="pl-s"><span class="pl-pds">'</span>encrypted_attribu
 
 <p>Then, from a recipe, you can read this user keys and allow them to read the attributes.</p>
 
-<div class="highlight highlight-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-ruby"><pre>chef_gem <span class="pl-s"><span class="pl-pds">'</span>chef-encrypted-attributes<span class="pl-pds">'</span></span>
 <span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>chef/encrypted_attributes<span class="pl-pds">'</span></span>
 
 chef_users <span class="pl-k">=</span> <span class="pl-c1">Chef</span>::<span class="pl-c1">DataBagItem</span>.load(<span class="pl-s"><span class="pl-pds">'</span>global_data_bag<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>chef_users<span class="pl-pds">'</span></span>)
@@ -180,12 +184,12 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 <p><strong>Note:</strong> This data bag does <strong>not</strong> need to be <strong>encrypted</strong>, because it only stores <strong>public keys</strong>.</p>
 
 <h2>
-<a id="chefencryptedattribute-api" class="anchor" href="#chefencryptedattribute-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chef::EncryptedAttribute API</h2>
+<a id="chefencryptedattribute-api" class="anchor" href="#chefencryptedattribute-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Chef::EncryptedAttribute API</h2>
 
 <p>See the <a href="http://www.rubydoc.info/gems/chef-encrypted-attributes/Chef/EncryptedAttribute/API.html">API documentation</a> for a more detailed information about <code>Chef::EncryptedAttribute</code> class and its methods.</p>
 
 <h2>
-<a id="chef-user-keys-access-limitation" class="anchor" href="#chef-user-keys-access-limitation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chef User Keys Access Limitation</h2>
+<a id="chef-user-keys-access-limitation" class="anchor" href="#chef-user-keys-access-limitation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Chef User Keys Access Limitation</h2>
 
 <p>Keep in mind that, from a Chef Node, <em>Chef User</em> <em>public keys</em> are inaccessible. So you have to pass them in raw mode in the recipe if you need any <em>Chef User</em> to be able to use the encrypted attributes (this is <strong>required for</strong> example to use the <strong>knife commands</strong> included in this gem, as knife is usually used by <em>Chef Users</em>). Summarizing, Chef Node inside a recipe (using its <em>Chef Client</em> key) will not be able to retrieve the <em>Chef Users</em> <em>public keys</em>, so you need to pass them using the <code>[:keys]</code> configuration value.</p>
 
@@ -196,7 +200,7 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 <p><strong>Note:</strong> <em>Chef Clients</em> usually are Chef Nodes and <em>chef-validation</em>/<em>chef-webui</em> keys. <em>Chef Users</em> usually are knife users. The main difference between <em>Chef Users</em> and <em>Chef Clients</em> is that the former are able to log in via <em>web-ui</em> (has a password).</p>
 
 <h2>
-<a id="chef-client-keys-access-limitation" class="anchor" href="#chef-client-keys-access-limitation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chef Client Keys Access Limitation</h2>
+<a id="chef-client-keys-access-limitation" class="anchor" href="#chef-client-keys-access-limitation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Chef Client Keys Access Limitation</h2>
 
 <p><em>Chef Client</em> <em>public keys</em> has a <a href="#chef-user-keys-access-limitation">similar problem to the user keys</a>, you cannot retrieve them from a Chef Node.</p>
 
@@ -205,19 +209,19 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 <p>Exposing the public key through attributes should not be considered a security breach, so it's not a problem to include it on all machines.</p>
 
 <h2>
-<a id="maximum-number-of-nodes" class="anchor" href="#maximum-number-of-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maximum Number of Nodes</h2>
+<a id="maximum-number-of-nodes" class="anchor" href="#maximum-number-of-nodes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Maximum Number of Nodes</h2>
 
 <p>This gem is ready to be used with Chef Servers that have less than <code>1000</code> nodes by default. You can increase this limit setting the <code>search_max_rows</code> configuration option:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:search_max_rows</span>] <span class="pl-k">=</span> <span class="pl-c1">50_000</span></pre></div>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c1">Chef</span>::<span class="pl-c1">Config</span>[<span class="pl-c1">:encrypted_attributes</span>][<span class="pl-c1">:search_max_rows</span>] <span class="pl-k">=</span> <span class="pl-c1">50_000</span></pre></div>
 
 <h2>
-<a id="knife-commands" class="anchor" href="#knife-commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Knife Commands</h2>
+<a id="knife-commands" class="anchor" href="#knife-commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Knife Commands</h2>
 
 <p>See the <a href="http://www.rubydoc.info/gems/chef-encrypted-attributes/file/KNIFE.md">KNIFE.md</a> file.</p>
 
 <h2>
-<a id="internal-low-level-documentation" class="anchor" href="#internal-low-level-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Internal Low Level Documentation</h2>
+<a id="internal-low-level-documentation" class="anchor" href="#internal-low-level-documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Internal Low Level Documentation</h2>
 
 <p>The cryptographic systems used are documented in the following classes:</p>
 
@@ -236,16 +240,16 @@ chef_users.delete(<span class="pl-s"><span class="pl-pds">'</span>id<span class=
 <p>See the <a href="http://www.rubydoc.info/gems/chef-encrypted-attributes/">official gem documentation</a> for more information.</p>
 
 <h2>
-<a id="using-signed-gems" class="anchor" href="#using-signed-gems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using Signed Gems</h2>
+<a id="using-signed-gems" class="anchor" href="#using-signed-gems" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using Signed Gems</h2>
 
-<p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:team@onddo.com">team@onddo.com</a></em>. You can obtain the official signature here:</p>
+<p>The <code>chef-encrypted-attributes</code> gem is cryptographically signed by Onddo Labs's certificate, which identifies as <em><a href="mailto:xabier@zuazo.org">xabier@zuazo.org</a></em>. You can obtain the official signature here:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt
+<pre><code>https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/certs/xabier_zuazo.crt
 </code></pre>
 
 <p>To be sure the gem you install has not been tampered with:</p>
 
-<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/certs/team_onddo.crt)
+<pre><code>$ gem cert --add &lt;(curl -Ls https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/certs/xabier_zuazo.crt)
 $ gem install chef-encrypted-attributes -P MediumSecurity
 </code></pre>
 
@@ -253,48 +257,48 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 
 <p>We recommend to remove our certificate after the gem has been successfully verified and installed:</p>
 
-<pre><code>$ gem cert --remove '/cn=team/dc=onddo/dc=com'
+<pre><code>$ gem cert --remove '/cn=xabier/dc=zuazo/dc=org'
 </code></pre>
 
 <h2>
-<a id="security-notes" class="anchor" href="#security-notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Security Notes</h2>
+<a id="security-notes" class="anchor" href="#security-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Security Notes</h2>
 
 <p>All the cryptographic systems and algorithms used by <code>chef-encrypted-attributes</code> are carefully described in the <a href="#internal-low-level-documentation">internal documentation</a> for public review. The code was originally based on <em>Encrypted Data Bags</em> and <a href="https://github.com/Nordstrom/chef-vault">chef-vault</a> implementations, then improved.</p>
 
 <p>Still, this gem should be considered experimental until audited by professional cryptographers.</p>
 
 <h2>
-<a id="reporting-security-problems" class="anchor" href="#reporting-security-problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting Security Problems</h2>
+<a id="reporting-security-problems" class="anchor" href="#reporting-security-problems" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reporting Security Problems</h2>
 
 <p>If you have discovered a bug in <code>chef-encrypted-attributes</code> of a sensitive nature, i.e.  one which can compromise the security of <code>chef-encrypted-attributes</code> users, you can report it securely by sending a GPG encrypted message. Please use the following key:</p>
 
-<pre><code>https://raw.github.com/onddo/chef-encrypted-attributes/0.8.0/zuazo.gpg
+<pre><code>https://raw.github.com/zuazo/chef-encrypted-attributes/0.9.0/zuazo.gpg
 </code></pre>
 
 <p>The key fingerprint is (or should be):</p>
 
-<pre><code>8EFA 5B17 7275 5F1F 42B2  26B4 8E18 8B67 9DE1 9468
+<pre><code>ADAE EEFC BD78 6CBB B76B  1662 2195 FF19 5324 14AB
 </code></pre>
 
 <h2>
-<a id="testing" class="anchor" href="#testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing</h2>
+<a id="testing" class="anchor" href="#testing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Testing</h2>
 
-<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/master/TESTING.md">TESTING.md</a>.</p>
-
-<h2>
-<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
-
-<p>Please do not hesitate to <a href="https://github.com/onddo/chef-encrypted-attributes/issues/new">open an issue</a> with any questions or problems.</p>
-
-<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<p>See <a href="https://github.com/zuazo/chef-encrypted-attributes/blob/master/TESTING.md">TESTING.md</a>.</p>
 
 <h2>
-<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>TODO</h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h2>
 
-<p>See <a href="https://github.com/onddo/chef-encrypted-attributes/blob/master/TODO.md">TODO.md</a>.</p>
+<p>Please do not hesitate to <a href="https://github.com/zuazo/chef-encrypted-attributes/issues/new">open an issue</a> with any questions or problems.</p>
+
+<p>See <a href="https://github.com/zuazo/chef-encrypted-attributes/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
 
 <h2>
-<a id="license-and-author" class="anchor" href="#license-and-author" aria-hidden="true"><span class="octicon octicon-link"></span></a>License and Author</h2>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TODO</h2>
+
+<p>See <a href="https://github.com/zuazo/chef-encrypted-attributes/blob/master/TODO.md">TODO.md</a>.</p>
+
+<h2>
+<a id="license-and-author" class="anchor" href="#license-and-author" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License and Author</h2>
 
 <table>
 <thead>
@@ -307,7 +311,7 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <tr>
 <td align="left"><strong>Author:</strong></td>
 <td align="left">
-<a href="https://github.com/zuazo">Xabier de Zuazo</a> (<a href="mailto:xabier@onddo.com">xabier@onddo.com</a>)</td>
+<a href="https://github.com/zuazo">Xabier de Zuazo</a> (<a href="mailto:xabier@zuazo.org">xabier@zuazo.org</a>)</td>
 </tr>
 <tr>
 <td align="left"><strong>Contributor:</strong></td>
@@ -322,8 +326,16 @@ $ gem install chef-encrypted-attributes -P MediumSecurity
 <td align="left"><a href="https://github.com/ldanz">Lisa Danz</a></td>
 </tr>
 <tr>
+<td align="left"><strong>Contributor:</strong></td>
+<td align="left"><a href="https://github.com/e100">Eric Blevins</a></td>
+</tr>
+<tr>
 <td align="left"><strong>Copyright:</strong></td>
-<td align="left">Copyright (c) 2014-2015 Onddo Labs, SL. (<a href="http://www.onddo.com">www.onddo.com</a>)</td>
+<td align="left">Copyright (c) 2016 Xabier de Zuazo</td>
+</tr>
+<tr>
+<td align="left"><strong>Copyright:</strong></td>
+<td align="left">Copyright (c) 2014-2015 Onddo Labs, SL.</td>
 </tr>
 <tr>
 <td align="left"><strong>License:</strong></td>
@@ -346,7 +358,7 @@ limitations under the License.
 </code></pre>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/onddo/chef-encrypted-attributes">Chef-encrypted-attributes</a> is maintained by <a href="https://github.com/onddo">onddo</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/zuazo/chef-encrypted-attributes">Chef-encrypted-attributes</a> is maintained by <a href="https://github.com/zuazo">zuazo</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
@@ -359,11 +371,10 @@ limitations under the License.
           </script>
           <script type="text/javascript">
             try {
-              var pageTracker = _gat._getTracker("UA-38093658-2");
+              var pageTracker = _gat._getTracker("UA-6988302-3");
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
 
   </body>
 </html>
-
